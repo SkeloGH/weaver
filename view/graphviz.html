@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <style>
+    html, text {
+      font-family: 'Lato', sans-serif;
+    }
+    body { height: 100vh; padding: 0; margin: 0; }
+    .helmet { position: fixed; line-height: 2em; padding: 0.8em; background: #eee; z-index: 1; width: 100vw;}
+    #graph, svg {min-height: 90vh;}
+  </style>
+  <script defer src="https://d3js.org/d3.v4.min.js"></script>
+  <script defer src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
+  <script defer src="https://unpkg.com/d3-graphviz@1.4.0/build/d3-graphviz.min.js"></script>
+</head>
+<body>
+<div class="helmet">
+  <label for="query_box">
+    Get graph for:
+    <input name="query_box" id="query_box" type="text">
+  </label>
+  <label for="related_cb">
+    Extended
+    <input id="show_related" type="checkbox">
+  </label>
+</div>
+<div id="graph" style="text-align: center;">Loading...</div>
+<script>
+  const GRAPH_SRC = './graphviz/clean.out.json';
+  let _graphData_, $graphCanvas, $queryBox, $relatedCheckbox, _show_related_;
+
+  const init = () => {
+    $graphCanvas = d3.select("#graph");
+    $queryBox = d3.select('#query_box')
+    $relatedCheckbox = d3.select('#show_related')
+    _show_related_ = $relatedCheckbox.property('checked');
+    loadGraphData(GRAPH_SRC);
+    bindings()
+  };
+  const loadGraphData = (graphSrc) => {
+    const loader = d3.json(graphSrc, (graphData)=> {
+      const graphNodesText = graphData.join('');
+      _graphData_ = graphData
+      render(graphNodesText);
+    });
+  };
+  const render = (graphNodesText, cb) => {
+    if (!graphNodesText.length) { return $graphCanvas.text('No results found :('); }
+    $graphCanvas.text('');
+    $graphCanvas.graphviz()
+      .transition(function () {
+          return d3.transition("main")
+              .ease(d3.easeLinear)
+              // .delay(500)
+              .duration(500);
+      })
+      .fade(true)
+      .renderDot(['digraph G{', graphNodesText, '}'].join(''))
+      .on("end", cb);
+  };
+  const bindings = () => {
+    $queryBox.on('input', debounce(onInputChange));
+    $relatedCheckbox.on('change', debounce(() => {
+      _show_related_ = $relatedCheckbox.property('checked');
+      onInputChange();
+    }));
+  }
+  const debounce = (fn) => () => {
+    let timeoutId = fn.name+'_timeout';
+    clearTimeout(window[timeoutId]);
+    window[timeoutId] = null;
+    window[timeoutId] = setTimeout(fn, 250);
+  }
+  const onInputChange = (ev) => {
+    const query = $queryBox.property('value');
+    const result = relatedNodes(query)
+    let graphNodesText = result.join('');
+    if (!query.length) {
+      graphNodesText = _graphData_.join('');
+    }
+    render(graphNodesText, () => {
+      let $highlightedNode;
+      $highlightedNode = d3.selectAll('g[class="node"]');
+      $highlightedNode = $highlightedNode.filter((svgNode) => {
+        return svgNode.key.toLowerCase() === query.toLowerCase()
+      }).select('ellipse').attr('fill', '#c1f2f1');
+      console.log($highlightedNode)
+    });
+  }
+  const relatedNodes = (query) => {
+    let related = d3.set();
+    related.add(query.toLowerCase());
+
+    const result = _graphData_.filter((node) => {
+      let hasMatch = false;
+      let nodeElems = node.replace(';','').toLowerCase().split('->');
+
+      nodeElems.forEach((elem) => {
+        if (related.has(elem)) {
+          hasMatch = true;
+        }
+      });
+      if (hasMatch && _show_related_) {
+        nodeElems.forEach((elem)=>{related.add(elem)});
+      }
+      return hasMatch;
+    });
+    return result;
+  }
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
