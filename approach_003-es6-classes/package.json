@@ -1,0 +1,14 @@
+{
+  "name": "approach_003-es6-classes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "002_imports2Dot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esprima": "^4.0.1"
+  }
+}
