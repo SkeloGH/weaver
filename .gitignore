@@ -1,5 +1,5 @@
 .DS_Store
 schemas/*.coffee
-schemas/node_modules
+node_modules
 *.out
 *.out.*

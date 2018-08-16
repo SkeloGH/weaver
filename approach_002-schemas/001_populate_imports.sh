@@ -1,16 +1,5 @@
 # since all schemas have a module.export, scan them and put them into a file
 # will be using coffee as they're written in it
-SYNOPSIS="""
-  WIP
-"""
-
-function synopsis {
-  echo "$SYNOPSIS"
-}
-
-if [ $# -eq 0 ]
-  then synopsis
-fi
 
 SRC_DIR='../approach_002'
 IMPORTS_SRC="$SRC_DIR/imports.out.coffee";
@@ -33,18 +22,4 @@ function populate {
   cd $SRC_DIR
 }
 
-while [[ $# -gt 0 ]]
-do
-  key="$1"
-
-  case $key in
-      "-populate")
-        populate
-      shift
-      ;;
-      *)
-        # unknown option
-      ;;
-  esac
-shift
-done
+populate
