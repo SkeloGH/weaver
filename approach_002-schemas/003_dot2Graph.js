@@ -38,10 +38,10 @@ class Visualizer {
 /*
 e.g.: [ "Analytics->scope->tagId" ]
 */
-const DATA_SRC = '../view/graphviz/raw.out.json'
+const DATA_SRC = './raw.out.json'
 let graph = new Visualizer({filePath: DATA_SRC})
 
-fs.writeFileSync('../view/graphviz/clean.out.json', JSON.stringify(graph.graphNodes), 'utf-8')
-fs.writeFileSync('../view/graphviz/data.out.gv', graph.render(), 'utf-8')
-console.log('written ../view/graphviz/clean.out.json');
-console.log('written ../view/graphviz/data.out.gv');
+fs.writeFileSync('./clean.out.json', JSON.stringify(graph.graphNodes), 'utf-8')
+fs.writeFileSync('./data.out.gv', graph.render(), 'utf-8')
+console.log('written ./clean.out.json');
+console.log('written ./data.out.gv');

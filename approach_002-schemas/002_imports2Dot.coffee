@@ -24,5 +24,5 @@ tree2Graph = (_result=[], _validationFn, tree, carry) ->
   return _result
 
 graph = tree2Graph [], validate, SCHEMAS
-fs.writeFileSync('../view/graphviz/raw.out.json', JSON.stringify(graph, null, 2), 'utf-8')
-console.log 'saved to ../view/graphviz/raw.out.json'
+fs.writeFileSync('./raw.out.json', JSON.stringify(graph, null, 2), 'utf-8')
+console.log 'saved to ./raw.out.json'
