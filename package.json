@@ -1,0 +1,26 @@
+{
+  "name": "weaver",
+  "version": "1.0.0",
+  "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
+  "main": "-",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SkeloGH/weaver.git"
+  },
+  "keywords": [
+    "mongodb",
+    "visualize",
+    "import",
+    "relational",
+    "graphviz"
+  ],
+  "author": "Aaron G.H.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SkeloGH/weaver/issues"
+  },
+  "homepage": "https://github.com/SkeloGH/weaver#readme"
+}
