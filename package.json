@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/SkeloGH/weaver/issues"
   },
-  "homepage": "https://github.com/SkeloGH/weaver#readme"
+  "homepage": "https://github.com/SkeloGH/weaver#readme",
+  "dependencies": {
+    "async": "^2.6.1"
+  }
 }
