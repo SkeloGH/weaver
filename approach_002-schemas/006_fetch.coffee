@@ -3,7 +3,53 @@ async = require 'async'
 QUERIES = require './queries.out'
 REQUIRED_ARGS = ['collection','id']
 
-
+# mock logic start
+ObjectId = (e) -> e
+db = {
+  analytics: {
+    find: (e) ->
+      return {
+        exec: (cb) ->
+          return cb( null, [ { _id: '4321', scope: { campaignId: '1234' } } ] )
+      }
+  },
+  campaign: {
+    find: (e) ->
+      return {
+        exec: (cb) ->
+          return cb( null, [ { _id: '5678', groupId: '9123' } ] )
+      }
+  },
+  group: {
+    find: (e) ->
+      return {
+        exec: (cb) ->
+          return cb( null, [
+              {
+                _id: '9123',
+                shipping: {
+                  prices: [ { productId:'9876' } ]
+                }
+              }
+            ]
+          )
+      }
+  }
+  product: {
+    find: (e) ->
+      return {
+        exec: (cb) ->
+          return cb( null, [
+              {
+                _id: '9876',
+                groupId: '9123'
+              }
+            ]
+          )
+      }
+  }
+}
+# mock logic end
 
 class Weaver
   constructor: (cb) ->

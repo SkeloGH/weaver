@@ -47,3 +47,15 @@ This tool instead will help you visualize the relationships, and even download t
 # Usage
 
 [WIP]
+
+# Roadmap
+
+- Ability to map the schemas.
+- Ability to render a dendogram visualizer.
+- Ability to render a graph vizualizer.
+- [Current] Ability to find between collections.
+- Ability to install the retrieved collection data locally.
+- Parameterize scripts.
+- Cleanup, refactor and proper project structure and documentation.
+- Testing.
+- Make it an npm package.
