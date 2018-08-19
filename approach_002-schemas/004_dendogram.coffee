@@ -31,5 +31,5 @@ pushNode = (stash, key, value)->
 
 treeScan SCHEMAS, graph.children, pushNode
 
-fs.writeFile('../view/dendogram/data.out.json', JSON.stringify(graph, null, 2), 'utf-8')
+fs.writeFileSync('../view/dendogram/data.out.json', JSON.stringify(graph, null, 2), 'utf-8')
 console.log 'saved to ../view/dendogram/data.out.json'
