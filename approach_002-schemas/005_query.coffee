@@ -1,32 +1,34 @@
 fs = require 'fs'
+async = require 'async'
 SCHEMAS = require './imports.out'
-config =
-  'collection': null
-  'id': null
-
-process.argv.forEach (arg) ->
-  paramValuePair = arg.split '='
-  name = paramValuePair[0]
-  value = paramValuePair[1]
-
-  if Object.keys(config).includes(name)
-    config[name] = value
-# I left off here ^
 
 main = (cb) ->
-  _graphNodes = fs.readFileSync('./raw.out.json')
-  _graphNodes = JSON.parse(_graphNodes)
-  rawQueries = _graphNodes.map( (e) -> e.replace(/->/g, '.'))
-  queries = {}
+  graphNodes = null
+  graphNodes = null
+  rawQueries = null
+  collectionQueries = {}
 
-  rawQueries.forEach (rawQuery) ->
-    modelName = rawQuery.split('.')[0]
-    query = rawQuery.replace(modelName+'.', '')
-    thisQuery = queries[modelName] ||= []
-    thisQuery.push(query)
-  # console.log queries
+  async.series [
+    (sCb) ->
+      graphNodes = fs.readFileSync('./raw.out.json')
+      graphNodes = JSON.parse(graphNodes)
+      rawQueries = graphNodes.map( (e) -> e.replace(/->/g, '.'))
+      sCb()
+    (sCb) ->
+      async.each rawQueries, (rawQuery, eCb) ->
+        modelName = rawQuery.split('.')[0]
+        query = rawQuery.replace modelName + '.', ''
+        thisQuery = collectionQueries[modelName] ||= []
+        thisQuery.push query
+        eCb()
+      , sCb
+    (sCb) ->
+      content = JSON.stringify collectionQueries, null, 2
+      fs.writeFileSync './queries.out.json', content, 'utf-8'
+      sCb()
+  ], cb
 
 main (err) ->
   throw err if err
-  console.log 'Done'
-process.exit()
+  console.log 'Written file at ./queries.out.json'
+  process.exit()
