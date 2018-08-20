@@ -1,22 +1,19 @@
-fs = require 'fs'
 async = require 'async'
 mongo = require 'mongodb'
-MongoClient = mongo.MongoClient
 ObjectId = mongo.ObjectID
 
 QUERIES = require './queries.out'
-DB_HOST = 'mongodb://localhost:27017'
-DB_NAME = 'sl-dev'
 REQUIRED_ARGS = ['collection','id']
-db = null
+
+db = db ||= null
 
 class Weaver
-  constructor: (cb) ->
-    config = @parseArgs()
+  constructor: (cfg, cb) ->
+    config = cfg ||= @parseArgs()
     @output = {}
     return cb null unless @validConfig(config)
+    db = db ||= config.db
     @lookup(config.collection, config.id, cb)
-    return @
 
   parseArgs: () =>
     config = {}
@@ -35,7 +32,7 @@ class Weaver
   queriesOf: (collection) =>
     collections = Object.keys QUERIES
     collectionName = collections.find (_collection) =>
-      _collection.toLowerCase() == collection.toLowerCase()
+      @mutateCollectionName(_collection.toLowerCase()) == @mutateCollectionName(collection.toLowerCase())
     collectionQueries = QUERIES[collectionName]
     return { collectionName, collectionQueries }
 
@@ -55,51 +52,38 @@ class Weaver
       , eCb
     , cb
 
-
-  itemSaved: (collection, result) =>
-    return @output[collection]?[result?._id]?
-
   lookup: (collection, _id, cb) =>
-    collectionName = collectionQueries = null
     async.waterfall [
       (sCb) =>
-        { collectionName, collectionQueries } = @queriesOf collection
-        sCb()
-      (sCb) =>
         query = { '_id' : ObjectId(_id) }
-        collection = @toPlural(collection)
-        db.collection(collection).find(query).toArray (err, res) =>
-          return sCb err if err
-          results = res
-          sCb null, results
+        collection = @mutateCollectionName(collection)
+        db.collection(collection).find(query).toArray sCb
       (results, sCb) =>
-        counter = 0
+        { collectionQueries } = @queriesOf collection
         async.each results, (result, eCb) =>
-          if !@itemSaved collection, result
-            @saveResult collection, result
+          shouldCache = !@isCached collection, result
+          return eCb() unless shouldCache
+          if shouldCache
+            @cacheResult collection, result
             @findReferences result, collectionQueries, collection, eCb
-          else
-            eCb()
         , sCb
     ], (err) =>
       cb err if err
       cb null, @output
 
-  toPlural: (word) ->
-    if (word.lastIndexOf('s')+1 < word.length)
-      return word+'s'
-    return word
+  mutateCollectionName: (collectionName) ->
+    # TODO: this should be a configurable transformation fxn
+    #  to add flexibility and supporting to differenct collection name patterns
+    if (collectionName.lastIndexOf('s') + 1 < collectionName.length)
+      return collectionName+'s'
+    return collectionName
 
-  saveResult: (collection, result) =>
+  cacheResult: (collection, result) =>
     if !@output[collection]
       @output[collection] = {}
     @output[collection][result._id] = result
 
-MongoClient.connect DB_HOST, (err, database) ->
-  db = database.db(DB_NAME)
-  new Weaver (err, result) ->
-    throw err if err
-    console.log result
-    console.log 'Done'
-    database.close()
-    process.exit()
+  isCached: (collection, result) =>
+    return @output[collection]?[result?._id]?
+
+module.exports = Weaver
