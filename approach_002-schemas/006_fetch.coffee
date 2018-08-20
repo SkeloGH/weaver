@@ -1,55 +1,14 @@
 fs = require 'fs'
 async = require 'async'
-QUERIES = require './queries.out'
-REQUIRED_ARGS = ['collection','id']
+mongo = require 'mongodb'
+MongoClient = mongo.MongoClient
+ObjectId = mongo.ObjectID
 
-# mock logic start
-ObjectId = (e) -> e
-db = {
-  analytics: {
-    find: (e) ->
-      return {
-        exec: (cb) ->
-          return cb( null, [ { _id: '4321', scope: { campaignId: '1234' } } ] )
-      }
-  },
-  campaign: {
-    find: (e) ->
-      return {
-        exec: (cb) ->
-          return cb( null, [ { _id: '5678', groupId: '9123' } ] )
-      }
-  },
-  group: {
-    find: (e) ->
-      return {
-        exec: (cb) ->
-          return cb( null, [
-              {
-                _id: '9123',
-                shipping: {
-                  prices: [ { productId:'9876' } ]
-                }
-              }
-            ]
-          )
-      }
-  }
-  product: {
-    find: (e) ->
-      return {
-        exec: (cb) ->
-          return cb( null, [
-              {
-                _id: '9876',
-                groupId: '9123'
-              }
-            ]
-          )
-      }
-  }
-}
-# mock logic end
+QUERIES = require './queries.out'
+DB_HOST = 'mongodb://localhost:27017'
+DB_NAME = 'sl-dev'
+REQUIRED_ARGS = ['collection','id']
+db = null
 
 class Weaver
   constructor: (cb) ->
@@ -80,50 +39,67 @@ class Weaver
     collectionQueries = QUERIES[collectionName]
     return { collectionName, collectionQueries }
 
-  findReferences: (document, queries) =>
-    queries.forEach (query) =>
+  findReferences: (document, queries, collection, cb) =>
+    async.each queries, (query, eCb) =>
       fields = query.split('.')
       prevDoc = Object.assign {}, document
-      referenceId = null
-
-      fields.forEach (field, idx) =>
-        if typeof prevDoc[field] == 'object'
-          prevDoc = Object.assign {}, prevDoc[field]
+      fIdx = -1
+      async.each fields, (field, eeCb) =>
+        fIdx++
+        if ObjectId.isValid prevDoc[field]
+          @lookup(field.replace(/id/i,''), prevDoc[field], eeCb)
+        else if typeof prevDoc[field] == 'object'
+          @findReferences(prevDoc[field], fields.slice(fIdx), collection, eeCb)
         else
-          referenceId = prevDoc[field]
-          if referenceId
-            @lookup field.replace(/id/i,''), referenceId, (err) =>
-              throw err if err
+          eeCb()
+      , eCb
+    , cb
+
+
   itemSaved: (collection, result) =>
     return @output[collection]?[result?._id]?
 
   lookup: (collection, _id, cb) =>
     collectionName = collectionQueries = null
-    async.series [
+    async.waterfall [
       (sCb) =>
         { collectionName, collectionQueries } = @queriesOf collection
         sCb()
       (sCb) =>
-        query = ObjectId(_id)
-        db[collection]?.find(query).exec (err, results) =>
-          results.forEach (result) =>
-            if !@itemSaved collection, result
-              @saveResult collection, result
-              @findReferences result, collectionQueries
-          sCb()
+        query = { '_id' : ObjectId(_id) }
+        collection = @toPlural(collection)
+        db.collection(collection).find(query).toArray (err, res) =>
+          return sCb err if err
+          results = res
+          sCb null, results
+      (results, sCb) =>
+        counter = 0
+        async.each results, (result, eCb) =>
+          if !@itemSaved collection, result
+            @saveResult collection, result
+            @findReferences result, collectionQueries, collection, eCb
+          else
+            eCb()
+        , sCb
     ], (err) =>
-      cb err, @output
+      cb err if err
+      cb null, @output
+
+  toPlural: (word) ->
+    if (word.lastIndexOf('s')+1 < word.length)
+      return word+'s'
+    return word
 
   saveResult: (collection, result) =>
     if !@output[collection]
       @output[collection] = {}
     @output[collection][result._id] = result
 
-
-
-
-new Weaver (err, result) ->
-  throw err if err
-  console.log result
-  console.log 'Done'
-  process.exit()
+MongoClient.connect DB_HOST, (err, database) ->
+  db = database.db(DB_NAME)
+  new Weaver (err, result) ->
+    throw err if err
+    console.log result
+    console.log 'Done'
+    database.close()
+    process.exit()
