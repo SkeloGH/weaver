@@ -53,9 +53,16 @@ This tool instead will help you visualize the relationships, and even download t
 - Ability to map the schemas.
 - Ability to render a dendogram visualizer.
 - Ability to render a graph vizualizer.
-- [Current] Ability to find between collections.
-- Ability to install the retrieved collection data locally.
+- Ability to find between collections.
+- [Current WIP] Ability to install the retrieved collection data locally.
+- Output truth validation.
+- Full test coverage.
+- Modularization.
 - Parameterize scripts.
 - Cleanup, refactor and proper project structure and documentation.
-- Testing.
 - Make it an npm package.
+
+# Requirements
+
+- A directory where your schemas are saved
+- As of now, works with [mongoose](https://mongoosejs.com/docs/guide.html) schemas
