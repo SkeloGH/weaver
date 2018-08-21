@@ -13,7 +13,6 @@ class Weaver
     @output = {}
     return cb null unless @validConfig(config)
     db = db ||= config.db
-    @lookup(config.collection, config.id, cb)
 
   parseArgs: () =>
     config = {}
@@ -44,7 +43,7 @@ class Weaver
       async.each fields, (field, eeCb) =>
         fIdx++
         if ObjectId.isValid prevDoc[field]
-          @lookup(field.replace(/id/i,''), prevDoc[field], eeCb)
+          @interlace(field.replace(/id/i,''), prevDoc[field], eeCb)
         else if typeof prevDoc[field] == 'object'
           @findReferences(prevDoc[field], fields.slice(fIdx), collection, eeCb)
         else
@@ -52,7 +51,7 @@ class Weaver
       , eCb
     , cb
 
-  lookup: (collection, _id, cb) =>
+  interlace: (collection, _id, cb) =>
     async.waterfall [
       (sCb) =>
         query = { '_id' : ObjectId(_id) }

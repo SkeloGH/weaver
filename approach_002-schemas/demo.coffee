@@ -1,21 +1,30 @@
-CFG = require './config.out'
 async = require 'async'
+fs = require 'fs'
 mongo = require 'mongodb'
+CFG = require './config.out'
 Weaver = require './006_fetch'
 MongoClient = mongo.MongoClient
 
 
 # Demo
-MongoClient.connect CFG.dbHost, (err, database) ->
-  db = database.db(CFG.dbName)
-  config = {
-    'db': db
-    'collection': CFG.collectionName
-    'id': CFG.documentId
-  }
-  new Weaver config, (err, result) ->
-    throw err if err
-    console.log result
-    console.log 'Done'
-    database.close()
-    process.exit()
+db = null;
+config = {};
+database = null;
+
+async.waterfall [
+  (wCb) ->
+    MongoClient.connect CFG.dbHost, wCb
+  (_database, wCb) ->
+    database = _database
+    db = database.db(CFG.dbName)
+    config.db = db
+    config.collection = CFG.collectionName
+    config.id = CFG.documentId
+    weaver = new Weaver(config)
+    weaver.interlace config.collection, config.id, wCb
+], (err, result) ->
+  throw err if err
+  fileName = './results/' + CFG.collectionName + '_' + CFG.documentId + '.out.json'
+  fs.writeFileSync fileName, JSON.stringify(result, null, 2), 'utf-8'
+  console.info fileName
+  database.close() && process.exit();
