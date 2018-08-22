@@ -11,6 +11,7 @@ class Weaver
   constructor: (cfg, cb) ->
     config = cfg ||= @parseArgs()
     @output = {}
+    @collectionMappings = config.collectionMappings
     return cb null unless @validConfig(config)
     db = db ||= config.db
 
@@ -71,11 +72,10 @@ class Weaver
       cb null, @output
 
   mutateCollectionName: (collectionName) ->
-    # TODO: this should be a configurable transformation fxn
-    #  to add flexibility and supporting to differenct collection name patterns
-    if (collectionName.lastIndexOf('s') + 1 < collectionName.length)
-      return collectionName+'s'
-    return collectionName
+    name = collectionName
+    if @collectionMappings?[collectionName]?
+      name = @collectionMappings[collectionName]
+    return name
 
   cacheResult: (collection, result) =>
     if !@output[collection]

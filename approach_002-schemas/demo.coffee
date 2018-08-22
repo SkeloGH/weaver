@@ -20,6 +20,7 @@ async.waterfall [
     config.db = db
     config.collection = CFG.collectionName
     config.id = CFG.documentId
+    config.collectionMappings = CFG.collectionMappings
     weaver = new Weaver(config)
     weaver.interlace config.collection, config.id, wCb
 ], (err, result) ->
