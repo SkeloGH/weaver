@@ -4,6 +4,7 @@ ObjectId = mongo.ObjectID
 
 QUERIES = require './queries.out'
 REQUIRED_ARGS = ['collection','id']
+COLLECTIONS = Object.keys QUERIES
 
 db = db ||= null
 
@@ -29,10 +30,18 @@ class Weaver
       return REQUIRED_ARGS.includes cfg
     return configs.length >= REQUIRED_ARGS.length
 
+  collectionName: (collection) =>
+    collectionName = COLLECTIONS.find (_collection) =>
+      target = @mappedCollectionName(collection.toLowerCase())
+      source = @mappedCollectionName(_collection.toLowerCase())
+      return target == source
+    return collectionName
+
+  mappedCollectionName: (collectionName) ->
+    return @collectionMappings[collectionName] || collectionName
+
   queriesOf: (collection) =>
-    collections = Object.keys QUERIES
-    collectionName = collections.find (_collection) =>
-      @mutateCollectionName(_collection.toLowerCase()) == @mutateCollectionName(collection.toLowerCase())
+    collectionName = @collectionName(collection)
     collectionQueries = QUERIES[collectionName]
     return { collectionName, collectionQueries }
 
@@ -41,12 +50,23 @@ class Weaver
       fields = query.split('.')
       prevDoc = Object.assign {}, document
       fIdx = -1
+
       async.each fields, (field, eeCb) =>
         fIdx++
-        if ObjectId.isValid prevDoc[field]
-          @interlace(field.replace(/id/i,''), prevDoc[field], eeCb)
-        else if typeof prevDoc[field] == 'object'
-          @findReferences(prevDoc[field], fields.slice(fIdx), collection, eeCb)
+        _id = collectionSource = prevDoc[field]
+        fieldIsArray = field == '0'
+        nextFields = fields.slice(fIdx)
+
+        if ObjectId.isValid _id
+          collectionName = field.replace(/id/i,'')
+          @interlace(collectionName, _id, eeCb)
+        else if fieldIsArray && prevDoc[field]
+          async.each Object.keys(prevDoc), (index, kCb) => #supports both numeric keys or arrays
+            nestedDoc = prevDoc[index]
+            @findReferences(nestedDoc, Object.keys(nestedDoc), collection, kCb) # greedy lookup
+          , eeCb
+        else if typeof collectionSource == 'object'
+          @findReferences(collectionSource, nextFields.join('.'), collection, eeCb)
         else
           eeCb()
       , eCb
@@ -56,7 +76,7 @@ class Weaver
     async.waterfall [
       (sCb) =>
         query = { '_id' : ObjectId(_id) }
-        collection = @mutateCollectionName(collection)
+        collection = @mappedCollectionName(collection)
         db.collection(collection).find(query).toArray sCb
       (results, sCb) =>
         { collectionQueries } = @queriesOf collection
@@ -70,12 +90,6 @@ class Weaver
     ], (err) =>
       cb err if err
       cb null, @output
-
-  mutateCollectionName: (collectionName) ->
-    name = collectionName
-    if @collectionMappings?[collectionName]?
-      name = @collectionMappings[collectionName]
-    return name
 
   cacheResult: (collection, result) =>
     if !@output[collection]
