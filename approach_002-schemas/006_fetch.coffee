@@ -88,8 +88,7 @@ class Weaver
             @findReferences result, collectionQueries, collection, eCb
         , sCb
     ], (err) =>
-      cb err if err
-      cb null, @output
+      cb err, @output
 
   cacheResult: (collection, result) =>
     if !@output[collection]
