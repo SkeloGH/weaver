@@ -32,13 +32,13 @@ class Weaver
 
   collectionName: (collection) =>
     collectionName = COLLECTIONS.find (_collection) =>
-      target = @mappedCollectionName(collection.toLowerCase())
-      source = @mappedCollectionName(_collection.toLowerCase())
+      target = @mappedCollectionName('name', collection.toLowerCase())
+      source = @mappedCollectionName('name', _collection.toLowerCase())
       return target == source
     return collectionName
 
-  mappedCollectionName: (collectionName) ->
-    return @collectionMappings[collectionName] || collectionName
+  mappedCollectionName: (type, collectionName) ->
+    return @collectionMappings?[type]?[collectionName] || collectionName
 
   queriesOf: (collection) =>
     collectionName = @collectionName(collection)
@@ -58,7 +58,7 @@ class Weaver
         nextFields = fields.slice(fIdx)
 
         if ObjectId.isValid _id
-          collectionName = field.replace(/id/i,'')
+          collectionName = @mappedCollectionName('field', field.replace(/id/i,''))
           @interlace(collectionName, _id, eeCb)
         else if fieldIsArray && prevDoc[field]
           async.each Object.keys(prevDoc), (index, kCb) => #supports both numeric keys or arrays
@@ -66,7 +66,7 @@ class Weaver
             @findReferences(nestedDoc, Object.keys(nestedDoc), collection, kCb) # greedy lookup
           , eeCb
         else if typeof collectionSource == 'object'
-          @findReferences(collectionSource, nextFields.join('.'), collection, eeCb)
+          @findReferences(collectionSource, [nextFields.join('.')], collection, eeCb)
         else
           eeCb()
       , eCb
@@ -76,7 +76,7 @@ class Weaver
     async.waterfall [
       (sCb) =>
         query = { '_id' : ObjectId(_id) }
-        collection = @mappedCollectionName(collection)
+        collection = @mappedCollectionName('name', collection)
         db.collection(collection).find(query).toArray sCb
       (results, sCb) =>
         { collectionQueries } = @queriesOf collection
