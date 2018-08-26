@@ -40,18 +40,16 @@ async.waterfall [
     console.log '\n Found interlaced collections:\n\n'+collections.join('\n')
     wCb null, result
 
-  promptJSONSave = (result, wCb) ->
-    prompt '\nsave JSON? [y]es: ', (err, answer) ->
-      wCb(null, answer == 'y', result)
-
   saveJSON = (save, result, wCb) ->
-    return wCb null, result unless save
-    fileName = CFG.collectionName + '_' + CFG.documentId + '.out.json'
-    filePath = './results/' + fileName
-    fileContent = JSON.stringify(result, null, 2)
-    fs.writeFile filePath, fileContent, 'utf8', (err) ->
-      console.info '\nsaved to: '+filePath+'\n'
-      wCb err, result
+    prompt '\nsave JSON? [y]es: ', (err, answer) ->
+      return wCb null, result unless answer == 'y'
+
+      fileName = CFG.collectionName + '_' + CFG.documentId + '.out.json'
+      filePath = './results/' + fileName
+      fileContent = JSON.stringify(result, null, 2)
+      fs.writeFile filePath, fileContent, 'utf8', (err) ->
+        console.info '\nsaved to: '+filePath+'\n'
+        wCb err, result
 
   connectTarget = (result, wCb) ->
     MongoClient.connect CFG.dbHost.target, CFG.dbOptions.target, (err, database) ->
