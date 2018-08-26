@@ -57,8 +57,8 @@ class Weaver
         fieldIsArray = field == '0'
         nextFields = fields.slice(fIdx)
 
-        if ObjectId.isValid _id
-          collectionName = @mappedCollectionName('field', field.replace(/id/i,''))
+        if ObjectId.isValid(_id?.toString()) && field != '_id'
+          collectionName = @mappedCollectionName('field', field.replace(/id/i,'').toLowerCase())
           @interlace(collectionName, _id, eeCb)
         else if fieldIsArray && prevDoc[field]
           async.each Object.keys(prevDoc), (index, kCb) => #supports both numeric keys or arrays
@@ -77,8 +77,12 @@ class Weaver
       (sCb) =>
         query = { '_id' : ObjectId(_id) }
         collection = @mappedCollectionName('name', collection)
-        db.collection(collection).find(query).toArray sCb
-      (results, sCb) =>
+        cachedResult = @fromCache(collection, _id?.toString())
+        return sCb(null, collection, _id, [cachedResult]) if cachedResult
+
+        db.collection(collection).find(query).toArray (err, res) ->
+          sCb err, collection, _id, res
+      (coll, _id, results, sCb) =>
         { collectionQueries } = @queriesOf collection
         async.each results, (result, eCb) =>
           shouldCache = !@isCached collection, result
@@ -90,12 +94,15 @@ class Weaver
     ], (err) =>
       cb err, @output
 
+  fromCache: (collection, _id) =>
+    return @output[collection]?[_id]
+
   cacheResult: (collection, result) =>
     if !@output[collection]
       @output[collection] = {}
     @output[collection][result._id] = result
 
   isCached: (collection, result) =>
-    return @output[collection]?[result?._id]?
+    return !!@fromCache(collection, result?._id)
 
 module.exports = Weaver
