@@ -4,7 +4,7 @@ ObjectId = mongo.ObjectID
 
 QUERIES = require './queries.out'
 REQUIRED_ARGS = ['collection','id']
-COLLECTIONS = Object.keys QUERIES
+SCHEMA_NAMES = Object.keys QUERIES
 
 db = db ||= null
 
@@ -30,10 +30,10 @@ class Weaver
       return REQUIRED_ARGS.includes cfg
     return configs.length >= REQUIRED_ARGS.length
 
-  collectionName: (collection) =>
-    collectionName = COLLECTIONS.find (_collection) =>
-      target = @mappedCollectionName('name', collection.toLowerCase())
-      source = @mappedCollectionName('name', _collection.toLowerCase())
+  schemaName: (name) =>
+    collectionName = SCHEMA_NAMES.find (schema) =>
+      target = @mappedCollectionName('name', name.toLowerCase())
+      source = @mappedCollectionName('name', schema.toLowerCase())
       return target == source
     return collectionName
 
@@ -41,9 +41,9 @@ class Weaver
     return @collectionMappings?[type]?[collectionName] || collectionName
 
   queriesOf: (collection) =>
-    collectionName = @collectionName(collection)
-    collectionQueries = QUERIES[collectionName]
-    return { collectionName, collectionQueries }
+    schema = @schemaName(collection)
+    collectionQueries = QUERIES[schema]
+    return { schema, collectionQueries }
 
   findReferences: (document, queries, collection, cb) =>
     async.each queries, (query, eCb) =>
@@ -61,9 +61,11 @@ class Weaver
           collectionName = @mappedCollectionName('field', field.replace(/id/i,'').toLowerCase())
           @interlace(collectionName, _id, eeCb)
         else if fieldIsArray && prevDoc[field]
+          # TODO: support ids in array format (e.g.: artworkIds: ['...','...'])
           async.each Object.keys(prevDoc), (index, kCb) => #supports both numeric keys or arrays
             nestedDoc = prevDoc[index]
-            @findReferences(nestedDoc, Object.keys(nestedDoc), collection, kCb) # greedy lookup
+            _queries = Object.keys(nestedDoc).concat(nextFields.slice(fIdx).join('.'))
+            @findReferences(nestedDoc, _queries, collection, kCb) # greedy lookup
           , eeCb
         else if typeof collectionSource == 'object'
           @findReferences(collectionSource, [nextFields.join('.')], collection, eeCb)
@@ -72,17 +74,18 @@ class Weaver
       , eCb
     , cb
 
-  interlace: (collection, _id, cb) =>
+  interlace: (coll, _id, cb) =>
     async.waterfall [
       (sCb) =>
         query = { '_id' : ObjectId(_id) }
-        collection = @mappedCollectionName('name', collection)
+        collection = @mappedCollectionName('name', coll)
         cachedResult = @fromCache(collection, _id?.toString())
-        return sCb(null, collection, _id, [cachedResult]) if cachedResult
-
-        db.collection(collection).find(query).toArray (err, res) ->
-          sCb err, collection, _id, res
-      (coll, _id, results, sCb) =>
+        if cachedResult
+          sCb(null, collection, _id, [cachedResult])
+        else
+          db.collection(collection).find(query).toArray (err, res) ->
+            sCb err, collection, _id, res
+      (collection, _id, results, sCb) =>
         { collectionQueries } = @queriesOf collection
         async.each results, (result, eCb) =>
           shouldCache = !@isCached collection, result
