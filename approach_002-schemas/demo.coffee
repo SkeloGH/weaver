@@ -35,8 +35,10 @@ async.waterfall [
       wCb err, result
   (result, wCb) ->
     MongoClient.connect CFG.dbHost.target, CFG.dbOptions.target, (err, database) ->
+      idx = 0
       targetDb = database.db(CFG.dbName.target)
       collections = Object.keys result
+      console.log collections
       async.eachLimit collections, 1, (collection, eCb) ->
         docsById = result[collection]
         rl = readline.createInterface
@@ -46,17 +48,18 @@ async.waterfall [
         docs = Object.keys(docsById).map (docId) ->
           return docsById[docId]
 
-        message ='add ' + docs.length + ' docs to ' + collection + '? [y/n]: '
+        message = 'add ' + docs.length + ' docs to ' + CFG.dbName.target+'\'s '+collection + '? [y/n]: '
 
         rl.question message, (answer) ->
           rl.close()
-          if answer && answer == 'y'
-            targetDb.collection(collection).insertMany(docs, eCb)
-            return
-          eCb()
+          switch answer
+            when answer == 'y' then targetDb.collection(collection).insertMany(docs, eCb)
+            else eCb()
+        idx++
       , (err) ->
         database.close()
-], (err) ->
+        wCb(err, result[collections[idx]])
+], (err, meta) ->
   throw err if err
-  # database.close()
+  console.log meta if meta
   process.exit();
