@@ -40,13 +40,13 @@ async.waterfall [
     console.log '\n Found interlaced collections:\n\n'+collections.join('\n')
     wCb null, result
 
-  saveJSON = (save, result, wCb) ->
+  saveJSON = (result, wCb) ->
     prompt '\nsave JSON? [y]es: ', (err, answer) ->
       return wCb null, result unless answer == 'y'
-
       fileName = CFG.collectionName + '_' + CFG.documentId + '.out.json'
       filePath = './results/' + fileName
       fileContent = JSON.stringify(result, null, 2)
+
       fs.writeFile filePath, fileContent, 'utf8', (err) ->
         console.info '\nsaved to: '+filePath+'\n'
         wCb err, result
