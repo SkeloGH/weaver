@@ -8,6 +8,12 @@ SCHEMA_NAMES = Object.keys QUERIES
 
 db = db ||= null
 
+# dbugIter = 0
+# dbug = ->
+#   args = arguments
+#   if args[0] == 'retailcarts'
+#     console.log args
+
 class Weaver
   constructor: (cfg, cb) ->
     config = cfg ||= @parseArgs()
@@ -49,26 +55,36 @@ class Weaver
     async.each queries, (query, eCb) =>
       fields = query.split('.')
       prevDoc = Object.assign {}, document
-      fIdx = -1
+      fieldSliceOrigin = -1
 
       async.each fields, (field, eeCb) =>
-        fIdx++
+        fieldSliceOrigin++
         _id = collectionSource = prevDoc[field]
-        fieldIsArray = field == '0'
-        nextFields = fields.slice(fIdx)
+        fieldIsArray = field == '0' && collectionSource
+        fieldIsArray = fieldIsArray || ObjectId.isValid(_id?[0])
+        nextFields = fields.slice(fieldSliceOrigin)
 
-        if ObjectId.isValid(_id?.toString()) && field != '_id'
+        if !fieldIsArray && ObjectId.isValid(_id?.toString()) && field != '_id'
           collectionName = @mappedCollectionName('field', field.replace(/id/i,'').toLowerCase())
           @interlace(collectionName, _id, eeCb)
-        else if fieldIsArray && prevDoc[field]
-          # TODO: support ids in array format (e.g.: artworkIds: ['...','...'])
-          async.each Object.keys(prevDoc), (index, kCb) => #supports both numeric keys or arrays
-            nestedDoc = prevDoc[index]
-            _queries = Object.keys(nestedDoc).concat(nextFields.slice(fIdx).join('.'))
-            @findReferences(nestedDoc, _queries, collection, kCb) # greedy lookup
+        else if fieldIsArray
+          async.each Object.keys(prevDoc), (keyIndex, kCb) => #supports both numeric keys or arrays
+            nestedDoc = prevDoc[keyIndex]
+            nestedDocKeys = Object.keys(nestedDoc)
+            nextQueries = nextFields.slice(fieldSliceOrigin).join('.')
+            _queries = nestedDocKeys.concat(nextQueries)
+
+            if typeof nestedDoc == 'string'# && ObjectId.isValid(nestedDoc)
+              if ObjectId.isValid(nestedDoc)
+                collectionName = queries[queries.length - 1].replace(/id/i,'').toLowerCase()
+                collectionName = @mappedCollectionName('field', collectionName)
+                return @interlace(collectionName, nestedDoc, kCb)
+              return kCb()
+            @findReferences(nestedDoc, _queries, collection, kCb)
           , eeCb
         else if typeof collectionSource == 'object'
-          @findReferences(collectionSource, [nextFields.join('.')], collection, eeCb)
+          _queries = [nextFields.join('.')]
+          @findReferences(collectionSource, _queries, collection, eeCb)
         else
           eeCb()
       , eCb
@@ -80,19 +96,17 @@ class Weaver
         query = { '_id' : ObjectId(_id) }
         collection = @mappedCollectionName('name', coll)
         cachedResult = @fromCache(collection, _id?.toString())
-        if cachedResult
-          sCb(null, collection, _id, [cachedResult])
-        else
-          db.collection(collection).find(query).toArray (err, res) ->
-            sCb err, collection, _id, res
-      (collection, _id, results, sCb) =>
+        return sCb(null, collection, [cachedResult]) if cachedResult
+
+        db.collection(collection).find(query).toArray (err, res) ->
+          sCb err, collection, res
+      (collection, results, sCb) =>
         { collectionQueries } = @queriesOf collection
         async.each results, (result, eCb) =>
           shouldCache = !@isCached collection, result
           return eCb() unless shouldCache
-          if shouldCache
-            @cacheResult collection, result
-            @findReferences result, collectionQueries, collection, eCb
+          @memoize collection, result
+          @findReferences result, collectionQueries, collection, eCb
         , sCb
     ], (err) =>
       cb err, @output
@@ -100,7 +114,7 @@ class Weaver
   fromCache: (collection, _id) =>
     return @output[collection]?[_id]
 
-  cacheResult: (collection, result) =>
+  memoize: (collection, result) =>
     if !@output[collection]
       @output[collection] = {}
     @output[collection][result._id] = result

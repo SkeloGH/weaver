@@ -95,4 +95,5 @@ async.waterfall [
 ], (err, meta) ->
   throw err if err
   console.log meta if meta
+  console.info 'Done'
   process.exit();
