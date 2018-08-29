@@ -8,11 +8,6 @@ SCHEMA_NAMES = Object.keys QUERIES
 
 db = db ||= null
 
-# dbugIter = 0
-# dbug = ->
-#   args = arguments
-#   if args[0] == 'retailcarts'
-#     console.log args
 
 class Weaver
   constructor: (cfg, cb) ->
