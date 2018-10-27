@@ -4,8 +4,8 @@ readline = require('readline');
 async = require 'async'
 mongo = require 'mongodb'
 
-CFG = require './config.out'
-Weaver = require './006_fetch'
+CFG = require './LEGACY_config.out'
+Weaver = require './LEGACY_006_fetch'
 
 MongoClient = mongo.MongoClient
 

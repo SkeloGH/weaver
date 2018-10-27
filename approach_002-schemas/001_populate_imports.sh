@@ -6,7 +6,7 @@ IMPORTS_SRC="$SRC_DIR/imports.out.coffee";
 
 function populate {
   cd '../schemas';
-  echo -e 'SCHEMAS = {}' > $IMPORTS_SRC;
+  echo 'SCHEMAS = {}' > $IMPORTS_SRC;
 
   for schema in $(ls | grep -v 'node_modules'); do
     schemaName=$(echo "$schema" | sed 's/\.coffee//')
@@ -16,7 +16,7 @@ function populate {
     | sed 's/$/"/' \
     >> $IMPORTS_SRC;
   done
-  echo -e 'module.exports = SCHEMAS' >> $IMPORTS_SRC;
+  echo 'module.exports = SCHEMAS' >> $IMPORTS_SRC;
   echo "done, check $IMPORTS_SRC file"
   # get back
   cd $SRC_DIR
