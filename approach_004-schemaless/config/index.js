@@ -1,0 +1,12 @@
+const mongo = require('mongodb');
+
+const dataClients = require('./clients');
+
+const ObjectId = mongo.ObjectID;
+
+module.exports = {
+  queries: [
+    { _id: ObjectId("58dd856c1a70665027a41183") }
+  ],
+  dataClients: dataClients
+}
