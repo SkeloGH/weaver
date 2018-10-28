@@ -3,3 +3,4 @@ schemas/*.coffee
 node_modules
 *.out
 *.out.*
+npm-debug.log

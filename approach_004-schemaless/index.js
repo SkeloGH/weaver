@@ -1,15 +1,15 @@
 const fs       = require('fs');
 const readline = require('readline');
 const async    = require('async');
-
-const config   = require('./config');
+const logging  = require('debug')('Weaver');
 
 class Weaver {
   constructor(config) {
+    this.queries     = config.queries;
     this.dataClients = config.dataClients;
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
-    this.showResult = this.showResult.bind(this);
+    this.showResult  = this.showResult.bind(this);
   }
 
   prompt(message, cb) {
@@ -23,26 +23,28 @@ class Weaver {
     });
   }
 
-  fetch() {
+  fetch(query) {
+    logging('Source dbs are %O', this.dataSources.map(client => client.config.db.name));
     const clientConnections = this.dataSources.map(client => {
       return client.connect()
         .catch(client.onError)
-        // .then(client.fetch)
-        // .finally(() => {
-        //   client.out(fetchedData);
-        //   client.disconnect();
-        // });
+        .then(client.fetch(query))
+        .then(() => {
+          // client.out(fetchedData);
+          // client.disconnect();
+          logging('finished fetch');
+        });
     })
     return Promise.all(clientConnections);
   }
 
   showResult(result) {
-    console.log('\n Target dbs are '+this.dataTargets.map(client => client.config.db.name));
-    console.log(result)
+    logging('Target dbs are %O', this.dataTargets.map(client => client.config.db.name));
+    logging(result)
     return new Promise((resolve, reject) => {
       try {
         const collections = Object.keys(result);
-        console.log('\n Found interlaced collections:\n\n'+collections.join('\n'));
+        logging('Found interlaced collections:\n\n'+collections.join('\n'));
         resolve(result);
       } catch(e) {
         reject(e);
@@ -65,18 +67,20 @@ class Weaver {
   }
 
   run(cb) {
-    this.fetch()
-      .then(this.showResult)
-      .catch(console.error)
-      // .then(this.saveAsJSON)
-      // .then(this.dump)
-      // .finally(cb);
+    this.queries.forEach(query => {
+      this.fetch(query)
+        .then(this.showResult)
+        .catch(logging)
+        // .then(this.saveAsJSON)
+        // .then(this.dump)
+        // .finally(cb);
+    })
   }
 }
 
 // TODO: detect if running as module or expect query in script arguments
-new Weaver(config).run((err) => {
-  console.log('Done');
+new Weaver(require('./config')).run((err) => {
+  logging('Done');
   process.exit()
 });
 

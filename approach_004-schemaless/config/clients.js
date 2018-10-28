@@ -2,11 +2,20 @@ const WeaverMongoClient = require('../clients/mongodb');
 
 const secret = require('./secret.out');
 
-const sourceLocalDbClient = new WeaverMongoClient({
+const sourceLocalDbClient1 = new WeaverMongoClient({
   type: 'source',
   db: {
     url: secret.local.db.url, // string
-    name: secret.local.db.source.name, // string
+    name: secret.local.db.sources[0].name, // string
+    options: {}
+  }
+});
+
+const sourceLocalDbClient2 = new WeaverMongoClient({
+  type: 'source',
+  db: {
+    url: secret.local.db.url, // string
+    name: secret.local.db.sources[1].name, // string
     options: {}
   }
 });
@@ -47,7 +56,8 @@ const remoteDbClient = new WeaverMongoClient({
 });
 
 module.exports = [
-  sourceLocalDbClient,
+  sourceLocalDbClient1,
+  sourceLocalDbClient2,
   targetLocalDbClient,
   // remoteDbClient,
 ];
