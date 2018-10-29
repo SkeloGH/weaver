@@ -10,6 +10,8 @@ class Weaver {
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
     this.showResult  = this.showResult.bind(this);
+    this.runQuery    = this.runQuery.bind(this);
+    this.runQueries  = this.runQueries.bind(this);
   }
 
   prompt(message, cb) {
@@ -23,29 +25,16 @@ class Weaver {
     });
   }
 
-  fetch(query) {
-    logging('Source dbs are %O', this.dataSources.map(client => client.config.db.name));
-    const clientConnections = this.dataSources.map(client => {
-      return client.connect()
-        .catch(client.onError)
-        .then(client.fetch(query))
-        .then(() => {
-          // client.out(fetchedData);
-          // client.disconnect();
-          logging('finished fetch');
-        });
-    })
-    return Promise.all(clientConnections);
-  }
 
-  showResult(result) {
+
+  showResult(results) {
     logging('Target dbs are %O', this.dataTargets.map(client => client.config.db.name));
-    logging(result)
+    logging(results)
     return new Promise((resolve, reject) => {
       try {
-        const collections = Object.keys(result);
+        const collections = Object.keys(results);
         logging('Found interlaced collections:\n\n'+collections.join('\n'));
-        resolve(result);
+        resolve(results);
       } catch(e) {
         reject(e);
       }
@@ -66,15 +55,54 @@ class Weaver {
     });
   }
 
+  connectClients(){
+    return this.dataSources.map(client => {
+      return new Promise((resolve, reject) => {
+        client.connect()
+        .catch(client.onError)
+        .then(resolve);
+      });
+    });
+  }
+
+  runQuery(query) {
+    logging('Running query on: %O', this.dataSources.map(client => client.config.db.name));
+    return Promise.all(
+      this.dataSources.map(client => {
+        return new Promise((resolve, reject) => {
+          client.fetch(query)
+          .then((results) => {
+            // const results = client.data;
+            logging(`finished fetching ${client.config.db.name}`);
+            if (results.length) logging(`results ${results}`);
+            // client.disconnect();
+            resolve(results);
+          });
+        });
+      })
+    );
+  }
+
+  runQueries() {
+    return Promise.all(
+      this.queries.map(query => {
+        return this.runQuery(query).catch(logging)
+      })
+    )
+  }
+
   run(cb) {
-    this.queries.forEach(query => {
-      this.fetch(query)
-        .then(this.showResult)
-        .catch(logging)
-        // .then(this.saveAsJSON)
-        // .then(this.dump)
-        // .finally(cb);
-    })
+    const clientSessions = this.connectClients();
+    logging(clientSessions.length + ' DB client sessions');
+
+    Promise.all(clientSessions)
+    .catch(logging)
+    .then(this.runQueries)
+    .then(this.showResult)
+    // .then(this.saveAsJSON)
+    // .then(this.dump)
+    .then(cb);
+
   }
 }
 
