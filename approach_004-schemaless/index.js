@@ -5,17 +5,26 @@ const logging  = require('debug')('Weaver');
 
 class Weaver {
   constructor(config) {
+    return this._configure(config)._bindings();
+  }
+
+  _configure(config) {
     this.queries     = config.queries;
     this.dataClients = config.dataClients;
     this.jsonConfig  = config.jsonConfig;
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
+    return this;
+  }
+
+  _bindings() {
     this.showResults = this.showResults.bind(this);
     this.saveJSON    = this.saveJSON.bind(this);
     this.runQuery    = this.runQuery.bind(this);
     this.runQueries  = this.runQueries.bind(this);
     this.queryClient = this.queryClient.bind(this);
     this.dump        = this.dump.bind(this);
+    return this;
   }
 
   prompt(message, cb) {
@@ -37,6 +46,18 @@ class Weaver {
     }).catch(logging)
   }
 
+  saveJSON(results) {
+    return new Promise((resolve, reject) => {
+      if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
+      const fileContent = JSON.stringify(results, null, 2);
+
+      fs.writeFile(this.jsonConfig.filePath, fileContent, 'utf8', (err) => {
+        logging(`saved to: ${this.jsonConfig.filePath}`);
+        resolve(results);
+      });
+    }).catch(logging)
+  }
+
   showResults(results) {
     return new Promise((resolve, reject) => {
 
@@ -49,16 +70,10 @@ class Weaver {
     }).catch(logging)
   }
 
-  saveJSON(results) {
+  interlace(results) {
     return new Promise((resolve, reject) => {
-      if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
-      const fileContent = JSON.stringify(results, null, 2);
-
-      fs.writeFile(this.jsonConfig.filePath, fileContent, 'utf8', (err) => {
-        logging(`saved to: ${this.jsonConfig.filePath}`);
-        resolve(results);
-      });
-    }).catch(logging)
+      resolve(results);
+    });
   }
 
   connectClients(clients) {
@@ -79,15 +94,14 @@ class Weaver {
   }
 
   runQueries() {
-    return Promise.all(
-      this.queries.map(query => this.runQuery(query))
-    ).catch(logging)
+    return Promise.all(this.queries.map(this.runQuery)).catch(logging)
   }
 
   run(cb) {
 
     this.connectClients(this.dataSources)
     .then(this.runQueries)
+    .then(this.interlace)
     .then(this.showResults)
     .then(this.saveJSON)
     .then(this.dump)
