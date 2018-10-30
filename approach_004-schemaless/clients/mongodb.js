@@ -41,7 +41,7 @@ class WeaverMongoClient {
     this.config.db.options['useNewUrlParser'] = true;
 
     // Bind functions called in nested scopes
-    this.fetch             = this.fetch.bind(this);
+    this.query             = this.query.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
     this._fetchDocuments   = this._fetchDocuments.bind(this);
     this._cache            = this._cache.bind(this);
@@ -91,7 +91,7 @@ class WeaverMongoClient {
     });
   }
 
-  fetch(query) {
+  query(query) {
     return new Promise((resolve, reject) => {
       const dbScans = this.collNames.map(this._fetchDocuments.bind(this, query));
       Promise.all(dbScans)
@@ -145,7 +145,7 @@ class WeaverMongoClient {
 
     // idsInDocs.forEach(_id => {
     //   if (_id && _id.length) {
-    //     const promise = this.fetch({'_id': ObjectId(_id)});
+    //     const promise = this.query({'_id': ObjectId(_id)});
     //     queries.push(promise);
     //   }
     // });

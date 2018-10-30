@@ -12,6 +12,7 @@ class Weaver {
     this.showResult  = this.showResult.bind(this);
     this.runQuery    = this.runQuery.bind(this);
     this.runQueries  = this.runQueries.bind(this);
+    this.queryClient = this.queryClient.bind(this);
   }
 
   prompt(message, cb) {
@@ -55,48 +56,32 @@ class Weaver {
     });
   }
 
-  connectClients(){
-    return this.dataSources.map(client => {
-      return new Promise((resolve, reject) => {
-        client.connect()
-        .catch(client.onError)
-        .then(resolve);
-      });
-    });
+  connectClients(clients) {
+    return Promise.all(
+      clients.map(client => client.connect())
+    ).catch(logging)
+  }
+
+  queryClient(query, client) {
+    return client.query(query);
   }
 
   runQuery(query) {
     logging('Running query on: %O', this.dataSources.map(client => client.config.db.name));
     return Promise.all(
-      this.dataSources.map(client => {
-        return new Promise((resolve, reject) => {
-          client.fetch(query)
-          .then((results) => {
-            // const results = client.data;
-            logging(`finished fetching ${client.config.db.name}`);
-            if (results.length) logging(`results ${results}`);
-            // client.disconnect();
-            resolve(results);
-          });
-        });
-      })
-    );
+      this.dataSources.map(client => this.queryClient(query, client))
+    ).catch(logging)
   }
 
   runQueries() {
     return Promise.all(
-      this.queries.map(query => {
-        return this.runQuery(query).catch(logging)
-      })
-    )
+      this.queries.map(query => this.runQuery(query))
+    ).catch(logging)
   }
 
   run(cb) {
-    const clientSessions = this.connectClients();
-    logging(clientSessions.length + ' DB client sessions');
 
-    Promise.all(clientSessions)
-    .catch(logging)
+    this.connectClients(this.dataSources)
     .then(this.runQueries)
     .then(this.showResult)
     // .then(this.saveAsJSON)
