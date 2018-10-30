@@ -7,12 +7,15 @@ class Weaver {
   constructor(config) {
     this.queries     = config.queries;
     this.dataClients = config.dataClients;
+    this.jsonConfig  = config.jsonConfig;
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
-    this.showResult  = this.showResult.bind(this);
+    this.showResults = this.showResults.bind(this);
+    this.saveJSON    = this.saveJSON.bind(this);
     this.runQuery    = this.runQuery.bind(this);
     this.runQueries  = this.runQueries.bind(this);
     this.queryClient = this.queryClient.bind(this);
+    this.dump        = this.dump.bind(this);
   }
 
   prompt(message, cb) {
@@ -26,34 +29,36 @@ class Weaver {
     });
   }
 
-
-
-  showResult(results) {
-    logging('Target dbs are %O', this.dataTargets.map(client => client.config.db.name));
-    logging(results)
+  dump(results) {
     return new Promise((resolve, reject) => {
-      try {
-        const collections = Object.keys(results);
-        logging('Found interlaced collections:\n\n'+collections.join('\n'));
-        resolve(results);
-      } catch(e) {
-        reject(e);
-      }
-    })
+      const targetDbs = this.dataTargets.map(client => client.config.db.name);
+      logging(`Target dbs are ${targetDbs}`);
+      resolve();
+    }).catch(logging)
   }
 
-  saveAsJSON(result, cb) {
-    this.prompt('\nsave JSON? [y]es: ', (err, answer) => {
-      if (answer != 'y') return cb(null, result);
-      const fileName = CFG.collectionName + '_' + CFG.documentId + '.out.json';
-      const filePath = './results/' + fileName;
-      const fileContent = JSON.stringify(result, null, 2);
+  showResults(results) {
+    return new Promise((resolve, reject) => {
 
-      fs.writeFile(filePath, fileContent, 'utf8', (err) => {
-        console.info('\nsaved to: '+filePath+'\n');
-        return cb(err, result);
+      logging(`TODO ==== unpack results ====`);
+
+      logging(results.length);
+      const collections = Object.keys(results);
+      logging('Found interlaced collections:\n\n'+collections.join('\n'));
+      resolve(results);
+    }).catch(logging)
+  }
+
+  saveJSON(results) {
+    return new Promise((resolve, reject) => {
+      if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
+      const fileContent = JSON.stringify(results, null, 2);
+
+      fs.writeFile(this.jsonConfig.filePath, fileContent, 'utf8', (err) => {
+        logging(`saved to: ${this.jsonConfig.filePath}`);
+        resolve(results);
       });
-    });
+    }).catch(logging)
   }
 
   connectClients(clients) {
@@ -63,11 +68,11 @@ class Weaver {
   }
 
   queryClient(query, client) {
+    logging('Running query on: %O', client.config.db.name);
     return client.query(query);
   }
 
   runQuery(query) {
-    logging('Running query on: %O', this.dataSources.map(client => client.config.db.name));
     return Promise.all(
       this.dataSources.map(client => this.queryClient(query, client))
     ).catch(logging)
@@ -83,9 +88,9 @@ class Weaver {
 
     this.connectClients(this.dataSources)
     .then(this.runQueries)
-    .then(this.showResult)
-    // .then(this.saveAsJSON)
-    // .then(this.dump)
+    .then(this.showResults)
+    .then(this.saveJSON)
+    .then(this.dump)
     .then(cb);
 
   }
@@ -113,16 +118,7 @@ new Weaver(require('./config')).run((err) => {
 //     return cb(err, result);
 //   });
 // };
-
-// const connectTarget = (result, cb) => {
-//   const host = CFG.dbHost.target;
-//   const options = CFG.dbOptions.target;
-//   MongoClient.connect(host, options, (err, database) => {
-//     return cb(err, result, database);
-//   });
-// };
-
-
+//
 // const install = (result, database, targetDb, cb) => {
 //   const collections = Object.keys(result);
 //   let idx = 0;

@@ -8,5 +8,8 @@ module.exports = {
   queries: [
     { _id: ObjectId("58dd856c1a70665027a41183") }
   ],
-  dataClients: dataClients
+  dataClients: dataClients,
+  jsonConfig: {
+    filePath: `${process.env.PWD}/results/weaver.out.json`
+  }
 }
