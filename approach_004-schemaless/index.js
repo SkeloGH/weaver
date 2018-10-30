@@ -60,18 +60,17 @@ class Weaver {
 
   showResults(results) {
     return new Promise((resolve, reject) => {
-
-      logging(`TODO ==== unpack results ====`);
-
       logging(results.length);
       const collections = Object.keys(results);
-      logging('Found interlaced collections:\n\n'+collections.join('\n'));
+      logging(`Found interlaced collections: ${collections.join('/n')}`);
       resolve(results);
     }).catch(logging)
   }
 
   interlace(results) {
     return new Promise((resolve, reject) => {
+      logging(`TODO ==== unpack results ====`);
+      logging(JSON.stringify(results, null, 2));
       resolve(results);
     });
   }
@@ -83,7 +82,7 @@ class Weaver {
   }
 
   queryClient(query, client) {
-    logging('Running query on: %O', client.config.db.name);
+    logging(`Running query on: ${client.config.db.name}`);
     return client.query(query);
   }
 
