@@ -5,17 +5,28 @@ const logging  = require('debug')('Weaver');
 
 class Weaver {
   constructor(config) {
+    return this._configure(config)._bindings();
+  }
+
+  _configure(config) {
     this.queries     = config.queries;
     this.dataClients = config.dataClients;
     this.jsonConfig  = config.jsonConfig;
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
+    return this;
+  }
+
+  _bindings() {
     this.showResults = this.showResults.bind(this);
+    this.interlace   = this.interlace.bind(this);
+    this.uniques     = this.uniques.bind(this);
     this.saveJSON    = this.saveJSON.bind(this);
     this.runQuery    = this.runQuery.bind(this);
     this.runQueries  = this.runQueries.bind(this);
     this.queryClient = this.queryClient.bind(this);
     this.dump        = this.dump.bind(this);
+    return this;
   }
 
   prompt(message, cb) {
@@ -37,18 +48,6 @@ class Weaver {
     }).catch(logging)
   }
 
-  showResults(results) {
-    return new Promise((resolve, reject) => {
-
-      logging(`TODO ==== unpack results ====`);
-
-      logging(results.length);
-      const collections = Object.keys(results);
-      logging('Found interlaced collections:\n\n'+collections.join('\n'));
-      resolve(results);
-    }).catch(logging)
-  }
-
   saveJSON(results) {
     return new Promise((resolve, reject) => {
       if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
@@ -61,6 +60,34 @@ class Weaver {
     }).catch(logging)
   }
 
+  showResults(results) {
+    return new Promise((resolve, reject) => {
+      logging(results.length);
+      const collections = Object.keys(results);
+      logging(`Found interlaced collections: ${collections.join('/n')}`);
+      resolve(results);
+    }).catch(logging)
+  }
+
+  interlace(results) {
+    return new Promise((resolve, reject) => {
+      logging(`TODO ==== unpack results ====`);
+      let idsInDoc = [];
+      this.dataSources.forEach(client => {
+        idsInDoc = idsInDoc.concat(client.idsInDoc(results));
+      });
+      idsInDoc = this.uniques(idsInDoc);
+      logging(JSON.stringify(idsInDoc));
+      resolve(results);
+    }).catch(logging);
+  }
+
+  uniques(list) {
+    const dict = {};
+    list.forEach(item => {dict[item] = 0})
+    return Object.keys(dict);
+  }
+
   connectClients(clients) {
     return Promise.all(
       clients.map(client => client.connect())
@@ -68,7 +95,7 @@ class Weaver {
   }
 
   queryClient(query, client) {
-    logging('Running query on: %O', client.config.db.name);
+    logging(`Running query on: ${client.config.db.name}`);
     return client.query(query);
   }
 
@@ -79,15 +106,14 @@ class Weaver {
   }
 
   runQueries() {
-    return Promise.all(
-      this.queries.map(query => this.runQuery(query))
-    ).catch(logging)
+    return Promise.all(this.queries.map(this.runQuery)).catch(logging)
   }
 
   run(cb) {
 
     this.connectClients(this.dataSources)
     .then(this.runQueries)
+    .then(this.interlace)
     .then(this.showResults)
     .then(this.saveJSON)
     .then(this.dump)
