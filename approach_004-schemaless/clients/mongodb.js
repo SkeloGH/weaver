@@ -45,8 +45,8 @@ class WeaverMongoClient {
     this._fetchCollections = this._fetchCollections.bind(this);
     this._fetchDocuments   = this._fetchDocuments.bind(this);
     this._cache            = this._cache.bind(this);
-    this._idsInDoc         = this._idsInDoc.bind(this);
-    this._interlace         = this._interlace.bind(this);
+    this.idsInDoc          = this.idsInDoc.bind(this);
+    this.interlace         = this.interlace.bind(this);
   }
 
   connect() {
@@ -134,14 +134,10 @@ class WeaverMongoClient {
     this.__cache[key] = data;
   }
 
-  _interlace(documents, cb) {
-    // this.logging('interlacing')
+  interlace(documents, cb) {
+    this.logging('interlacing')
     // let queries = [];
-    // let idsInDocs = [];
-    // documents.forEach(document => {
-    //   const idsInDoc = this._idsInDoc(document);
-    //   idsInDocs = idsInDocs.concat(idsInDoc);
-    // });
+    const idsInDocs = this.idsInDoc(documents);
 
     // idsInDocs.forEach(_id => {
     //   if (_id && _id.length) {
@@ -152,26 +148,21 @@ class WeaverMongoClient {
     // return queries;
   }
 
-  _idsInDoc(document) {
-    // let ids = []
-    // Object.keys(document).forEach(key => {
-    //   const fieldValue = document[key];
-    //   const isArray = Array.isArray(fieldValue);
-    //   const isObject = !isArray && typeof fieldValue == 'object';
+  idsInDoc(document, carry) {
+    const isArray = Array.isArray(document);
+    const isObject = !isArray && typeof document == 'object';
+    const ids = carry || [];
 
-    //   if (!isArray && !isObject) {
-    //     const stringValue = fieldValue.toString();
-    //     const isValid = ObjectId.isValid(stringValue);
-    //     if (isValid) {
-    //       ids.push(stringValue)
-    //     }
-    //   } else if (isArray) {
-    //     ids = ids.concat(fieldValue.map(this._idsInDoc));
-    //   } else if (isObject) {
-    //     ids = ids.concat(this._idsInDoc(fieldValue));
-    //   }
-    // });
-    // return ids;
+    if (typeof document == 'string' || ObjectId.isValid(document.toString())) {
+      ObjectId.isValid(document) && ids.push(document);
+    } else if (isArray) {
+      document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
+    } else if (isObject) {
+      Object.keys(document).map(key => {
+        return ids.concat(this.idsInDoc(document[key], ids));
+      });
+    }
+    return ids;
   }
 
   get data() {

@@ -19,6 +19,8 @@ class Weaver {
 
   _bindings() {
     this.showResults = this.showResults.bind(this);
+    this.interlace   = this.interlace.bind(this);
+    this.uniques     = this.uniques.bind(this);
     this.saveJSON    = this.saveJSON.bind(this);
     this.runQuery    = this.runQuery.bind(this);
     this.runQueries  = this.runQueries.bind(this);
@@ -70,9 +72,20 @@ class Weaver {
   interlace(results) {
     return new Promise((resolve, reject) => {
       logging(`TODO ==== unpack results ====`);
-      logging(JSON.stringify(results, null, 2));
+      let idsInDoc = [];
+      this.dataSources.forEach(client => {
+        idsInDoc = idsInDoc.concat(client.idsInDoc(results));
+      });
+      idsInDoc = this.uniques(idsInDoc);
+      logging(JSON.stringify(idsInDoc));
       resolve(results);
-    });
+    }).catch(logging);
+  }
+
+  uniques(list) {
+    const dict = {};
+    list.forEach(item => {dict[item] = 0})
+    return Object.keys(dict);
   }
 
   connectClients(clients) {
