@@ -96,6 +96,34 @@ class Weaver {
     return Object.keys(dict);
   }
 
+  showResults(results) {
+    return new Promise((resolve, reject) => {
+      logging(results.length);
+      const collections = Object.keys(results);
+      logging(`Found interlaced collections: ${collections.join('/n')}`);
+      resolve(results);
+    }).catch(logging)
+  }
+
+  interlace(results) {
+    return new Promise((resolve, reject) => {
+      logging(`TODO ==== unpack results ====`);
+      let idsInDoc = [];
+      this.dataSources.forEach(client => {
+        idsInDoc = idsInDoc.concat(client.idsInDoc(results));
+      });
+      idsInDoc = this.uniques(idsInDoc);
+      logging(JSON.stringify(idsInDoc));
+      resolve(results);
+    }).catch(logging);
+  }
+
+  uniques(list) {
+    const dict = {};
+    list.forEach(item => {dict[item] = 0})
+    return Object.keys(dict);
+  }
+
   connectClients(clients) {
     return Promise.all(
       clients.map(client => client.connect())
