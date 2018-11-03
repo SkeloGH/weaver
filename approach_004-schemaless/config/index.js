@@ -6,7 +6,8 @@ const ObjectId = mongo.ObjectID;
 
 module.exports = {
   queries: [
-    { _id: ObjectId("58dd856c1a70665027a41183") /* example id, don't panic */ },
+    { _id: ObjectId("5bde262fa09d0c95cbc62b38") /* example id, don't panic */ },
+    { _id: ObjectId("5bde2691a09d0c95cbc62b4a") /* example id, don't panic */ },
   ],
   dataClients: dataClients,
   jsonConfig: {

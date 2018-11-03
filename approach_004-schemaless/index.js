@@ -1,7 +1,6 @@
 const fs       = require('fs');
-const readline = require('readline');
 const async    = require('async');
-const logging  = require('debug')('Weaver');
+const logging  = require('debug');
 
 class Weaver {
   constructor(config) {
@@ -9,6 +8,7 @@ class Weaver {
   }
 
   _configure(config) {
+    this.logging     = logging(`Weaver`);
     this.queries     = config.queries;
     this.dataClients = config.dataClients;
     this.jsonConfig  = config.jsonConfig;
@@ -18,34 +18,24 @@ class Weaver {
   }
 
   _bindings() {
-    this.showResults = this.showResults.bind(this);
-    this.interlace   = this.interlace.bind(this);
-    this.uniques     = this.uniques.bind(this);
-    this.saveJSON    = this.saveJSON.bind(this);
-    this.runQuery    = this.runQuery.bind(this);
-    this.runQueries  = this.runQueries.bind(this);
-    this.queryClient = this.queryClient.bind(this);
     this.dump        = this.dump.bind(this);
+    this.interlace   = this.interlace.bind(this);
+    this.logging     = this.logging.bind(this);
+    this.queryClient = this.queryClient.bind(this);
+    this.runQueries  = this.runQueries.bind(this);
+    this.runQuery    = this.runQuery.bind(this);
+    this.saveJSON    = this.saveJSON.bind(this);
+    this.showResults = this.showResults.bind(this);
+    this.uniques     = this.uniques.bind(this);
     return this;
-  }
-
-  prompt(message, cb) {
-    const rl = readline.createInterface({
-      input: process.stdin, output: process.stdout,
-    });
-
-    rl.question(message, answer => {
-      rl.close();
-      return cb(null, answer);
-    });
   }
 
   dump(results) {
     return new Promise((resolve, reject) => {
       const targetDbs = this.dataTargets.map(client => client.config.db.name);
-      logging(`Target dbs are ${targetDbs}`);
+      this.logging(`Target dbs are ${targetDbs}`);
       resolve();
-    }).catch(logging)
+    }).catch(this.logging)
   }
 
   saveJSON(results) {
@@ -54,75 +44,93 @@ class Weaver {
       const fileContent = JSON.stringify(results, null, 2);
 
       fs.writeFile(this.jsonConfig.filePath, fileContent, 'utf8', (err) => {
-        logging(`saved to: ${this.jsonConfig.filePath}`);
+        this.logging(`saved to: ${this.jsonConfig.filePath}`);
         resolve(results);
       });
-    }).catch(logging)
+    }).catch(this.logging)
   }
 
   showResults(results) {
     return new Promise((resolve, reject) => {
-      logging(results.length);
+      this.logging(`showResults results.length ${results.length}`);
       const collections = Object.keys(results);
-      logging(`Found interlaced collections: ${collections.join('/n')}`);
+      this.logging(`Found interlaced collections: ${collections.join('/n')}`);
       resolve(results);
-    }).catch(logging)
+    }).catch(this.logging)
   }
 
   interlace(results) {
     return new Promise((resolve, reject) => {
-      logging(`TODO ==== unpack results ====`);
+      this.logging(`TODO ==== unpack results ====`);
       let idsInDoc = [];
+      let queries = [];
+      /**
+        1. retrieve unique ids
+      */
       this.dataSources.forEach(client => {
         idsInDoc = idsInDoc.concat(client.idsInDoc(results));
       });
       idsInDoc = this.uniques(idsInDoc);
-      logging(JSON.stringify(idsInDoc));
-      resolve(results);
-    }).catch(logging);
+      /**
+        2. generate queries
+      */
+      this.dataSources.forEach(client => {
+        queries = queries.concat(client.idsToQuery(idsInDoc));
+      });
+      this.logging(queries);
+
+      /**
+        3. run queries
+      */
+      this.runQueries(queries)
+      // resolve(results);
+    }).catch(this.logging);
   }
 
   uniques(list) {
     const dict = {};
-    list.forEach(item => {dict[item] = 0})
+    list.forEach(item => {
+      let key = typeof item === 'string' ? item : JSON.stringify(item);
+      dict[key] = 0
+    });
     return Object.keys(dict);
   }
 
   connectClients(clients) {
     return Promise.all(
       clients.map(client => client.connect())
-    ).catch(logging)
+    ).catch(this.logging)
   }
 
   queryClient(query, client) {
-    logging(`Running query on: ${client.config.db.name}`);
+    this.logging(`Running query ${JSON.stringify(query)} on: ${client.config.db.name}`);
     return client.query(query);
   }
 
   runQuery(query) {
     return Promise.all(
       this.dataSources.map(client => this.queryClient(query, client))
-    ).catch(logging)
+    ).catch(this.logging)
   }
 
-  runQueries() {
-    return Promise.all(this.queries.map(this.runQuery)).catch(logging)
+  runQueries(queries) {
+    return Promise.all(queries.map(this.runQuery)).catch(this.logging)
   }
 
   run(cb) {
 
     this.connectClients(this.dataSources)
-    .then(this.runQueries)
-    .then(this.interlace)
-    .then(this.showResults)
-    .then(this.saveJSON)
-    .then(this.dump)
-    .then(cb);
+      .then(() => this.runQueries(this.queries))
+        // .then(this.interlace)
+          .then(this.showResults)
+            .then(this.saveJSON)
+              .then(this.dump)
+                .then(cb);
 
   }
 }
 
-// TODO: detect if running as module or expect query in script arguments
+/** @TODO detect if running as module or expect query in script arguments */
 new Weaver(require('./config')).run((err) => {
   logging('Done');
   process.exit()
