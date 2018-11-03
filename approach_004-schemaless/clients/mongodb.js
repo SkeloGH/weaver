@@ -8,28 +8,30 @@ const ObjectId    = mongo.ObjectID;
 
 
 /**
-  @class WeaverMongoClient
-  @arguments config<Object>:
-    {
-      type: 'source' || 'target',
-      db: {
-        url: <String> db address, ex: 'mongodb://localhost:27017'
-        name: <String>db name ex: 'my-app-store',
-        options: {
-          [http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
-        }
-      },
-      sshTunelConfig : {
-        [https://www.npmjs.com/package/tunnel-ssh#config-example]
-        [https://github.com/mscdex/ssh2#client-methods]
-      }
-    }
+  * A MongoDB client wrapper interface for Weaver
+  * @class WeaverMongoClient
+  * @param {object} config:
+  *   {
+  *     @key type {string} - the type of db client:
+  *       @enum 'source' - the client is a data source
+  *       @enum 'target' - the client is a data target
+  *     @key db {object}:
+  *       {
+  *         @key url {string} - the db url address:
+  *           @value 'mongodb://localhost:27017'
+  *         @key name {string} - the client db name:
+  *           @value 'my-app-store'
+  *         @key options {object} - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
+  *       }
+  *     },
+  *     @key sshTunelConfig {object} - tunnel-ssh options: {
+  *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
+  *       [https://github.com/mscdex/ssh2#client-methods]
+  *     }
+  *   }
 */
 class WeaverMongoClient {
   constructor(config) {
-    this.logging     = logging(`WeaverMongoClient:${config.db.name}`);
-    this.type        = config.type;
-    this.config      = config;
     this.db          = null;
     this.remote      = null;
     this.results     = [];
@@ -37,16 +39,26 @@ class WeaverMongoClient {
     this.collNames   = [];
     this.__cache     = {};
 
+    this._configure(config)._bindings()
+  }
+
+  _configure(config) {
+    this.logging = logging(`WeaverMongoClient:${config.db.name}`);
+    this.type    = config.type;
+    this.config  = config;
+
     // Hide mongo deprecation notice by using the new url parser
     this.config.db.options['useNewUrlParser'] = true;
+    return this;
+  }
 
+  _bindings() {
     // Bind functions called in nested scopes
-    this.query             = this.query.bind(this);
+    this._cache            = this._cache.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
     this._fetchDocuments   = this._fetchDocuments.bind(this);
-    this._cache            = this._cache.bind(this);
     this.idsInDoc          = this.idsInDoc.bind(this);
-    this.interlace         = this.interlace.bind(this);
+    this.query             = this.query.bind(this);
   }
 
   connect() {
@@ -98,8 +110,7 @@ class WeaverMongoClient {
       .catch(this.onError)
       .then(results => {
         const dataEntries = results.filter(result => !!result);
-        this.logging('Fetch results:')
-        this.logging('-- ', dataEntries)
+        this.logging(`${JSON.stringify(query)} results: ${JSON.stringify(dataEntries, null, 2)}`)
         resolve(dataEntries);
       });
     });
@@ -108,13 +119,13 @@ class WeaverMongoClient {
   _fetchDocuments(query, collection) {
     const queryHash = md5(JSON.stringify(query));
 
-    if (this.__cache[queryHash]) return resolve([this.__cache[queryHash]]);
+    if (this.__cache[queryHash]) return Promise.resolve([this.__cache[queryHash]]);
 
     return new Promise((resolve, reject) => {
       this.db.collection(collection).findOne(query)
       .then(document => {
         if (document) {
-          this.logging(`${collection}.find(${query.toString()}): `);
+          this.logging(`${collection}.find(${JSON.stringify(query)}): `);
           const formattedResult = {
             database: this.config.db.name,
             dataSet: collection,
@@ -134,27 +145,18 @@ class WeaverMongoClient {
     this.__cache[key] = data;
   }
 
-  interlace(documents, cb) {
-    this.logging('interlacing')
-    // let queries = [];
-    const idsInDocs = this.idsInDoc(documents);
-
-    // idsInDocs.forEach(_id => {
-    //   if (_id && _id.length) {
-    //     const promise = this.query({'_id': ObjectId(_id)});
-    //     queries.push(promise);
-    //   }
-    // });
-    // return queries;
-  }
-
+  /**
+    * Recursively finds id-looking values
+    * @return {array} valid ObjectIds converted to string:
+    *   ["12345678901234567890"]
+  */
   idsInDoc(document, carry) {
     const isArray = Array.isArray(document);
     const isObject = !isArray && typeof document == 'object';
     const ids = carry || [];
-
+    this.logging(document)
     if (typeof document == 'string' || ObjectId.isValid(document.toString())) {
-      ObjectId.isValid(document) && ids.push(document);
+      ObjectId.isValid(document) && ids.push(document.toString());
     } else if (isArray) {
       document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
     } else if (isObject) {
@@ -163,6 +165,13 @@ class WeaverMongoClient {
       });
     }
     return ids;
+  }
+
+  idsToQuery(ids) {
+    this.logging(ids)
+    return ids.map(_id => {
+      return { _id: ObjectId(_id)}
+    });
   }
 
   get data() {
@@ -177,10 +186,9 @@ class WeaverMongoClient {
     return this.config.onError && this.config.onError(error);
   }
 
-
   disconnect(data, cb) {
     this.remote.close();
   }
 }
 
-module.exports = WeaverMongoClient
+module.exports = WeaverMongoClient;
