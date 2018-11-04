@@ -38,7 +38,7 @@ class WeaverMongoClient {
     this.collNames   = [];
     this.__cache     = {};
 
-    this._configure(config)._bindings()
+    this._configure(config)._bindings();
   }
 
   _configure(config) {
@@ -55,27 +55,18 @@ class WeaverMongoClient {
     // Bind functions called in nested scopes
     this._cache            = this._cache.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
-    this._fetchDocument   = this._fetchDocument.bind(this);
+    this._fetchDocument    = this._fetchDocument.bind(this);
     this.idsInDoc          = this.idsInDoc.bind(this);
     this.query             = this.query.bind(this);
   }
 
   connect() {
-    this.logging('Connecting MongoDb client');
     return new Promise((resolve, reject) => {
       const host    = this.config.db.url;
       const options = this.config.db.options;
 
       if (!this.config.sshTunnelConfig) {
-        MongoClient.connect(host, options, (error, database) => {
-          if (error) reject(this.onError(error, 'failed to connect'));
-          this.db = database.db(this.config.db.name);
-          this.logging('Connection success');
-          this._fetchCollections().then((collectionNames) => {
-            this.logging(collectionNames.length + ' collections in db');
-            resolve();
-          });
-        });
+        this.__connectClient(host, options, resolve, reject);
       }
 
       // this.remote = tunnel(this.config.sshTunnelConfig)
@@ -86,6 +77,16 @@ class WeaverMongoClient {
       //     }
       //     this._fetchCollections(resolve);
       //   });
+    });
+  }
+
+  __connectClient(host, options, resolve, reject) {
+    this.logging('Connecting MongoDb client');
+    MongoClient.connect(host, options, (error, database) => {
+      if (error) reject(this.onError(error, 'failed to connect'));
+      this.db = database.db(this.config.db.name);
+      this.logging('Connection success');
+      this._fetchCollections().then(resolve);
     });
   }
 
