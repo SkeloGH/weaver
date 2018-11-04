@@ -159,10 +159,12 @@ class Weaver {
 }
 
 /** @TODO detect if running as module or expect query in script arguments */
-new Weaver(require('./config')).run((err) => {
-  logging('Done');
-  process.exit()
-});
+if (require.main === module) {
+  new Weaver(require('./config')).run((err) => {
+    logging('Done');
+    process.exit()
+  });
+}
 
 //
 // const install = (result, database, targetDb, cb) => {
