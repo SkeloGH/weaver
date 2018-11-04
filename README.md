@@ -2,6 +2,8 @@
 
 A MongoDB relational collection field mapping, visualizing and importing tool
 
+[![codebeat badge](https://codebeat.co/badges/d6101e2d-7c26-4c19-a820-d90a96a5fd54)](https://codebeat.co/projects/github-com-skelogh-weaver-master)
+
 # Say what
 
 Often times documents have references to other documents or collections, which result in complex-to-replicate data sets that result in wasted time while trying to retrieve every data entry with its connections.
