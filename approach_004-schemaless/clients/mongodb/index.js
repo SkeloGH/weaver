@@ -3,6 +3,8 @@ const tunnel  = require('tunnel-ssh');
 const logging = require('debug');
 const md5     = require('md5');
 
+const Utils   = require('./util');
+
 const MongoClient = mongo.MongoClient;
 const ObjectId    = mongo.ObjectID;
 
@@ -34,8 +36,9 @@ const ObjectId    = mongo.ObjectID;
   *     }
   *   }
 */
-class WeaverMongoClient {
+class WeaverMongoClient extends Utils {
   constructor(config) {
+    super(config);
     this.db          = null;
     this.remote      = null;
     this.collections = [];
@@ -116,56 +119,12 @@ class WeaverMongoClient {
     return this.db.collection(collection).findOne(query)
       .catch(this.onError)
       .then(document => {
-        let formattedResult;
         if (document) {
-          formattedResult = {
-            database: this.config.db.name,
-            dataSet: collection,
-            data: document
-          };
-          this._cache(queryHash, formattedResult);
           this.logging(`${collection}.find(${JSON.stringify(query)}):`);
-          this.logging(`${JSON.stringify(formattedResult, null, 2)}`);
+          this.logging(`${JSON.stringify(document, null, 2)}`);
         }
-
-        return Promise.resolve(formattedResult);
+        return this._cacheDocument(queryHash, collection, document);
       });
-  }
-
-  _cache = (key, data) => {
-    this.__cache[key] = data;
-  }
-
-  /**
-    * Recursively finds id-looking values
-    * @return {array} valid ObjectIds converted to string:
-    *   ["12345678901234567890"]
-  */
-  idsInDoc = (document, carry) => {
-    const validDoc = typeof document !== 'undefined' && document !== null;
-    const isArray  = Array.isArray(document);
-    const isObject = !isArray && typeof document === 'object';
-    const ids      = carry || [];
-
-    if (!validDoc) return ids;
-
-    if ((typeof document === 'string' && ObjectId.isValid(document)) || ObjectId.isValid(document.toString())) {
-      ids.push(document.toString());
-    } else if (isArray) {
-      document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
-    } else if (isObject) {
-      Object.keys(document).map(key => {
-        return ids.concat(this.idsInDoc(document[key], ids));
-      });
-    }
-
-    return ids;
-  }
-
-  idsToQuery = (ids) => {
-    return ids.map(_id => {
-      return { _id: ObjectId(_id)}
-    });
   }
 
   get data() {
@@ -183,6 +142,27 @@ class WeaverMongoClient {
   disconnect = (data, cb) => {
     this.remote.close();
     cb();
+  }
+
+  digest = (dbContent) => {
+    this.logging(dbContent)
+    const dumpResults = dbContent.map(entry => {
+      const collection = entry.dataSet;
+      const _id = entry.data._id;
+      const query = {_id: _id};
+
+      return this.db.collection(collection).findOne(query)
+      .then(document => {
+        if (document) return this.handleSavedDocument(document);
+
+        return this.db.collection(collection).insertOne(entry.data);
+      });
+    });
+    return Promise.all(dumpResults);
+  }
+
+  handleSavedDocument = (document) => {
+    return Promise.resolve(document);
   }
 }
 

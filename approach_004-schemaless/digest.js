@@ -2,7 +2,7 @@ const fs       = require('fs');
 const async    = require('async');
 const logging  = require('debug');
 const ld       = {
-  array: require('lodash/array'),
+  collection: require('lodash/collection'),
   lang: require('lodash/lang'),
 };
 
@@ -48,11 +48,23 @@ class WeaverDigest {
   dump = (results) => {
     const targetDbs = this.dataTargets.map(client => client.config.db.name);
     const validation = this.validate();
-    if (validation.success) {
-      this.logging(`Target dbs are: ${targetDbs.join(', ')}`);
-      return Promise.resolve(results);
-    }
-    return Promise.reject(validation.error);
+    const resultsByDb = ld.collection.groupBy(results, res => res.database);
+    let dumpResults;
+
+    if (validation.error) return Promise.reject(validation.error);
+
+    this.logging(`Target dbs are: ${targetDbs.join(', ')}`);
+    dumpResults = Object.keys(resultsByDb).map( dbName => {
+      return this.digest(dbName, resultsByDb);
+    });
+
+    return Promise.all(dumpResults);
+  }
+
+  digest = (dbName, resultsByDb) => {
+    const client = ld.collection.find(this.dataTargets, tgt => tgt.config.origin == dbName);
+    const dbContent = resultsByDb[dbName];
+    return client.digest(dbContent);
   }
 
   saveJSON = (results) => {
@@ -63,7 +75,7 @@ class WeaverDigest {
 
     this.logging(`Saving to: ${this.jsonConfig.filePath}`);
     fs.writeFileSync(this.jsonConfig.filePath, fileContent, 'utf8');
-    Promise.resolve(results);
+    return Promise.resolve(results);
   }
 
 }

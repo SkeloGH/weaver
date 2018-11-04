@@ -66,12 +66,6 @@ class WeaverCollect {
       .then(this.interlace);
   }
 
-  connectClients = (clients) => {
-    return Promise.all(
-      clients.map(client => client.connect())
-    ).catch(this.logging)
-  }
-
   queryClient = (query, client) => {
     this.logging(`Running query ${JSON.stringify(query)} on: ${client.config.db.name}`);
     return client.query(query);

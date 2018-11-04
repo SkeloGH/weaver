@@ -31,11 +31,18 @@ class Weaver {
     const dataEntries = Object.keys(results);
     this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
     this.logging(`Total dataEntries: ${dataEntries.length}`);
-    Promise.resolve(results);
+    return Promise.resolve(results);
+  }
+
+  connectClients = (clients) => {
+    return Promise.all(
+      clients.map(client => client.connect())
+    ).catch(this.logging)
   }
 
   run = (cb) => {
-    this.collect.connectClients(this.dataSources)
+    this.connectClients(this.dataTargets)
+      .then(() => this.connectClients(this.dataSources))
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
       .then(this.showResults)
