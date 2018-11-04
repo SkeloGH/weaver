@@ -9,7 +9,7 @@ const ld       = {
 class WeaverCollect {
   constructor(config) {
     this.__cache     = {};
-    return this._configure(config)._bindings();
+    return this._configure(config);
   }
 
   _configure(config) {
@@ -19,27 +19,14 @@ class WeaverCollect {
     return this;
   }
 
-  _bindings() {
-    /** TODO: auto-bind all methods */
-    this.cacheResult     = this.cacheResult.bind(this);
-    this.cacheResults    = this.cacheResults.bind(this);
-    this.interlace       = this.interlace.bind(this);
-    this.logging         = this.logging.bind(this);
-    this.queryClient     = this.queryClient.bind(this);
-    this.runQueries      = this.runQueries.bind(this);
-    this.runQuery        = this.runQuery.bind(this);
-    this.unCachedResults = this.unCachedResults.bind(this);
-    return this;
-  }
-
-  unCachedResults(results) {
+  unCachedResults = (results) => {
     return results.filter(result => {
       const cacheKey = result.data._id;
       return !this.__cache[cacheKey];
     });
   }
 
-  cacheResult(result) {
+  cacheResult = (result) => {
     const cacheKey = result.data._id;
     if (!this.__cache[cacheKey]) {
       this.__cache[cacheKey] = result;
@@ -47,13 +34,13 @@ class WeaverCollect {
     return this.__cache[cacheKey];
   }
 
-  cacheResults(results) {
+  cacheResults = (results) => {
     const flatResults = ld.array.flattenDeep(results);
     flatResults.forEach(this.cacheResult);
     return Promise.resolve(this.__cache);
   }
 
-  interlace(results) {
+  interlace = (results) => {
     let idsInDoc = [];
     let queries = [];
     const flatResults = ld.array.flattenDeep(results);
@@ -79,24 +66,24 @@ class WeaverCollect {
       .then(this.interlace);
   }
 
-  connectClients(clients) {
+  connectClients = (clients) => {
     return Promise.all(
       clients.map(client => client.connect())
     ).catch(this.logging)
   }
 
-  queryClient(query, client) {
+  queryClient = (query, client) => {
     this.logging(`Running query ${JSON.stringify(query)} on: ${client.config.db.name}`);
     return client.query(query);
   }
 
-  runQuery(query) {
+  runQuery = (query) => {
     return Promise.all(
       this.dataSources.map(client => this.queryClient(query, client))
     ).catch(this.logging)
   }
 
-  runQueries(queries) {
+  runQueries = (queries) => {
     return Promise.all(queries.map(this.runQuery)).catch(this.logging)
   }
 }

@@ -12,7 +12,7 @@ class Weaver {
   constructor(config) {
     this.__cache = {};
     this.collect = new WeaverCollect(config);
-    return this._configure(config)._bindings();
+    return this._configure(config);
   }
 
   _configure(config) {
@@ -25,15 +25,7 @@ class Weaver {
     return this;
   }
 
-  _bindings() {
-    this.dump            = this.dump.bind(this);
-    this.logging         = this.logging.bind(this);
-    this.saveJSON        = this.saveJSON.bind(this);
-    this.showResults     = this.showResults.bind(this);
-    return this;
-  }
-
-  dump(results) {
+  dump = (results) => {
     return new Promise((resolve, reject) => {
       const targetDbs = this.dataTargets.map(client => client.config.db.name);
       this.logging(`Target dbs are ${targetDbs}`);
@@ -41,7 +33,7 @@ class Weaver {
     }).catch(this.logging)
   }
 
-  saveJSON(results) {
+  saveJSON = (results) => {
     return new Promise((resolve, reject) => {
       if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
       const fileContent = JSON.stringify(results, null, 2);
@@ -53,7 +45,7 @@ class Weaver {
     }).catch(this.logging)
   }
 
-  showResults(results) {
+  showResults = (results) => {
     return new Promise((resolve, reject) => {
       const dataEntries = Object.keys(results);
       this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
@@ -62,7 +54,7 @@ class Weaver {
     }).catch(this.logging)
   }
 
-  run(cb) {
+  run = (cb) => {
     this.collect.connectClients(this.dataSources)
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
