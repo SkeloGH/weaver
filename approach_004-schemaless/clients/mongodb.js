@@ -34,7 +34,6 @@ class WeaverMongoClient {
   constructor(config) {
     this.db          = null;
     this.remote      = null;
-    this.results     = [];
     this.collections = [];
     this.collNames   = [];
     this.__cache     = {};
@@ -56,7 +55,7 @@ class WeaverMongoClient {
     // Bind functions called in nested scopes
     this._cache            = this._cache.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
-    this._fetchDocuments   = this._fetchDocuments.bind(this);
+    this._fetchDocument   = this._fetchDocument.bind(this);
     this.idsInDoc          = this.idsInDoc.bind(this);
     this.query             = this.query.bind(this);
   }
@@ -105,33 +104,34 @@ class WeaverMongoClient {
 
   query(query) {
     return new Promise((resolve, reject) => {
-      const dbScans = this.collNames.map(this._fetchDocuments.bind(this, query));
+      const dbScans = this.collNames.map(this._fetchDocument.bind(this, query));
       Promise.all(dbScans)
       .catch(this.onError)
       .then(results => {
-        const dataEntries = results.filter(result => !!result);
-        this.logging(`${JSON.stringify(query)} results: ${JSON.stringify(dataEntries, null, 2)}`)
-        resolve(dataEntries);
+        const dataEntry = results.filter(result => !!result);
+        resolve(dataEntry);
       });
     });
   }
 
-  _fetchDocuments(query, collection) {
+  _fetchDocument(query, collection) {
     const queryHash = md5(JSON.stringify(query));
 
-    if (this.__cache[queryHash]) return Promise.resolve([this.__cache[queryHash]]);
+    if (this.__cache[queryHash]) return Promise.resolve(this.__cache[queryHash]);
 
     return new Promise((resolve, reject) => {
       this.db.collection(collection).findOne(query)
+      .catch(this.logging)
       .then(document => {
         if (document) {
-          this.logging(`${collection}.find(${JSON.stringify(query)}): `);
           const formattedResult = {
             database: this.config.db.name,
             dataSet: collection,
             data: document
           };
           this._cache(queryHash, formattedResult);
+          this.logging(`${collection}.find(${JSON.stringify(query)}):`);
+          this.logging(`${JSON.stringify(formattedResult, null, 2)}`);
           resolve(formattedResult);
         } else {
           resolve();
@@ -141,7 +141,6 @@ class WeaverMongoClient {
   }
 
   _cache(key, data){
-    this.results.push(data);
     this.__cache[key] = data;
   }
 
@@ -151,24 +150,25 @@ class WeaverMongoClient {
     *   ["12345678901234567890"]
   */
   idsInDoc(document, carry) {
+    const validDoc = typeof document !== 'undefined' && document != null;
     const isArray = Array.isArray(document);
     const isObject = !isArray && typeof document == 'object';
     const ids = carry || [];
-    this.logging(document)
-    if (typeof document == 'string' || ObjectId.isValid(document.toString())) {
+
+    if (validDoc && (typeof document == 'string' || ObjectId.isValid(document.toString()))) {
       ObjectId.isValid(document) && ids.push(document.toString());
-    } else if (isArray) {
+    } else if (validDoc && isArray) {
       document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
-    } else if (isObject) {
+    } else if (validDoc && isObject) {
       Object.keys(document).map(key => {
         return ids.concat(this.idsInDoc(document[key], ids));
       });
     }
+
     return ids;
   }
 
   idsToQuery(ids) {
-    this.logging(ids)
     return ids.map(_id => {
       return { _id: ObjectId(_id)}
     });
