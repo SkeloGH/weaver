@@ -4,4 +4,3 @@ node_modules
 *.out
 *.out.*
 npm-debug.log
-package-lock.json
