@@ -89,6 +89,8 @@ class Weaver {
   }
 
   interlace(results) {
+    let idsInDoc = [];
+    let queries = [];
     const flatResults = ld.array.flattenDeep(results);
     const unCachedResults = this.unCachedResults(flatResults);
 
@@ -98,30 +100,18 @@ class Weaver {
 
     this.cacheResults(unCachedResults);
 
-    return new Promise((resolve, reject) => {
-      let idsInDoc = [];
-      let queries = [];
-      /**
-        1. retrieve unique ids
-      */
-      this.dataSources.forEach(client => {
-        idsInDoc = idsInDoc.concat(client.idsInDoc(unCachedResults));
-      });
+    this.dataSources.forEach(client => {
+      idsInDoc = idsInDoc.concat(client.idsInDoc(unCachedResults));
+    });
 
-      idsInDoc = ld.array.uniq(idsInDoc);
-      /**
-        2. generate queries
-      */
-      this.dataSources.forEach(client => {
-        queries = queries.concat(client.idsToQuery(idsInDoc));
-      });
-      /**
-        3. run queries
-      */
-      this.runQueries(queries)
-        .then(this.interlace)
-          .then(resolve);
-    }).catch(this.logging);
+    idsInDoc = ld.array.uniq(idsInDoc);
+
+    this.dataSources.forEach(client => {
+      queries = queries.concat(client.idsToQuery(idsInDoc));
+    });
+
+    return this.runQueries(queries)
+      .then(this.interlace);
   }
 
   connectClients(clients) {
@@ -146,7 +136,6 @@ class Weaver {
   }
 
   run(cb) {
-
     this.connectClients(this.dataSources)
       .then(() => this.runQueries(this.queries))
         .then(this.interlace)

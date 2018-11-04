@@ -54,6 +54,7 @@ class WeaverMongoClient {
   _bindings() {
     // Bind functions called in nested scopes
     this._cache            = this._cache.bind(this);
+    this._onClientConnect  = this._onClientConnect.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
     this._fetchDocument    = this._fetchDocument.bind(this);
     this._saveCollections  = this._saveCollections.bind(this);
@@ -62,33 +63,29 @@ class WeaverMongoClient {
   }
 
   connect() {
-    return new Promise((resolve, reject) => {
-      const host    = this.config.db.url;
-      const options = this.config.db.options;
+    const host    = this.config.db.url;
+    const options = this.config.db.options;
 
-      if (!this.config.sshTunnelConfig) {
-        this.__connectClient(host, options, resolve, reject);
-      }
+    if (!this.config.sshTunnelConfig) {
+      this.logging('Connecting MongoDb client');
+      return MongoClient.connect(host, options)
+        .then(this._onClientConnect)
+    }
 
-      // this.remote = tunnel(this.config.sshTunnelConfig)
-      //   .then((error, server) => {
-      //     if (error){
-      //       this.onError(error);
-      //       return reject(error);
-      //     }
-      //     this._fetchCollections(resolve);
-      //   });
-    });
+    // this.remote = tunnel(this.config.sshTunnelConfig)
+    //   .then((error, server) => {
+    //     if (error){
+    //       this.onError(error);
+    //       return reject(error);
+    //     }
+    //     this._fetchCollections(resolve);
+    //   });
   }
 
-  __connectClient(host, options, resolve, reject) {
-    this.logging('Connecting MongoDb client');
-    MongoClient.connect(host, options, (error, database) => {
-      if (error) reject(this.onError(error, 'failed to connect'));
-      this.db = database.db(this.config.db.name);
-      this.logging('Connection success');
-      this._fetchCollections().then(resolve);
-    });
+  _onClientConnect(database) {
+    this.db = database.db(this.config.db.name);
+    this.logging('Connection success');
+    return this._fetchCollections();
   }
 
   _fetchCollections() {
@@ -105,14 +102,13 @@ class WeaverMongoClient {
   }
 
   query(query) {
-    return new Promise((resolve, reject) => {
-      const dbScans = this.collNames.map(this._fetchDocument.bind(this, query));
-      Promise.all(dbScans)
-      .catch(this.onError)
-      .then(results => {
-        const dataEntry = results.filter(result => !!result);
-        resolve(dataEntry);
-      });
+    const dbScans = this.collNames.map(this._fetchDocument.bind(this, query));
+
+    return Promise.all(dbScans)
+    .catch(this.onError)
+    .then(results => {
+      const dataEntry = results.filter(result => !!result);
+      return Promise.resolve(dataEntry);
     });
   }
 
@@ -121,12 +117,12 @@ class WeaverMongoClient {
 
     if (this.__cache[queryHash]) return Promise.resolve(this.__cache[queryHash]);
 
-    return new Promise((resolve, reject) => {
-      this.db.collection(collection).findOne(query)
-      .catch(this.logging)
+    return this.db.collection(collection).findOne(query)
+      .catch(this.onError)
       .then(document => {
+        let formattedResult;
         if (document) {
-          const formattedResult = {
+          formattedResult = {
             database: this.config.db.name,
             dataSet: collection,
             data: document
@@ -134,12 +130,10 @@ class WeaverMongoClient {
           this._cache(queryHash, formattedResult);
           this.logging(`${collection}.find(${JSON.stringify(query)}):`);
           this.logging(`${JSON.stringify(formattedResult, null, 2)}`);
-          resolve(formattedResult);
-        } else {
-          resolve();
         }
-      })
-    });
+
+        return Promise.resolve(formattedResult);
+      });
   }
 
   _cache(key, data){
@@ -152,16 +146,18 @@ class WeaverMongoClient {
     *   ["12345678901234567890"]
   */
   idsInDoc(document, carry) {
-    const validDoc = typeof document !== 'undefined' && document != null;
-    const isArray = Array.isArray(document);
-    const isObject = !isArray && typeof document == 'object';
-    const ids = carry || [];
+    const validDoc = typeof document !== 'undefined' && document !== null;
+    const isArray  = Array.isArray(document);
+    const isObject = !isArray && typeof document === 'object';
+    const ids      = carry || [];
 
-    if (validDoc && (typeof document == 'string' || ObjectId.isValid(document.toString()))) {
-      ObjectId.isValid(document) && ids.push(document.toString());
-    } else if (validDoc && isArray) {
+    if (!validDoc) return ids;
+
+    if ((typeof document === 'string' && ObjectId.isValid(document)) || ObjectId.isValid(document.toString())) {
+      ids.push(document.toString());
+    } else if (isArray) {
       document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
-    } else if (validDoc && isObject) {
+    } else if (isObject) {
       Object.keys(document).map(key => {
         return ids.concat(this.idsInDoc(document[key], ids));
       });
@@ -184,12 +180,13 @@ class WeaverMongoClient {
   }
 
   onError(error, message) {
-    if (message) console.error(message, error);
+    if (message) this.logging(message, error);
     return this.config.onError && this.config.onError(error);
   }
 
   disconnect(data, cb) {
     this.remote.close();
+    cb();
   }
 }
 
