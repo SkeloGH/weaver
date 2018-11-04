@@ -34,24 +34,21 @@ class Weaver {
   }
 
   saveJSON = (results) => {
-    return new Promise((resolve, reject) => {
-      if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) resolve(results);
-      const fileContent = JSON.stringify(results, null, 2);
+    if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) {
+      Promise.resolve(results);
+    }
+    const fileContent = JSON.stringify(results, null, 2);
 
-      fs.writeFile(this.jsonConfig.filePath, fileContent, 'utf8', (err) => {
-        this.logging(`saved to: ${this.jsonConfig.filePath}`);
-        resolve(results);
-      });
-    }).catch(this.logging)
+    this.logging(`Saving to: ${this.jsonConfig.filePath}`);
+    fs.writeFileSync(this.jsonConfig.filePath, fileContent, 'utf8');
+    Promise.resolve(results);
   }
 
   showResults = (results) => {
-    return new Promise((resolve, reject) => {
-      const dataEntries = Object.keys(results);
-      this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
-      this.logging(`Total dataEntries: ${dataEntries.length}`);
-      resolve(results);
-    }).catch(this.logging)
+    const dataEntries = Object.keys(results);
+    this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
+    this.logging(`Total dataEntries: ${dataEntries.length}`);
+    Promise.resolve(results);
   }
 
   run = (cb) => {
