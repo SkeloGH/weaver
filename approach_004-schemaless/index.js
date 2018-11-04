@@ -6,12 +6,12 @@ const ld       = {
   object: require('lodash/object'),
 };
 
-const Retrieve = require('./retrieve');
+const WeaverCollect = require('./collect');
 
 class Weaver {
   constructor(config) {
-    this.__cache     = {};
-    this.retriever   = new Retrieve(config);
+    this.__cache = {};
+    this.collect = new WeaverCollect(config);
     return this._configure(config)._bindings();
   }
 
@@ -63,9 +63,9 @@ class Weaver {
   }
 
   run(cb) {
-    this.retriever.connectClients(this.dataSources)
-      .then(() => this.retriever.runQueries(this.queries))
-      .then(this.retriever.interlace)
+    this.collect.connectClients(this.dataSources)
+      .then(() => this.collect.runQueries(this.queries))
+      .then(this.collect.interlace)
       .then(this.showResults)
       .then(this.saveJSON)
       .then(this.dump)

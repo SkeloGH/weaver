@@ -6,14 +6,14 @@ const ld       = {
   object: require('lodash/object'),
 };
 
-class Retrieve {
+class WeaverCollect {
   constructor(config) {
     this.__cache     = {};
     return this._configure(config)._bindings();
   }
 
   _configure(config) {
-    this.logging     = logging(`Retrieve`);
+    this.logging     = logging(`WeaverCollect`);
     this.dataClients = config.dataClients;
     this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
     return this;
@@ -101,4 +101,4 @@ class Retrieve {
   }
 }
 
-module.exports = Retrieve;
+module.exports = WeaverCollect;
