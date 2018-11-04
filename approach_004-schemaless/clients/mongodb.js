@@ -69,7 +69,7 @@ class WeaverMongoClient {
     if (!this.config.sshTunnelConfig) {
       this.logging('Connecting MongoDb client');
       return MongoClient.connect(host, options)
-        .then(this._onClientConnect)
+        .then(this._onClientConnect);
     }
 
     // this.remote = tunnel(this.config.sshTunnelConfig)
