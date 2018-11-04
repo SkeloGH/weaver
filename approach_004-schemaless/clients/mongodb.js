@@ -38,10 +38,10 @@ class WeaverMongoClient {
     this.collNames   = [];
     this.__cache     = {};
 
-    this._configure(config)._bindings();
+    this._configure(config);
   }
 
-  _configure(config) {
+  _configure = (config) => {
     this.logging = logging(`WeaverMongoClient:${config.db.name}`);
     this.type    = config.type;
     this.config  = config;
@@ -51,18 +51,7 @@ class WeaverMongoClient {
     return this;
   }
 
-  _bindings() {
-    // Bind functions called in nested scopes
-    this._cache            = this._cache.bind(this);
-    this._onClientConnect  = this._onClientConnect.bind(this);
-    this._fetchCollections = this._fetchCollections.bind(this);
-    this._fetchDocument    = this._fetchDocument.bind(this);
-    this._saveCollections  = this._saveCollections.bind(this);
-    this.idsInDoc          = this.idsInDoc.bind(this);
-    this.query             = this.query.bind(this);
-  }
-
-  connect() {
+  connect = () => {
     const host    = this.config.db.url;
     const options = this.config.db.options;
 
@@ -82,26 +71,26 @@ class WeaverMongoClient {
     //   });
   }
 
-  _onClientConnect(database) {
+  _onClientConnect = (database) => {
     this.db = database.db(this.config.db.name);
     this.logging('Connection success');
     return this._fetchCollections();
   }
 
-  _fetchCollections() {
+  _fetchCollections = () => {
     this.logging('Listing collections');
     return this.db.listCollections({} , { nameOnly:true })
       .toArray()
       .then(this._saveCollections);
   }
 
-  _saveCollections(collections) {
+  _saveCollections = (collections) => {
     this.collections = collections;
     this.collNames = collections.map(result => result.name);
     return Promise.resolve(this.collNames);
   }
 
-  query(query) {
+  query = (query) => {
     const dbScans = this.collNames.map(this._fetchDocument.bind(this, query));
 
     return Promise.all(dbScans)
@@ -112,7 +101,7 @@ class WeaverMongoClient {
     });
   }
 
-  _fetchDocument(query, collection) {
+  _fetchDocument = (query, collection) => {
     const queryHash = md5(JSON.stringify(query));
 
     if (this.__cache[queryHash]) return Promise.resolve(this.__cache[queryHash]);
@@ -136,7 +125,7 @@ class WeaverMongoClient {
       });
   }
 
-  _cache(key, data){
+  _cache = (key, data) => {
     this.__cache[key] = data;
   }
 
@@ -145,7 +134,7 @@ class WeaverMongoClient {
     * @return {array} valid ObjectIds converted to string:
     *   ["12345678901234567890"]
   */
-  idsInDoc(document, carry) {
+  idsInDoc = (document, carry) => {
     const validDoc = typeof document !== 'undefined' && document !== null;
     const isArray  = Array.isArray(document);
     const isObject = !isArray && typeof document === 'object';
@@ -166,7 +155,7 @@ class WeaverMongoClient {
     return ids;
   }
 
-  idsToQuery(ids) {
+  idsToQuery = (ids) => {
     return ids.map(_id => {
       return { _id: ObjectId(_id)}
     });
@@ -179,12 +168,12 @@ class WeaverMongoClient {
     };
   }
 
-  onError(error, message) {
+  onError = (error, message) => {
     if (message) this.logging(message, error);
     return this.config.onError && this.config.onError(error);
   }
 
-  disconnect(data, cb) {
+  disconnect = (data, cb) => {
     this.remote.close();
     cb();
   }
