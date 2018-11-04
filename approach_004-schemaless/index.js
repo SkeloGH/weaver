@@ -1,6 +1,10 @@
 const fs       = require('fs');
 const async    = require('async');
 const logging  = require('debug');
+const ld       = {
+  array: require('lodash/array'),
+  object: require('lodash/object'),
+};
 
 class Weaver {
   constructor(config) {
@@ -9,6 +13,7 @@ class Weaver {
 
   _configure(config) {
     this.logging     = logging(`Weaver`);
+    this.__cache     = {};
     this.queries     = config.queries;
     this.dataClients = config.dataClients;
     this.jsonConfig  = config.jsonConfig;
@@ -18,15 +23,18 @@ class Weaver {
   }
 
   _bindings() {
-    this.dump        = this.dump.bind(this);
-    this.interlace   = this.interlace.bind(this);
-    this.logging     = this.logging.bind(this);
-    this.queryClient = this.queryClient.bind(this);
-    this.runQueries  = this.runQueries.bind(this);
-    this.runQuery    = this.runQuery.bind(this);
-    this.saveJSON    = this.saveJSON.bind(this);
-    this.showResults = this.showResults.bind(this);
-    this.uniques     = this.uniques.bind(this);
+    /** TODO: auto-bind all methods */
+    this.cacheResult     = this.cacheResult.bind(this);
+    this.cacheResults    = this.cacheResults.bind(this);
+    this.dump            = this.dump.bind(this);
+    this.interlace       = this.interlace.bind(this);
+    this.logging         = this.logging.bind(this);
+    this.queryClient     = this.queryClient.bind(this);
+    this.runQueries      = this.runQueries.bind(this);
+    this.runQuery        = this.runQuery.bind(this);
+    this.saveJSON        = this.saveJSON.bind(this);
+    this.showResults     = this.showResults.bind(this);
+    this.unCachedResults = this.unCachedResults.bind(this);
     return this;
   }
 
@@ -52,76 +60,68 @@ class Weaver {
 
   showResults(results) {
     return new Promise((resolve, reject) => {
-      this.logging(`showResults results.length ${results.length}`);
-      const collections = Object.keys(results);
-      this.logging(`Found interlaced collections: ${collections.join('/n')}`);
+      const dataEntries = Object.keys(results);
+      this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
+      this.logging(`Total dataEntries: ${dataEntries.length}`);
       resolve(results);
     }).catch(this.logging)
   }
 
+  unCachedResults(results) {
+    return results.filter(result => {
+      const cacheKey = result.data._id;
+      return !this.__cache[cacheKey];
+    })
+  }
+
+  cacheResult(result) {
+    const cacheKey = result.data._id;
+    if (!this.__cache[cacheKey]) {
+      this.__cache[cacheKey] = result;
+    }
+    return this.__cache[cacheKey];
+  }
+
+  cacheResults(results) {
+    const flatResults = ld.array.flattenDeep(results);
+    flatResults.forEach(this.cacheResult);
+    return Promise.resolve(this.__cache);
+  }
+
   interlace(results) {
+    const flatResults = ld.array.flattenDeep(results);
+    const unCachedResults = this.unCachedResults(flatResults);
+
+    if (unCachedResults.length === 0) {
+      return Promise.resolve(this.__cache);
+    }
+
+    this.cacheResults(unCachedResults);
+
     return new Promise((resolve, reject) => {
-      this.logging(`TODO ==== unpack results ====`);
       let idsInDoc = [];
       let queries = [];
       /**
         1. retrieve unique ids
       */
       this.dataSources.forEach(client => {
-        idsInDoc = idsInDoc.concat(client.idsInDoc(results));
+        idsInDoc = idsInDoc.concat(client.idsInDoc(unCachedResults));
       });
-      idsInDoc = this.uniques(idsInDoc);
+
+      idsInDoc = ld.array.uniq(idsInDoc)
       /**
         2. generate queries
       */
       this.dataSources.forEach(client => {
         queries = queries.concat(client.idsToQuery(idsInDoc));
       });
-      this.logging(queries);
-
       /**
         3. run queries
       */
       this.runQueries(queries)
-      // resolve(results);
+        .then(this.interlace)
+          .then(resolve);
     }).catch(this.logging);
-  }
-
-  uniques(list) {
-    const dict = {};
-    list.forEach(item => {
-      let key = typeof item === 'string' ? item : JSON.stringify(item);
-      dict[key] = 0
-    });
-    return Object.keys(dict);
-  }
-
-  showResults(results) {
-    return new Promise((resolve, reject) => {
-      logging(results.length);
-      const collections = Object.keys(results);
-      logging(`Found interlaced collections: ${collections.join('/n')}`);
-      resolve(results);
-    }).catch(logging)
-  }
-
-  interlace(results) {
-    return new Promise((resolve, reject) => {
-      logging(`TODO ==== unpack results ====`);
-      let idsInDoc = [];
-      this.dataSources.forEach(client => {
-        idsInDoc = idsInDoc.concat(client.idsInDoc(results));
-      });
-      idsInDoc = this.uniques(idsInDoc);
-      logging(JSON.stringify(idsInDoc));
-      resolve(results);
-    }).catch(logging);
-  }
-
-  uniques(list) {
-    const dict = {};
-    list.forEach(item => {dict[item] = 0})
-    return Object.keys(dict);
   }
 
   connectClients(clients) {
@@ -149,7 +149,7 @@ class Weaver {
 
     this.connectClients(this.dataSources)
       .then(() => this.runQueries(this.queries))
-        // .then(this.interlace)
+        .then(this.interlace)
           .then(this.showResults)
             .then(this.saveJSON)
               .then(this.dump)
@@ -164,22 +164,6 @@ new Weaver(require('./config')).run((err) => {
   process.exit()
 });
 
-
-
-// const interlace = (database, cb) => {
-//   const sourceDb = database.db(CFG.dbName.source);
-//   const config = {
-//     db: sourceDb,
-//     collection: CFG.collectionName,
-//     id: CFG.documentId,
-//     collectionMappings: CFG.collectionMappings,
-//   };
-//   const weaver = new Weaver(config);
-//   weaver.interlace(config.collection, config.id, (err, result) => {
-//     database.close();
-//     return cb(err, result);
-//   });
-// };
 //
 // const install = (result, database, targetDb, cb) => {
 //   const collections = Object.keys(result);
