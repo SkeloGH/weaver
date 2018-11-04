@@ -7,7 +7,10 @@ const sourceLocalDbClient1 = new WeaverMongoClient({
   db: {
     url: secret.local.db.url, // string
     name: secret.local.db.sources[0].name, // string
-    options: {}
+    options: secret.local.db.options // object
+  },
+  client: {
+    ignoreFields: secret.local.client.ignoreFields
   }
 });
 
