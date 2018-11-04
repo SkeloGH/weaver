@@ -37,7 +37,7 @@ class Weaver {
   connectClients = (clients) => {
     return Promise.all(
       clients.map(client => client.connect())
-    ).catch(this.logging)
+    ).catch(this.logging);
   }
 
   run = (cb) => {
