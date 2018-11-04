@@ -71,7 +71,7 @@ class Weaver {
     return results.filter(result => {
       const cacheKey = result.data._id;
       return !this.__cache[cacheKey];
-    })
+    });
   }
 
   cacheResult(result) {
@@ -108,7 +108,7 @@ class Weaver {
         idsInDoc = idsInDoc.concat(client.idsInDoc(unCachedResults));
       });
 
-      idsInDoc = ld.array.uniq(idsInDoc)
+      idsInDoc = ld.array.uniq(idsInDoc);
       /**
         2. generate queries
       */
@@ -162,7 +162,7 @@ class Weaver {
 if (require.main === module) {
   new Weaver(require('./config')).run((err) => {
     logging('Done');
-    process.exit()
+    process.exit();
   });
 }
 
