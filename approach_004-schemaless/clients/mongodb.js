@@ -56,6 +56,7 @@ class WeaverMongoClient {
     this._cache            = this._cache.bind(this);
     this._fetchCollections = this._fetchCollections.bind(this);
     this._fetchDocument    = this._fetchDocument.bind(this);
+    this._saveCollections  = this._saveCollections.bind(this);
     this.idsInDoc          = this.idsInDoc.bind(this);
     this.query             = this.query.bind(this);
   }
@@ -92,15 +93,15 @@ class WeaverMongoClient {
 
   _fetchCollections() {
     this.logging('Listing collections');
-    return new Promise((resolve, reject) => {
-      this.db
-      .listCollections({} , { nameOnly:true }).toArray()
-      .then((collections) => {
-        this.collections = collections;
-        this.collNames = collections.map(result => result.name);
-        resolve(this.collNames);
-      });
-    });
+    return this.db.listCollections({} , { nameOnly:true })
+      .toArray()
+      .then(this._saveCollections);
+  }
+
+  _saveCollections(collections) {
+    this.collections = collections;
+    this.collNames = collections.map(result => result.name);
+    return Promise.resolve(this.collNames);
   }
 
   query(query) {
