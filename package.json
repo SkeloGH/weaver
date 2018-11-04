@@ -6,7 +6,7 @@
   "scripts": {
     "app": "node approach_004-schemaless/index.js",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No test specified\""
   },
   "repository": {
     "type": "git",

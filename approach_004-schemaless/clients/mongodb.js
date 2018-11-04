@@ -24,6 +24,10 @@ const ObjectId    = mongo.ObjectID;
   *         @key options {object} - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
   *       }
   *     },
+  *     @key client {object} - WeaverMongoClient-specific configurations:
+  *       {
+  *         @key ignoreFields {array} - The list of collection names to avoid querying
+  *       }
   *     @key sshTunelConfig {object} - tunnel-ssh options: {
   *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
   *       [https://github.com/mscdex/ssh2#client-methods]
@@ -45,6 +49,7 @@ class WeaverMongoClient {
     this.logging = logging(`WeaverMongoClient:${config.db.name}`);
     this.type    = config.type;
     this.config  = config;
+    this.ignoreFields = config.client && config.client.ignoreFields || [];
 
     // Hide mongo deprecation notice by using the new url parser
     this.config.db.options['useNewUrlParser'] = true;
@@ -103,8 +108,10 @@ class WeaverMongoClient {
 
   _fetchDocument = (query, collection) => {
     const queryHash = md5(JSON.stringify(query));
+    const queryCache = this.__cache[queryHash];
 
-    if (this.__cache[queryHash]) return Promise.resolve(this.__cache[queryHash]);
+    if (queryCache) return Promise.resolve(queryCache);
+    if (this.ignoreFields.indexOf(collection) > -1) return Promise.resolve(queryCache);
 
     return this.db.collection(collection).findOne(query)
       .catch(this.onError)
