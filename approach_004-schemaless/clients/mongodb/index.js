@@ -145,20 +145,21 @@ class WeaverMongoClient extends Utils {
   }
 
   digest = (dbContent) => {
-    this.logging(dbContent)
-    const dumpResults = dbContent.map(entry => {
-      const collection = entry.dataSet;
-      const _id = entry.data._id;
-      const query = {_id: _id};
+    this.logging(dbContent);
+    return Promise.all(dbContent.map(this.saveDocument));
+  }
 
-      return this.db.collection(collection).findOne(query)
-      .then(document => {
-        if (document) return this.handleSavedDocument(document);
+  saveDocument = (document) => {
+    const collection = document.dataSet;
+    const _id = document.data._id;
+    const query = { _id: _id };
 
-        return this.db.collection(collection).insertOne(entry.data);
-      });
+    return this.db.collection(collection)
+      .findOne(query)
+      .then(result => {
+        if (result) return this.handleSavedDocument(result);
+        return this.db.collection(collection).insertOne(document.data);
     });
-    return Promise.all(dumpResults);
   }
 
   handleSavedDocument = (document) => {
