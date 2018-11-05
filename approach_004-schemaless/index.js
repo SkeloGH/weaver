@@ -7,11 +7,13 @@ const ld       = {
 };
 
 const WeaverCollect = require('./collect');
+const WeaverDigest = require('./digest');
 
 class Weaver {
   constructor(config) {
     this.__cache = {};
     this.collect = new WeaverCollect(config);
+    this.digest  = new WeaverDigest(config);
     return this._configure(config);
   }
 
@@ -25,39 +27,28 @@ class Weaver {
     return this;
   }
 
-  dump = (results) => {
-    return new Promise((resolve, reject) => {
-      const targetDbs = this.dataTargets.map(client => client.config.db.name);
-      this.logging(`Target dbs are ${targetDbs}`);
-      resolve();
-    }).catch(this.logging)
-  }
-
-  saveJSON = (results) => {
-    if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) {
-      Promise.resolve(results);
-    }
-    const fileContent = JSON.stringify(results, null, 2);
-
-    this.logging(`Saving to: ${this.jsonConfig.filePath}`);
-    fs.writeFileSync(this.jsonConfig.filePath, fileContent, 'utf8');
-    Promise.resolve(results);
-  }
-
   showResults = (results) => {
     const dataEntries = Object.keys(results);
     this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
     this.logging(`Total dataEntries: ${dataEntries.length}`);
-    Promise.resolve(results);
+    return Promise.resolve(results);
+  }
+
+  connectClients = (clients) => {
+    return Promise.all(
+      clients.map(client => client.connect())
+    ).catch(this.logging);
   }
 
   run = (cb) => {
-    this.collect.connectClients(this.dataSources)
+    this.connectClients(this.dataTargets)
+      .then(() => this.connectClients(this.dataSources))
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
       .then(this.showResults)
-      .then(this.saveJSON)
-      .then(this.dump)
+      .then(this.digest.saveJSON)
+      .then(this.digest.dump)
+      .catch(this.logging)
       .then(cb);
   }
 }
@@ -70,39 +61,4 @@ if (require.main === module) {
   });
 }
 
-//
-// const install = (result, database, targetDb, cb) => {
-//   const collections = Object.keys(result);
-//   let idx = 0;
-//   let installAll = false;
-//   let skipAll = false;
-
-//   async.eachLimit(collections, 1, (collection, eCb) => {
-//     const docsById = result[collection];
-//     const docs = Object.keys(docsById).map(docId => docsById[docId]);
-//     const inputOptions = ['[y]es','[n]o','[a]ll','[v]iew','[q]uit'].join(' ');
-//     const message = ['\n','add',docs.length,'docs to',collection,'-',inputOptions,': '].join(' ');
-//     idx++;
-
-//     if (installAll) return targetDb.collection(collection).insertMany(docs, eCb);
-//     if (skipAll) return eCb()
-
-//     prompt(message, (err, answer) => {
-//       installAll = answer == 'a';
-//       skipAll = answer == 'q';
-//       const shouldInstall = installAll || answer == 'y';
-//       const view = answer == 'v';
-
-//       if (shouldInstall) {
-//         return targetDb.collection(collection).insertMany(docs, eCb);
-//       } else if (view) {
-//         console.log('\n\n' + JSON.stringify(docs, null, 2));
-//       }
-//       return eCb();
-//     });
-//   }, err => {
-//     database.close()
-//     if (err) return cb(err, result[collections[idx]] );
-//     return cb();
-//   });
-// }
+module.exports = Weaver;

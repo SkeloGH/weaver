@@ -23,11 +23,22 @@ const sourceLocalDbClient2 = new WeaverMongoClient({
   }
 });
 
-const targetLocalDbClient = new WeaverMongoClient({
+const targetLocalDbClient1 = new WeaverMongoClient({
   type: 'target',
+  origin: secret.local.db.sources[0].name,
   db: {
     url: secret.local.db.url, // string
-    name: 'weaver-output',
+    name: `weaver-out-${secret.local.db.sources[0].name}`,
+    options: {}
+  }
+});
+
+const targetLocalDbClient2 = new WeaverMongoClient({
+  type: 'target',
+  origin: secret.local.db.sources[1].name,
+  db: {
+    url: secret.local.db.url, // string
+    name: `weaver-out-${secret.local.db.sources[1].name}`,
     options: {}
   }
 });
@@ -61,6 +72,7 @@ const remoteDbClient = new WeaverMongoClient({
 module.exports = [
   sourceLocalDbClient1,
   sourceLocalDbClient2,
-  targetLocalDbClient,
+  targetLocalDbClient1,
+  targetLocalDbClient2,
   // remoteDbClient,
 ];
