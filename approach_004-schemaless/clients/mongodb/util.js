@@ -1,4 +1,7 @@
 const mongo   = require('mongodb');
+const ld      = {
+  lang: require('lodash/lang')
+};
 
 const ObjectId    = mongo.ObjectID;
 
@@ -32,19 +35,18 @@ class Util {
     *   ["12345678901234567890"]
   */
   idsInDoc = (document, carry) => {
-    const validDoc = typeof document !== 'undefined' && document !== null;
-    const isArray  = Array.isArray(document);
-    const isObject = !isArray && typeof document === 'object';
+    const isArray  = ld.lang.isArray(document);
+    const isObject = ld.lang.isPlainObject(document);
     const ids      = carry || [];
 
-    if (!validDoc) return ids;
+    if (ld.lang.isEmpty(document)) return ids;
 
-    if ((typeof document === 'string' && ObjectId.isValid(document)) || ObjectId.isValid(document.toString())) {
+    if (ObjectId.isValid(document.toString())) {
       ids.push(document.toString());
     } else if (isArray) {
       document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
     } else if (isObject) {
-      Object.keys(document).map(key => {
+      Object.keys(document).forEach(key => {
         return ids.concat(this.idsInDoc(document[key], ids));
       });
     }
