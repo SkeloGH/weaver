@@ -66,12 +66,13 @@ There are 3 main files to look at:
 
 # Roadmap
 
-- Ability to map the schemas.
-- Ability to render a dendogram visualizer.
-- Ability to render a graph vizualizer.
-- Ability to find between collections.
-- Ability to install the retrieved collection data locally.
-- [Current WIP] Ability to find in remote hosts.
+- ~~Ability to map the schemas.~~
+- ~~Ability to render a dendogram visualizer.~~
+- ~~Ability to render a graph vizualizer.~~
+- ~~Ability to find between collections.~~
+- ~~Ability to install the retrieved collection data locally.~~
+- ~~Ability to find between dbs.~~
+- [Current WIP] Ability to find/install in remote dbs.
 - Modularization.
 - Parameterize scripts.
 - Documentation.
@@ -81,14 +82,11 @@ There are 3 main files to look at:
 - Make it an npm package.
 - Add plugins for different data sources.
   + Elasticsearch
-  + CouchDB
-  + Redis
-  + RethinkDB
+  + DinamoDB
   + and so on...
 
 # Requirements
 
-- Clone the project.
-- npm install.
-- ~~A directory where your schemas are saved.~~
-- ~~As of now, works with [mongoose](https://mongoosejs.com/docs/guide.html) schemas.~~
+- [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
+- [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
+- [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
