@@ -79,11 +79,13 @@ There are 3 main files to look at:
 - Cleanup, refactor and proper project structure
 - Output truth validation.
 - Full test coverage.
-- Make it an npm package.
+- Make it an npm package.(?)
 - Add plugins for different data sources.
+  + ~~MongoDb~~
   + Elasticsearch
   + DinamoDB
   + and so on...
+- Client UI
 
 # Requirements
 
