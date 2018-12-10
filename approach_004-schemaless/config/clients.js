@@ -60,7 +60,7 @@ const targetLocalDbClient2 = new WeaverMongoClient({
 const remoteDbClient = new WeaverMongoClient({
   type: 'source',
   db: {
-    url: secret.remote.db.address, // string
+    url: secret.remote.db.url, // string
     name: secret.remote.db.sources[0].name, // string
     options: {
       readPreference: 'secondary',
