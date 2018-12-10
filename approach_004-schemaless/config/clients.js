@@ -1,6 +1,14 @@
 const WeaverMongoClient = require('../clients/mongodb');
+const logging = require('debug')('config/clients.js');
+let secret;
 
-const secret = require('./secret.out');
+try {
+  secret = require('./secret.out');
+} catch (e) {
+  logging('\n\n********** Missing secret config file **********');
+  logging('\n\nHave you tried renaming secret.example.js to secret.out.js?\n\n');
+  process.exit();
+}
 
 const sourceLocalDbClient1 = new WeaverMongoClient({
   type: 'source',
