@@ -57,31 +57,31 @@ const targetLocalDbClient2 = new WeaverMongoClient({
   }
 });
 
-const remoteDbClient = new WeaverMongoClient({
-  type: 'source',
-  db: {
-    url: secret.remote.db.url, // string
-    name: secret.remote.db.sources[0].name, // string
-    options: {
-      readPreference: 'secondary',
-    }
-  },
-  /**
-    https://www.npmjs.com/package/tunnel-ssh#config-example
-    https://github.com/mscdex/ssh2#client-methods
-   */
-  sshTunnelConfig : {
-    port: secret.ssh.port, // number
-    agent: secret.ssh.agent, // string
-    username: secret.ssh.username, // string
-    privateKey: secret.ssh.private_key, // string
-    host: secret.remote.host, // string
-    dstHost: secret.remote.host, // string
-    dstPort: secret.remote.dstPort, // number
-    localPort: secret.remote.localPort, // number
-    localhost: secret.remote.localhost, // string
-  }
-});
+// const remoteDbClient = new WeaverMongoClient({
+//   type: 'source',
+//   db: {
+//     url: secret.remote.db.url, // string
+//     name: secret.remote.db.sources[0].name, // string
+//     options: {
+//       readPreference: 'secondary',
+//     }
+//   },
+//   /**
+//     https://www.npmjs.com/package/tunnel-ssh#config-example
+//     https://github.com/mscdex/ssh2#client-methods
+//    */
+//   sshTunnelConfig : {
+//     port: secret.ssh.port, // number
+//     agent: secret.ssh.agent, // string
+//     username: secret.ssh.username, // string
+//     privateKey: secret.ssh.private_key, // string
+//     host: secret.remote.host, // string
+//     dstHost: secret.remote.host, // string
+//     dstPort: secret.remote.dstPort, // number
+//     localPort: secret.remote.localPort, // number
+//     localhost: secret.remote.localhost, // string
+//   }
+// });
 
 module.exports = [
   sourceLocalDbClient1,
