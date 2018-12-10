@@ -30,7 +30,7 @@ const ObjectId    = mongo.ObjectID;
   *       {
   *         @key ignoreFields {array} - The list of collection names to avoid querying
   *       }
-  *     @key sshTunelConfig {object} - tunnel-ssh options: {
+  *     @key sshTunnelConfig {object} - tunnel-ssh options: {
   *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
   *       [https://github.com/mscdex/ssh2#client-methods]
   *     }
