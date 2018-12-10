@@ -1,4 +1,18 @@
+const fs = require('fs');
+const path = require('path');
+
 const WeaverMongoClient = require('../clients/mongodb');
+const logging = require('debug')('Weaver:config/clients.js');
+const secretFileName = path.join(__dirname, 'secret.out.js');
+
+if (!fs.existsSync(secretFileName)) {
+  logging(`
+    \n\n********** Missing secret config file **********
+    ${secretFileName}
+    \n\nHave you tried renaming secret.example.js to secret.out.js?\n\n
+  `);
+  process.exit();
+}
 
 const secret = require('./secret.out');
 
@@ -46,7 +60,7 @@ const targetLocalDbClient2 = new WeaverMongoClient({
 const remoteDbClient = new WeaverMongoClient({
   type: 'source',
   db: {
-    url: secret.remote.db.address, // string
+    url: secret.remote.db.url, // string
     name: secret.remote.db.sources[0].name, // string
     options: {
       readPreference: 'secondary',
@@ -56,7 +70,7 @@ const remoteDbClient = new WeaverMongoClient({
     https://www.npmjs.com/package/tunnel-ssh#config-example
     https://github.com/mscdex/ssh2#client-methods
    */
-  sshTunelConfig : {
+  sshTunnelConfig : {
     port: secret.ssh.port, // number
     agent: secret.ssh.agent, // string
     username: secret.ssh.username, // string
