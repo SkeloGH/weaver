@@ -1,14 +1,20 @@
-const WeaverMongoClient = require('../clients/mongodb');
-const logging = require('debug')('config/clients.js');
-let secret;
+const fs = require('fs');
+const path = require('path');
 
-try {
-  secret = require('./secret.out');
-} catch (e) {
-  logging('\n\n********** Missing secret config file **********');
-  logging('\n\nHave you tried renaming secret.example.js to secret.out.js?\n\n');
+const WeaverMongoClient = require('../clients/mongodb');
+const logging = require('debug')('Weaver:config/clients.js');
+const secretFileName = path.join(__dirname, 'secret.out.js');
+
+if (!fs.existsSync(secretFileName)) {
+  logging(`
+    \n\n********** Missing secret config file **********
+    ${secretFileName}
+    \n\nHave you tried renaming secret.example.js to secret.out.js?\n\n
+  `);
   process.exit();
 }
+
+const secret = require('./secret.out');
 
 const sourceLocalDbClient1 = new WeaverMongoClient({
   type: 'source',
