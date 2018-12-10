@@ -70,7 +70,7 @@ const remoteDbClient = new WeaverMongoClient({
     https://www.npmjs.com/package/tunnel-ssh#config-example
     https://github.com/mscdex/ssh2#client-methods
    */
-  sshTunelConfig : {
+  sshTunnelConfig : {
     port: secret.ssh.port, // number
     agent: secret.ssh.agent, // string
     username: secret.ssh.username, // string
