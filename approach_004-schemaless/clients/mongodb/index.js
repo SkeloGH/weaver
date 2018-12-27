@@ -10,33 +10,30 @@ const ObjectId    = mongo.ObjectID;
 
 
 /**
-  * A MongoDB client wrapper interface for Weaver
-  * @class WeaverMongoClient
-  * @param {object} config:
-  *   {
-  *     @key type {string} - the type of db client:
-  *       @enum 'source' - the client is a data source
-  *       @enum 'target' - the client is a data target
-  *     @key db {object}:
-  *       {
-  *         @key url {string} - the db url address:
-  *           @value 'mongodb://localhost:27017'
-  *         @key name {string} - the client db name:
-  *           @value 'my-app-store'
-  *         @key options {object} - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
-  *       }
-  *     },
-  *     @key client {object} - WeaverMongoClient-specific configurations:
-  *       {
-  *         @key ignoreFields {array} - The list of collection names to avoid querying
-  *       }
-  *     @key sshTunnelConfig {object} - tunnel-ssh options: {
-  *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
-  *       [https://github.com/mscdex/ssh2#client-methods]
-  *     }
-  *   }
+  * @class WeaverMongoClient A MongoDB client wrapper interface for Weaver
 */
 class WeaverMongoClient extends Utils {
+/**
+* @constructor
+* @param {Object} config
+* @param {string} config.type - the type of db client:
+*  'source' - the client is a data source
+*  'target' - the client is a data target
+* @param {object} config.db
+* @param {string} config.db.url - the db url address:
+*   example 'mongodb://localhost:27017'
+* @param {string} config.db.name - the client db name:
+*  example 'my-app-store'
+* @param {object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
+* @param {object} config.client - WeaverMongoClient-specific configurations:
+* @param {array} config.client.ignoreFields - The list of collection names to avoid querying
+* @param {object} config.sshTunnelConfig - tunnel-ssh options: {
+*       [https://www.npmjs.com/package/tunnel-ssh#config-example]
+*       [https://github.com/mscdex/ssh2#client-methods]
+*     }
+*   }
+* @return undefined
+*/
   constructor(config) {
     super(config);
     this.db          = null;
