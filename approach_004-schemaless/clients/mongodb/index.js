@@ -16,22 +16,29 @@ class WeaverMongoClient extends Utils {
 /**
 * @constructor
 * @param {Object} config
-* @param {string} config.type - the type of db client:
-*  'source' - the client is a data source
-*  'target' - the client is a data target
-* @param {object} config.db
-* @param {string} config.db.url - the db url address:
-*   example 'mongodb://localhost:27017'
-* @param {string} config.db.name - the client db name:
-*  example 'my-app-store'
-* @param {object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
-* @param {object} config.client - WeaverMongoClient-specific configurations:
-* @param {array} config.client.ignoreFields - The list of collection names to avoid querying
-* @param {object} config.sshTunnelConfig - tunnel-ssh options: {
+*   @param {'source' | 'target'} config.type - the type of db client:
+*    'source' - the client is a data source
+*    'target' - the client is a data target
+*   @param {Object} config.db
+*     @param {string} config.db.url - the db url address:
+*       example 'mongodb://localhost:27017'
+*     @param {string} config.db.name - the client db name:
+*      example 'my-app-store'
+*     @param {Object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
+*   @param {Object} config.client - WeaverMongoClient-specific configurations:
+*   @param {Array.<string>} config.client.ignoreFields - The list of collection names to avoid querying
+*   @param {Object} config.sshTunnelConfig - tunnel-ssh options:
 *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
 *       [https://github.com/mscdex/ssh2#client-methods]
-*     }
-*   }
+*     @param {number} config.sshTunnelConfig.port
+*     @param {string} config.sshTunnelConfig.agent
+*     @param {string} config.sshTunnelConfig.username
+*     @param {string} config.sshTunnelConfig.privateKey
+*     @param {string} config.sshTunnelConfig.host
+*     @param {string} config.sshTunnelConfig.dstHost
+*     @param {number} config.sshTunnelConfig.dstPort
+*     @param {number} config.sshTunnelConfig.localPort
+*     @param {string} config.sshTunnelConfig.localhost
 * @return undefined
 */
   constructor(config) {
