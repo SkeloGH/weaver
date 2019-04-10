@@ -4,21 +4,22 @@ const WeaverCollect = require('./collect');
 const WeaverDigest = require('./digest');
 
 /**
-  *
-  * The main API class
-  * @class Weaver
-*/
+ *
+ * @class Weaver
+ * @classdesc The main API class
+ */
 class Weaver {
-/**
-  *
-  * Consumes the given configuration object and initializes dependencies.
-  * @constructor
-  * @param {Object} config
-  * @param {Array.<Object>} config.queries
-  * @param {Array.<WeaverMongoClient>} config.dataClients
-  * @param {Object} config.jsonConfig
-  * @param {string} config.jsonConfig.filePath
-*/
+  /**
+   *
+   * Consumes the given configuration object and initializes dependencies.
+   * @constructor
+   * @param {Object} config - The configuration `Object`.
+   * @param {Array.<Object>} config.queries
+   * @param {Array.<WeaverMongoClient>} config.dataClients
+   * @param {Object} config.jsonConfig
+   * @param {string} config.jsonConfig.filePath
+   * @returns {this} this
+   */
   constructor(config) {
     this.__cache = {};
     this.collect = new WeaverCollect(config);
@@ -26,16 +27,16 @@ class Weaver {
     return this._configure(config);
   }
 
-/**
-  *
-  * Assigns the configuration object values to class properties.
-  * @param {Object} config
-  * @param {Array.<Object>} config.queries
-  * @param {Array.<WeaverMongoClient>} config.dataClients
-  * @param {Object} config.jsonConfig
-  * @param {string} config.jsonConfig.filePath
-  * @returns {this} this
-*/
+  /**
+   *
+   * Assigns the configuration `Object` values to class properties.
+   * @param {Object} config - The configuration `Object`.
+   * @param {Array.<Object>} config.queries
+   * @param {Array.<WeaverMongoClient>} config.dataClients
+   * @param {Object} config.jsonConfig
+   * @param {string} config.jsonConfig.filePath
+   * @returns {this} this
+   */
   _configure(config) {
     this.logging     = logging(`Weaver`);
     this.queries     = config.queries;
@@ -46,12 +47,12 @@ class Weaver {
     return this;
   }
 
-/**
-  *
-  * Given a results object, uses the standad output to print the results.
-  * @param {Object} results
-  * @returns {Promise.<Object>}
-*/
+  /**
+   *
+   * Given a results object, uses the standad output to print the results.
+   * @param {Object} results
+   * @returns {Promise.<Object>} A `Promise` resolution carrying the original `results` argument.
+   */
   showResults = (results) => {
     const dataEntries = Object.keys(results);
     this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
@@ -59,24 +60,24 @@ class Weaver {
     return Promise.resolve(results);
   }
 
-/**
-  *
-  * Given a list of clients, initialize their connections by calling their own connect method.
-  * @param {Array.<WeaverMongoClient>} clients
-  * @returns {Promise.<Object>}
-*/
+  /**
+   *
+   * Initializes each of the `clients` connections by calling their own `connect method.
+   * @param {Array.<WeaverMongoClient>} clients - List of `WeaverMongoClient` isntances.
+   * @returns {Promise.<Object>} A `Promise` resolution of all connections.
+   */
   connectClients = (clients) => {
     return Promise.all(
       clients.map(client => client.connect())
     ).catch(this.logging);
   }
 
-/**
-  *
-  * Given a list of clients, initialize their connections by calling their own connect method.
-  * @param {CallableFunction} cb
-  * @returns {undefined}
-*/
+  /**
+   *
+   * Given a list of clients, initialize their connections by calling their own connect method.
+   * @param {CallableFunction} cb - The callback function to execute on completion.
+   * @returns {undefined} undefined
+   */
   run = (cb) => {
     this.connectClients(this.dataTargets)
       .then(() => this.connectClients(this.dataSources))
@@ -91,9 +92,9 @@ class Weaver {
 }
 
 /**
-  * Detects if being called as module, otherwise initializes the app.
-  * @TODO delegate initialization to external module consumer
-*/
+ * Detects if being called as module, otherwise initializes the app.
+ * @TODO delegate initialization to external module consumer
+ */
 if (require.main === module) {
   new Weaver(require('./config')).run((err) => {
     logging('Done');

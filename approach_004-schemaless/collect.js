@@ -1,17 +1,34 @@
-const fs       = require('fs');
-const async    = require('async');
 const logging  = require('debug');
 const ld       = {
   array: require('lodash/array'),
   object: require('lodash/object'),
 };
 
+/**
+ * @class WeaverCollect
+ * @classdesc Data gathering interface for Weaver
+ */
 class WeaverCollect {
+  /**
+   *
+   * Consumes the given configuration object and initializes dependencies.
+   * @constructor
+   * @param {Object} config
+   * @param {Array.<WeaverMongoClient>} config.dataClients
+   * @returns {this} instance of WeaverCollect
+   */
   constructor(config) {
     this.__cache     = {};
     return this._configure(config);
   }
 
+  /**
+   *
+   * Given the list of `dataClients` in `config`, filters out the ones with `type` `'source'` and assigns them to `dataClients` class property.
+   * @param {Object} config
+   * @param {Array.<WeaverMongoClient>} config.dataClients
+   * @returns {this} WeaverCollect instance
+   */
   _configure(config) {
     this.logging     = logging(`WeaverCollect`);
     this.dataClients = config.dataClients;
@@ -19,6 +36,12 @@ class WeaverCollect {
     return this;
   }
 
+  /**
+   *
+   * Iterates over each `result` in `results`, checking if its `_id` key has been cached already, if true, the `result` is filtered, leaving in only the ones that weren't already cached.
+   * @param {Array.<Object>} results - A list of result objects
+   * @returns {Array} Filtered `results`.
+   */
   unCachedResults = (results) => {
     return results.filter(result => {
       const cacheKey = result.data._id;
@@ -26,6 +49,13 @@ class WeaverCollect {
     });
   }
 
+  /**
+   *
+   * Saves the given `result` `Object` in the current instance `cache` by the `result` `_id` key.
+   * @param {Object} result - A cacheable `Object`.
+   * @param {string} result._id - The cacheable `Object` identifier key.
+   * @returns {Object} The cached `Object`.
+   */
   cacheResult = (result) => {
     const cacheKey = result.data._id;
     if (!this.__cache[cacheKey]) {
@@ -34,6 +64,13 @@ class WeaverCollect {
     return this.__cache[cacheKey];
   }
 
+  /**
+   *
+   * Stores in `this.__cache` the result of flattening `results`, by each `result`'s `data._id` field.
+   * @param {Array.<Object>} results - A list of cacheable `Object`s.
+   * @param {string} result._id - The cacheable `Object` identifier key.
+   * @returns {Object} The cached `Object`.
+   */
   cacheResults = (results) => {
     const flatResults = ld.array.flattenDeep(results);
     flatResults.forEach(this.cacheResult);
