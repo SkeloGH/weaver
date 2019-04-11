@@ -1,0 +1,34 @@
+digraph {
+  "/config/secret.out.js" -> "/config/clients.js"
+  "/clients/mongodb" -> "class WeaverMongoClient"
+  "class WeaverMongoClient" -> "WeaverMongoClient.connect"
+
+  "/clients/mongodb" -> "/config/clients.js"
+
+  "/config/clients.js" -> "/config/index.js"
+  "/collect.js" -> "/index.js"
+  "/digest.js" -> "/index.js"
+
+  "/config/index.js" -> "/index.js"
+
+  "/index.js" -> "class Weaver"
+
+  "class Weaver" -> "Weaver.constructor"
+    "Weaver.constructor" -> "class WeaverCollect"
+    "Weaver.constructor" -> "class WeaverDigest"
+    "Weaver.constructor" -> "Weaver._configure"
+
+  "class Weaver" -> "Weaver.run"
+    "Weaver.run" -> "Weaver.connectClients"
+      "Weaver.connectClients" -> "WeaverMongoClient.connect"
+      "Weaver.connectClients" -> "WeaverMongoClient.connect"
+    "Weaver.run" -> "Weaver.showResults"
+
+  "class Weaver" -> "Weaver.showResults"
+
+  "/collect.js" -> "class WeaverCollect"
+  "class WeaverCollect" -> "WeaverCollect.constructor"
+
+  "/digest.js" -> "class WeaverDigest"
+  "class WeaverDigest" -> "WeaverDigest.constructor"
+}
