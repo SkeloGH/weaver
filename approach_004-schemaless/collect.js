@@ -67,7 +67,7 @@ class WeaverCollect {
   /**
    *
    * Stores in `this.__cache` the result of flattening `results`, by each `result`'s `data._id` field.
-   * @param {Array.<Object>} results - A list of cacheable `Object`s.
+   * @param {Array<Object>} results - A list of cacheable `Object`s.
    * @param {string} result._id - The cacheable `Object` identifier key.
    * @returns {Object} The cached `Object`.
    */
@@ -77,6 +77,23 @@ class WeaverCollect {
     return Promise.resolve(this.__cache);
   }
 
+  /**
+   * The core logic for collecting data.
+   * Stores the results in memory.
+   * Exits when no new results are cached.
+   *
+   * Flattens the `results` structure in order to check if they
+   * have been already cached.
+   *
+   * `unCachedResults` are then stored in the local cache.
+   *
+   * Every `result` in `unCachedResults` is examined for references to other documents.
+   *
+   * The resultant, unique ids are then converted into new `queries`. These are run
+   * on every `this.dataSources` DB client, the `results` of that query is passed on recursively.
+   * @param {Array<Object>} results - the output of running the queries against the DB clients.
+   * @returns {Array<Object>} The complete data set after running all the interlaced queries.
+   */
   interlace = (results) => {
     let idsInDoc = [];
     let queries = [];
@@ -103,17 +120,30 @@ class WeaverCollect {
       .then(this.interlace);
   }
 
+  /**
+   * Runs the given `query` against the given `client`.
+   * @param {Object} query - The query in JSON format.
+   * @param {WeaverMongoClient} client - The DB client instance.
+   */
   queryClient = (query, client) => {
-    this.logging(`Running query ${JSON.stringify(query)} on: ${client.config.db.name}`);
+    this.logging(`Running query against ${client.config.db.name} DB: ${JSON.stringify(query, null, 2)}`);
     return client.query(query);
   }
 
+  /**
+   * Runs the given `query` against all the configured `this.dataSources`.
+   * @param {Object} query - The query in JSON format.
+   */
   runQuery = (query) => {
     return Promise.all(
       this.dataSources.map(client => this.queryClient(query, client))
     ).catch(this.logging)
   }
 
+  /**
+   * Runs all the given `queries` against all the configured `this.dataSources`.
+   * @param {Array<Object>} queries - The list of queries to be run.
+   */
   runQueries = (queries) => {
     return Promise.all(queries.map(this.runQuery)).catch(this.logging)
   }

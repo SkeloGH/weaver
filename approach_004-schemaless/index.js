@@ -73,8 +73,21 @@ class Weaver {
   }
 
   /**
+   * Runs the whole program.
    *
-   * Given a list of clients, initialize their connections by calling their own connect method.
+   * Once `this.dataTargets` & `this.dataSources` have connected successfully, it
+   * "warms up" by running the initial client queries (`this.queries`) against
+   * `this.dataSources`, by calling `this.collect.runQueries` The resulting data is
+   * handed over to `this.collect.interlace`.
+   *
+   * `this.collect.interlace` is recursive. The exit results are passed to
+   * `this.showResults` to print out stats.
+   *
+   * `this.digest` then takes care of saving the output in JSON format and
+   * dumping the data into the configured `this.dataTargets`.
+   *
+   * The rest is just poorly executed error catching.
+   *
    * @param {CallableFunction} cb - The callback function to execute on completion.
    * @returns {undefined} undefined
    */
