@@ -16,19 +16,32 @@ digraph {
   "class Weaver" -> "Weaver.constructor"
     "Weaver.constructor" -> "class WeaverCollect"
     "Weaver.constructor" -> "class WeaverDigest"
+
+  "class Weaver" -> "Weaver._configure"
     "Weaver.constructor" -> "Weaver._configure"
 
   "class Weaver" -> "Weaver.run"
     "Weaver.run" -> "Weaver.connectClients"
       "Weaver.connectClients" -> "WeaverMongoClient.connect"
       "Weaver.connectClients" -> "WeaverMongoClient.connect"
+
+    "Weaver.run" -> "WeaverCollect.runQueries"
+    "Weaver.run" -> "WeaverCollect.interlace"
+
+    "Weaver.run" -> "WeaverDigest.saveJSON"
+    "Weaver.run" -> "WeaverDigest.dump"
+
     "Weaver.run" -> "Weaver.showResults"
 
   "class Weaver" -> "Weaver.showResults"
 
   "/collect.js" -> "class WeaverCollect"
-  "class WeaverCollect" -> "WeaverCollect.constructor"
+    "class WeaverCollect" -> "WeaverCollect.constructor"
+    "class WeaverCollect" -> "WeaverCollect.runQueries"
+    "class WeaverCollect" -> "WeaverCollect.interlace"
 
   "/digest.js" -> "class WeaverDigest"
-  "class WeaverDigest" -> "WeaverDigest.constructor"
+    "class WeaverDigest" -> "WeaverDigest.constructor"
+    "class WeaverDigest" -> "WeaverDigest.saveJSON"
+    "class WeaverDigest" -> "WeaverDigest.dump"
 }
