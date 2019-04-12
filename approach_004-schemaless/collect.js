@@ -24,15 +24,16 @@ class WeaverCollect {
 
   /**
    *
-   * Given the list of `dataClients` in `config`, filters out the ones with `type` `'source'` and assigns them to `dataClients` class property.
-   * @param {Object} config
-   * @param {Array.<WeaverMongoClient>} config.dataClients
+   * Given the list of `dataClients` in `config`, filters out the ones with `type` `'source'` and
+   * assigns them to `this.dataSources`.
+   * @param {Object} config - the configuration object
+   * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients to run the queries on.
    * @returns {this} WeaverCollect instance
    */
   _configure(config) {
     this.logging     = logging(`WeaverCollect`);
-    this.dataClients = config.dataClients;
-    this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
+    // this.dataClients = config.dataClients;
+    this.dataSources = config.dataClients.filter(client => client.config.type === 'source');
     return this;
   }
 
