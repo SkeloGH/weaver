@@ -66,26 +66,42 @@ There are 3 main files to look at:
 
 # Roadmap
 
+## MVP
+
 - ~~Ability to map the schemas.~~
 - ~~Ability to render a dendogram visualizer.~~
 - ~~Ability to render a graph vizualizer.~~
 - ~~Ability to find between collections.~~
 - ~~Ability to install the retrieved collection data locally.~~
 - ~~Ability to find between dbs.~~
-- [Current WIP] Ability to find/install in remote dbs.
+
+## Foundations
+
+- In-code documentation. [Current WIP]
+- Initial test coverage.
 - Modularization.
 - Parameterize scripts.
-- Documentation.
-- Cleanup, refactor and proper project structure
-- Output truth validation.
+- Cleanup, refactor and defnitive project structure
+
+## Future
+
 - Full test coverage.
-- Make it an npm package.(?)
 - Add plugins for different data sources.
-  + ~~MongoDb~~
-  + Elasticsearch
+  + ~~MongoDB~~
+  + ElasticSearch
   + DinamoDB
   + and so on...
+- API (REST?)
+  
+## Nice to have
+
 - Client UI
+- Output truth validation.
+- Ability to find/install in remote DBs.
+- Doc pages
+
+[See what's been worked on](https://github.com/SkeloGH/weaver/projects)
+
 
 # Requirements
 
