@@ -10,33 +10,37 @@ const ObjectId    = mongo.ObjectID;
 
 
 /**
-  * A MongoDB client wrapper interface for Weaver
-  * @class WeaverMongoClient
-  * @param {object} config:
-  *   {
-  *     @key type {string} - the type of db client:
-  *       @enum 'source' - the client is a data source
-  *       @enum 'target' - the client is a data target
-  *     @key db {object}:
-  *       {
-  *         @key url {string} - the db url address:
-  *           @value 'mongodb://localhost:27017'
-  *         @key name {string} - the client db name:
-  *           @value 'my-app-store'
-  *         @key options {object} - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
-  *       }
-  *     },
-  *     @key client {object} - WeaverMongoClient-specific configurations:
-  *       {
-  *         @key ignoreFields {array} - The list of collection names to avoid querying
-  *       }
-  *     @key sshTunnelConfig {object} - tunnel-ssh options: {
-  *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
-  *       [https://github.com/mscdex/ssh2#client-methods]
-  *     }
-  *   }
+  * @class WeaverMongoClient A MongoDB client wrapper interface for Weaver
 */
 class WeaverMongoClient extends Utils {
+/**
+* @constructor
+* @param {Object} config
+*   @param {'source' | 'target'} config.type - the type of db client:
+*    'source' - the client is a data source
+*    'target' - the client is a data target
+*   @param {Object} config.db
+*     @param {string} config.db.url - the db url address:
+*       example 'mongodb://localhost:27017'
+*     @param {string} config.db.name - the client db name:
+*      example 'my-app-store'
+*     @param {Object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
+*   @param {Object} config.client - WeaverMongoClient-specific configurations:
+*   @param {Array.<string>} config.client.ignoreFields - The list of collection names to avoid querying
+*   @param {Object} config.sshTunnelConfig - tunnel-ssh options:
+*       [https://www.npmjs.com/package/tunnel-ssh#config-example]
+*       [https://github.com/mscdex/ssh2#client-methods]
+*     @param {number} config.sshTunnelConfig.port
+*     @param {string} config.sshTunnelConfig.agent
+*     @param {string} config.sshTunnelConfig.username
+*     @param {string} config.sshTunnelConfig.privateKey
+*     @param {string} config.sshTunnelConfig.host
+*     @param {string} config.sshTunnelConfig.dstHost
+*     @param {number} config.sshTunnelConfig.dstPort
+*     @param {number} config.sshTunnelConfig.localPort
+*     @param {string} config.sshTunnelConfig.localhost
+* @return undefined
+*/
   constructor(config) {
     super(config);
     this.db          = null;
