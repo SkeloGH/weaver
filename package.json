@@ -6,7 +6,7 @@
   "scripts": {
     "app": "DEBUG=* node --harmony approach_004-schemaless/index.js",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
-    "test": "echo \"No test specified\""
+    "test": "npm run app && npm run dev"
   },
   "repository": {
     "type": "git",
