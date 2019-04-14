@@ -11,6 +11,9 @@ class Util {
     this.__cache  = this.__cache || {};
   }
 
+  /**
+   * @todo - return the cached entry
+   */
   _cache = (key, data) => {
     this.__cache[key] = data;
   }

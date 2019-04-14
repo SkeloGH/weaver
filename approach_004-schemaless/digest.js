@@ -25,8 +25,8 @@ class WeaverDigest {
 
   /**
    *
-   * Splits `config` into `this` properties.
-   * @param {Object} config - The cass configuration object
+   * Splits `config` into `this` class properties.
+   * @param {Object} config - The class configuration object
    * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients to run the queries on.
    * @returns {this} - instance of WeaverDigest
    */
