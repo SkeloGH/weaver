@@ -60,9 +60,9 @@ This tool instead will help you download the relationships, and even visualize t
 
 There are 3 main files to look at:
 
-- `config/index.js`: This is where you'll be changing things around more often, here you can set the initial query for Weaver to start from, there are a couple of examples of our own so feel free to modify accordingly. [TODO - add documentation link]
+- `config/index.js`: This is where you'll be changing things around more often, here you can set the initial query for Weaver to start from, there are a couple of examples so feel free to modify accordingly. [TODO - add documentation link]
 - `config/clients.js`: This is where you create instances of the db clients to be queried/targeted, use the examples in there to set up your own clients. [TODO - add documentation link]
-- `config/secret.example.js`: This is where your secret configurations should go, *BUT DON'T FORGET TO RENAME AS* `config/secret.out.js`, *SO THAT IS NOT PUSHED TO VERSION CONTROL*, use at your own risk. [TODO - add documentation link]
+- `config/secret.example.js`: This is where your secret configurations should go, *BUT DON'T FORGET TO RENAME AS* `config/secret.out.js`, *SO THAT IS NOT PUSHED TO VERSION CONTROL*, use at your own risk. [https://github.com/SkeloGH/weaver/blob/develop/approach_004-schemaless/config/clients.js](Read more...).
 
 # Roadmap
 
@@ -92,7 +92,7 @@ There are 3 main files to look at:
   + DinamoDB
   + and so on...
 - API (REST?)
-  
+
 ## Nice to have
 
 - Client UI
