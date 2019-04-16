@@ -5,19 +5,43 @@ const ld      = {
 
 const ObjectId    = mongo.ObjectID;
 
-
+/**
+ * @class Util
+ * @classdesc Utility class for MongoDB client only.
+ * @todo reconsider inheritance
+ */
 class Util {
+  /**
+   *
+   * Consumes the given configuration object and initializes dependencies.
+   * @constructor
+   * @param {Object} config - The configuration `Object`.
+   * @returns {undefined}
+   */
   constructor(config) {
     this.__cache  = this.__cache || {};
   }
 
   /**
+   *
+   * Keeps `data` in memory under the provided `key`.
    * @todo - return the cached entry
+   * @param {String|Symbol} key - The key under the data will be cached.
+   * @param {any} data - The data to be kept.
    */
   _cache = (key, data) => {
     this.__cache[key] = data;
   }
 
+  /**
+   *
+   * Formats the given `document` to cache under the provided `hash`, `collection` is kept for reference.
+   * @todo - return the cached entry
+   * @param {String|Symbol} hash - The key under the data will be cached.
+   * @param {String} collection - The name of the collection the data is from.
+   * @param {any} document - The data to be kept.
+   * @returns {Object} - The formatted object to be cached.
+   */
   _cacheDocument = (hash, collection, document) => {
     let formattedResult;
     if (document) {
@@ -57,6 +81,11 @@ class Util {
     return ids;
   }
 
+  /**
+   * Given a list of stringified ObjectIds, creates query objects for those specific ids, converted into ObjectId.
+   * @param {Array.<String>} ids - List of stringified ObjectIds
+   * @returns {{Array.<Object>}} - The list of query objects.
+   */
   idsToQuery = (ids) => {
     return ids.map(_id => {
       return { _id: ObjectId(_id)}
