@@ -1,0 +1,76 @@
+digraph g {
+  rankdir = LR;
+  "/config/secret.out.js" -> "/config/clients.js"
+  "/clients/mongodb/util.js" -> "/clients/mongodb/index.js"
+  "/clients/mongodb/util.js" -> "class WeaverMongoClient:Util"
+    "class WeaverMongoClient:Util" -> "/clients/mongodb/index.js"
+  "/clients/mongodb/index.js" -> "class WeaverMongoClient"
+    "class WeaverMongoClient" -> "WeaverMongoClient.constructor"
+    "WeaverMongoClient.constructor" -> "WeaverMongoClient._configure"
+
+  "/collect.js" -> "class WeaverCollect"
+    "class WeaverCollect" -> "WeaverCollect.constructor"
+    "WeaverCollect.constructor" -> "WeaverCollect._configure"
+
+  "/digest.js" -> "class WeaverDigest"
+    "class WeaverDigest" -> "WeaverDigest.constructor"
+
+  "/clients/mongodb/index.js" -> "/config/clients.js"
+
+  "/config/clients.js" -> "/config/index.js"
+  "/collect.js" -> "/index.js"
+  "/digest.js" -> "/index.js"
+
+  "/config/index.js" -> "/index.js"
+
+  "/index.js" -> "class Weaver"
+
+  "class Weaver" -> "Weaver.constructor"
+    "Weaver.constructor" -> {
+      "class WeaverCollect"
+      "class WeaverDigest"
+      "Weaver._configure"
+    }
+
+  "/index.js" -> "Weaver.run"
+
+    "Weaver.run" -> {
+      "Weaver.connectClients"
+      "WeaverCollect.runQueries"
+      "WeaverCollect.interlace"
+      "Weaver.showResults"
+      "WeaverDigest.saveJSON"
+      "WeaverDigest.dump"
+    }
+
+      "Weaver.connectClients" -> "WeaverMongoClient.connect"
+      "Weaver.connectClients" -> "WeaverMongoClient.connect"
+        "WeaverMongoClient.connect" -> "MongoClient.connect"
+        "MongoClient.connect" -> "WeaverMongoClient._onClientConnect"
+        "WeaverMongoClient._onClientConnect" -> "WeaverMongoClient._fetchCollections"
+        "WeaverMongoClient._fetchCollections" -> "WeaverMongoClient._saveCollections"
+
+      "WeaverCollect.runQueries" -> "WeaverCollect.runQuery"
+        "WeaverCollect.runQuery" -> "WeaverCollect.queryClient"
+        "WeaverCollect.queryClient" -> "WeaverMongoClient.query"
+        "WeaverMongoClient.query" -> "WeaverMongoClient._fetchDocument"
+        "WeaverMongoClient._fetchDocument" -> "WeaverMongoClient._cacheDocument"
+        "WeaverMongoClient._cacheDocument" -> "WeaverMongoClient:Util._cache"
+
+      "WeaverCollect.interlace" -> {
+        "WeaverCollect.unCachedResults"
+        "WeaverCollect.cacheResults"
+        "WeaverMongoClient:Util.idsInDoc"
+        "WeaverMongoClient:Util.idsToQuery"
+        "WeaverCollect.runQueries"
+        "WeaverCollect.interlace"
+      }
+        "WeaverCollect.cacheResults" -> "WeaverCollect.cacheResult"
+        "WeaverMongoClient:Util.idsInDoc" -> "WeaverMongoClient:Util.idsInDoc"
+
+      "WeaverDigest.dump" -> "WeaverDigest.validate"
+      "WeaverDigest.dump" -> "WeaverDigest.digest"
+        "WeaverDigest.digest" -> "WeaverMongoClient.digest"
+          "WeaverMongoClient.digest" -> "WeaverMongoClient.saveDocument"
+          "WeaverMongoClient.saveDocument" -> "WeaverMongoClient.handleSavedDocument"
+}

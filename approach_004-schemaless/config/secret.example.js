@@ -4,7 +4,7 @@ const fs = require('fs');
  * */
 const ignoreFields = require('./ignoreFields');
 /**
-Example secret config file
+Example secret config file, customized for convenience.
 */
 module.exports = {
   local: {
