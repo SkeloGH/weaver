@@ -34,6 +34,7 @@
     "tunnel-ssh": "^4.1.4"
   },
   "devDependencies": {
+    "jest": "^24.7.1",
     "nodemon": "^1.18.6"
   }
 }
