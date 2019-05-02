@@ -38,7 +38,7 @@ test('"showResults" returns the same input', async () => {
   const weaver = new Weaver(CONFIG);
   const mockObj = { a: 'b', "c": "d" };
   const results = await weaver.showResults(mockObj);
-  expect(results).toBe(mockObj)
+  expect(results).toBe(mockObj);
 });
 
 test('"connectClients" calls the connect methods', async () => {
@@ -46,7 +46,7 @@ test('"connectClients" calls the connect methods', async () => {
   const client = { connect() { return Promise.resolve('works') } };
   const mockClients = [client];
   const results = await weaver.connectClients(mockClients);
-  expect(results).toEqual(['works'])
+  expect(results).toEqual(['works']);
 });
 
 test('"run" resolves without errors', async (done) => {
@@ -58,10 +58,8 @@ test('"run" resolves without errors', async (done) => {
    * 4. Test JSON output
   */
   const cfg = require('../config');
-  cfg.queries = [{ _id: ObjectId("5ada1247e1c5f5eea5565b48")}];
-  // cfg.queries = [{ _id: ObjectId("5ada1247e1c5f5eea5565b44")}];
   const weaver = new Weaver(cfg);
   const result = await new Promise((resolve) => { weaver.run(resolve); });
   expect(result).toHaveLength(1);
-  done()
+  done();
 });
