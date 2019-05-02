@@ -1,6 +1,8 @@
-import Weaver from '../';
 require("@babel/polyfill");
+import Weaver from '../';
 
+const mongo = require('mongodb');
+const ObjectId = mongo.ObjectID;
 const mockClient = (type) => {
   return { config: { type }, connect() { return Promise.resolve('works') } }
 };
@@ -47,6 +49,19 @@ test('"connectClients" calls the connect methods', async () => {
   expect(results).toEqual(['works'])
 });
 
-test('"run" method proper execution', () => {
-  // TODO: refactor method for testability
+test('"run" resolves without errors', async (done) => {
+  /**
+   * TODO: refactor method for testability
+   * 1. Test clients connected successfully
+   * 2. Test warm up query
+   * 3. Test interlacing
+   * 4. Test JSON output
+  */
+  const cfg = require('../config');
+  cfg.queries = [{ _id: ObjectId("5ada1247e1c5f5eea5565b48")}];
+  // cfg.queries = [{ _id: ObjectId("5ada1247e1c5f5eea5565b44")}];
+  const weaver = new Weaver(cfg);
+  const result = await new Promise((resolve) => { weaver.run(resolve); });
+  expect(result).toHaveLength(1);
+  done()
 });
