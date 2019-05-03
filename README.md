@@ -77,8 +77,8 @@ There are 3 main files to look at:
 
 ## Foundations
 
-- In-code documentation. [Current WIP]
-- Initial test coverage.
+- In-code documentation.
+- Initial test coverage. [Current WIP]
 - Modularization.
 - Parameterize scripts.
 - Cleanup, refactor and defnitive project structure
