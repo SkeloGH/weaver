@@ -77,11 +77,9 @@ There are 3 main files to look at:
 
 ## Foundations
 
-- In-code documentation.
+- ~~In-code documentation.~~
 - Initial test coverage. [Current WIP]
-- Modularization.
-- Parameterize scripts.
-- Cleanup, refactor and defnitive project structure
+- Cleanup, refactor and definitive project structure
 
 ## Future
 
@@ -90,8 +88,9 @@ There are 3 main files to look at:
   + ~~MongoDB~~
   + ElasticSearch
   + DinamoDB
+  + Cassandra
   + and so on...
-- API (REST?)
+- API/SDK
 
 ## Nice to have
 
