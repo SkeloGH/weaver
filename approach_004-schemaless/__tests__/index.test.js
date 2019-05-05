@@ -17,21 +17,21 @@ const CONFIG = {
 
 test('Public methods are defined', () => {
   const weaver = new Weaver(CONFIG);
-  expect(weaver.collect).not.toBeUndefined();
-  expect(weaver.digest).not.toBeUndefined();
-  expect(weaver._configure).not.toBeUndefined();
-  expect(weaver.showResults).not.toBeUndefined();
-  expect(weaver.connectClients).not.toBeUndefined();
-  expect(weaver.run).not.toBeUndefined();
+  expect(weaver.collect).toBeDefined();
+  expect(weaver.digest).toBeDefined();
+  expect(weaver._configure).toBeDefined();
+  expect(weaver.showResults).toBeDefined();
+  expect(weaver.connectClients).toBeDefined();
+  expect(weaver.run).toBeDefined();
 });
 
 test('Self class configuration', () => {
   const weaver = new Weaver(CONFIG);
-  expect(weaver.queries).not.toBeUndefined();
-  expect(weaver.dataClients).not.toBeUndefined();
-  expect(weaver.jsonConfig).not.toBeUndefined();
-  expect(weaver.dataSources).not.toBeUndefined();
-  expect(weaver.dataTargets).not.toBeUndefined();
+  expect(weaver.queries).toBeDefined();
+  expect(weaver.dataClients).toBeDefined();
+  expect(weaver.jsonConfig).toBeDefined();
+  expect(weaver.dataSources).toBeDefined();
+  expect(weaver.dataTargets).toBeDefined();
 });
 
 test('"showResults" returns the same input', async () => {
@@ -49,7 +49,7 @@ test('"connectClients" calls the connect methods', async () => {
   expect(results).toEqual(['works']);
 });
 
-test('"run" resolves without errors', async (done) => {
+test('Weaver interwines', done => {
   /**
    * TODO: refactor method for testability
    * 1. Test clients connected successfully
@@ -57,9 +57,11 @@ test('"run" resolves without errors', async (done) => {
    * 3. Test interlacing
    * 4. Test JSON output
   */
+  function cb(result) {
+    expect(result).toBeDefined();
+    done();
+  }
   const cfg = require('../config');
   const weaver = new Weaver(cfg);
-  const result = await new Promise((resolve) => { weaver.run(resolve); });
-  expect(result).toHaveLength(1);
-  done();
+  weaver.run(cb);
 });
