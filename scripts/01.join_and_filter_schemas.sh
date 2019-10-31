@@ -19,6 +19,7 @@ function usage {
   echo ""
   return 0;
 }
+
 # -----------------------------
 # Set up script context
 # Arguments:
