@@ -75,15 +75,16 @@ function filter_schemas {
   return 0;
 }
 
-# -----------------------------
+# ---------------------------------
 # Set up script context
 # Arguments:
-#  :: [OPTIONAL] 
+#  :: [OPTIONAL] ${environment}.ini
+#      - config file to load
 #  -> load arguments
 #  -> use defaults where unset
 #  -> load configuration file
 #  -> move to working directory
-# -----------------------------
+# ---------------------------------
 export SCRIPT_DIR="`dirname $0`";
 export SCRIPT_NAME=$0;
 export ENV_CONFIG_FILE=$1;
@@ -106,11 +107,11 @@ source <(grep = "$ENV_CONFIG_DIR/$ENV_CONFIG_FILE");
 echo "entering $SCRIPT_DIR";
 pushd $SCRIPT_DIR > /dev/null;
 
-# -----------------------------------------------------------------------------------
+# --------------------------------------------------------------
 # Perform primary script functions
 #  -> combine schemas into one output file for later consumption
 #  -> consume schemas to create a filtered fields schema
-# -----------------------------------------------------------------------------------
+# --------------------------------------------------------------
 combine_schemas;
 filter_schemas;
 
