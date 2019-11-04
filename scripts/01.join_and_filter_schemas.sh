@@ -90,16 +90,16 @@ export SCRIPT_NAME=$0;
 export ENV_CONFIG_FILE=$1;
 export ENV_CONFIG_DIR="";
 if [ "$ENV_CONFIG_FILE" = "" ]; then
-    ENV_CONFIG_FILE="default.ini";
-    ENV_CONFIG_DIR="$SCRIPT_DIR/..";
+  ENV_CONFIG_FILE="default.ini";
+  ENV_CONFIG_DIR="$SCRIPT_DIR/..";
 else
-    ENV_CONFIG_DIR="`dirname $ENV_CONFIG_FILE`";
-    ENV_CONFIG_FILE="`basename $ENV_CONFIG_FILE`";
+  ENV_CONFIG_DIR="`dirname $ENV_CONFIG_FILE`";
+  ENV_CONFIG_FILE="`basename $ENV_CONFIG_FILE`";
 fi
 if [ ! -f "$ENV_CONFIG_DIR/$ENV_CONFIG_FILE" ]; then
-    echo "$ENV_CONFIG_DIR/$ENV_CONFIG_FILE configuration file not found" >&2;
-    usage;
-    exit 1;
+  echo "$ENV_CONFIG_DIR/$ENV_CONFIG_FILE configuration file not found" >&2;
+  usage;
+  exit 1;
 fi
 echo "running $SCRIPT_NAME";
 echo "loading $ENV_CONFIG_DIR/$ENV_CONFIG_FILE";
