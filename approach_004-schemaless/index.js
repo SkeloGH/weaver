@@ -89,7 +89,8 @@ class Weaver {
    * The rest is just poorly executed error catching.
    *
    * @param {CallableFunction} cb - The callback function to execute on completion.
-   * @returns {undefined} undefined
+   * @param {Array} results - If an insertion oparation was executed, it will return
+   *  the document or documents insertion results.
    */
   run = (cb) => {
     this.connectClients(this.dataTargets)
