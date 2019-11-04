@@ -89,7 +89,7 @@ module.exports = {
 
   // A preset that is used as a base for Jest's configuration
   // preset: null,
-  "preset": "@shelf/jest-mongodb"
+  "preset": "@shelf/jest-mongodb",
 
   // Run tests from one or more projects
   // projects: null,
@@ -139,10 +139,10 @@ module.exports = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  // testMatch: [
-  //   "**/__tests__/**/*.[jt]s?(x)",
-  //   "**/?(*.)+(spec|test).[tj]s?(x)"
-  // ],
+  testMatch: [
+    "**/__tests__/**/*.test.[jt]s?(x)",
+    // "**/?(*.)+(spec|test).[tj]s?(x)"
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [

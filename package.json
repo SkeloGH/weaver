@@ -6,7 +6,7 @@
   "scripts": {
     "app": "DEBUG=* node --harmony approach_004-schemaless/index.js",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "jest": {
     "transform": {
