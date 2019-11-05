@@ -6,7 +6,12 @@
   "scripts": {
     "app": "DEBUG=* node --harmony approach_004-schemaless/index.js",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
-    "test": "echo \"No test specified\""
+    "test": "jest --detectOpenHandles"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "repository": {
     "type": "git",
@@ -26,14 +31,22 @@
   },
   "homepage": "https://github.com/SkeloGH/weaver#readme",
   "dependencies": {
-    "async": "^2.6.1",
-    "debug": "^4.1.0",
-    "lodash": "^4.17.11",
+    "@babel/polyfill": "^7.6.0",
+    "async": "^2.6.3",
+    "debug": "^4.1.1",
+    "lodash": "^4.17.15",
     "md5": "^2.2.1",
-    "mongodb": "^3.1.3",
+    "mongodb": "^3.3.3",
     "tunnel-ssh": "^4.1.4"
   },
   "devDependencies": {
-    "nodemon": "^1.18.6"
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.3",
+    "@shelf/jest-mongodb": "^1.1.3",
+    "babel-jest": "^24.9.0",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.4"
   }
 }
