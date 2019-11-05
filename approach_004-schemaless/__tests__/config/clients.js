@@ -8,7 +8,7 @@ MONGO_URL = MONGO_URL.replace('?','');
 const source1 = {
   name: 'weaver--test-source-1',
   url: MONGO_URL + 'weaver--test-target-1',
-}
+};
 
 log('process.env.MONGO_URL', MONGO_URL);
 log('source1.url', source1.url);
