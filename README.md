@@ -78,8 +78,8 @@ There are 3 main files to look at:
 ## Foundations
 
 - ~~In-code documentation.~~
-- Initial test coverage. [Current WIP]
-- Cleanup, refactor and definitive project structure
+- ~~Initial test coverage.~~
+- Cleanup, refactor and definitive project structure. [Current WIP]
 
 ## Future
 
