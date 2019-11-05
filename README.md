@@ -40,7 +40,15 @@ If you wanted to replicate the `orders` and `carts` associated to the `user` in 
 3. Copy the reference value.
 4. Repeat from step 1.
 
-OR! You could use this tool instead to find all the relationships, replicate them in your local db, and even visualize them automatically (coming soon):
+OR! You could use this tool instead to find all the relationships, replicate them in your local db.
+
+| Query                                                   | prod db     | local db  |
+| ------------------------------------------------------- | ----------- | --------- |
+| db.users.findOne(ObjectId('abcdef78901234abcdef1234'))  |    found 1  |  found 1  |
+| db.orders.findOne(ObjectId('4321fedcbafedcba67890123')) |    found 1  |  found 1  |
+| db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))  |    found 1  |  found 1  |
+
+Or even visualize them automatically (coming soon).
 
 ![Basic visualization of collection relationships](/images/example_graph.png?raw=true)
 
