@@ -28,6 +28,7 @@
   "homepage": "https://github.com/SkeloGH/weaver#readme",
   "dependencies": {
     "async": "^2.6.1",
+    "coffee-script": "^1.12.7",
     "debug": "^4.1.0",
     "lodash": "^4.17.11",
     "md5": "^2.2.1",
