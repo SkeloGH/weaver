@@ -1,0 +1,31 @@
+{
+  "abcdef78901234abcdef1234": {
+    "database": "weaver--test-source-1",
+    "dataSet": "users",
+    "data": {
+      "_id": "abcdef78901234abcdef1234",
+      "name": "John",
+      "orders": [
+        {
+          "orderId": "4321fedcbafedcba67890123"
+        }
+      ]
+    }
+  },
+  "4321fedcbafedcba67890123": {
+    "database": "weaver--test-source-1",
+    "dataSet": "orders",
+    "data": {
+      "_id": "4321fedcbafedcba67890123",
+      "cartId": "fedcba67890123fedcba4321"
+    }
+  },
+  "fedcba67890123fedcba4321": {
+    "database": "weaver--test-source-1",
+    "dataSet": "carts",
+    "data": {
+      "_id": "fedcba67890123fedcba4321",
+      "userId": "abcdef78901234abcdef1234"
+    }
+  }
+}
