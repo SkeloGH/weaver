@@ -4,5 +4,5 @@
 environment.ini
 node_modules
 npm-debug.log
-schema/*.coffee
-schemas/*.coffee
+schema/*
+schemas/*
