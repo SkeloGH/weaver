@@ -27,7 +27,7 @@
 </div>
 <div id="graph" style="text-align: center;">Loading...</div>
 <script>
-  const GRAPH_SRC = './graphviz/clean.out.json';
+  const GRAPH_SRC = './graphviz/example.json';
   let _graphData_, $graphCanvas, $queryBox, $relatedCheckbox, _show_related_;
 
   const init = () => {
@@ -40,8 +40,8 @@
   };
   const loadGraphData = (graphSrc) => {
     const loader = d3.json(graphSrc, (graphData)=> {
-      const graphNodesText = graphData.join('');
-      _graphData_ = graphData
+      const graphNodesText = graphData.join(';');
+      _graphData_ = graphData;
       render(graphNodesText);
     });
   };
@@ -75,9 +75,9 @@
   const onInputChange = (ev) => {
     const query = $queryBox.property('value');
     const result = relatedNodes(query)
-    let graphNodesText = result.join('');
+    let graphNodesText = result.join(';');
     if (!query.length) {
-      graphNodesText = _graphData_.join('');
+      graphNodesText = _graphData_.join(';');
     }
     render(graphNodesText, () => {
       let $highlightedNode;
@@ -94,7 +94,8 @@
 
     const result = _graphData_.filter((node) => {
       let hasMatch = false;
-      let nodeElems = node.replace(';','').toLowerCase().split('->');
+      let nodeElems = node.toLowerCase().split('->');
+      nodeElems = nodeElems.map((ele)=>ele.trim());
 
       nodeElems.forEach((elem) => {
         if (related.has(elem)) {
