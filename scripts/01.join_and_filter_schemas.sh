@@ -24,7 +24,7 @@ function usage {
 }
 
 # -----------------------------------------------------------------------------------
-# Combine schemas into one output file for later consumption
+# Copy schemas into one output folder for later consumption
 # Arguments:
 #  :: SCHEMA_INPUT_DIRECTORY:                 set in $ENV_CONFIG_DIR/$ENV_CONFIG_FILE
 #      - schema input files are consumed from here
@@ -42,13 +42,17 @@ function combine_schemas {
   echo "creating $SCHEMA_OUTPUT_DIRECTORY/$SCHEMA_OUTPUT_FILENAME from contents of $SCHEMA_INPUT_DIRECTORY";
   for src_schema_filename in `ls $SCHEMA_INPUT_DIRECTORY`; do
     echo -e "\tprocessing $SCHEMA_INPUT_DIRECTORY/$src_schema_filename";
+    #cat "$SCHEMA_INPUT_DIRECTORY/$src_schema_filename" \
+    #  | grep -Ev "(module|mongoose|require '|process\.env|\.index|\$exists)" \
+    #  >> $SCHEMA_OUTPUT_DIRECTORY/$SCHEMA_OUTPUT_FILENAME;
     cat "$SCHEMA_INPUT_DIRECTORY/$src_schema_filename" \
-      | grep -Ev "(module|mongoose|require '|process\.env|\.index|\$exists)" \
       >> $SCHEMA_OUTPUT_DIRECTORY/$SCHEMA_OUTPUT_FILENAME;
   done
 
   return 0;
 }
+
+
 
 # -----------------------------------------------------------------------------------
 # Consume schemas to create a filtered fields schema
