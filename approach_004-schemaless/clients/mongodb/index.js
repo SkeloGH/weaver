@@ -231,9 +231,7 @@ class WeaverMongoClient extends Utils {
    * @param {Object} document - A MongoDB document.
    * @returns {Promise.<Object>} - The given `document`.
    */
-  static handleSavedDocument = (document) => {
-    return Promise.resolve(document);
-  }
+  handleSavedDocument = (document) => Promise.resolve(document);
 }
 
 module.exports = WeaverMongoClient;
