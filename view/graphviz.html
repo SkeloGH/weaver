@@ -7,15 +7,16 @@
       font-family: 'Lato', sans-serif;
     }
     body { height: 100vh; padding: 0; margin: 0; }
-    .helmet { position: fixed; line-height: 2em; padding: 0.8em; background: #eee; z-index: 1; width: 100vw;}
+    .nav { position: fixed; top:0; line-height: 2em; padding: 0.8em; background: #eee; z-index: 1; width: 100vw;}
     #graph, svg {min-height: 90vh;}
+    #graph {margin-top: 60px; padding: 30px;}
   </style>
   <script defer src="https://d3js.org/d3.v4.min.js"></script>
   <script defer src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
   <script defer src="https://unpkg.com/d3-graphviz@1.4.0/build/d3-graphviz.min.js"></script>
 </head>
 <body>
-<div class="helmet">
+<div class="nav">
   <label for="query_box">
     Get graph for:
     <input name="query_box" id="query_box" type="text">
@@ -46,17 +47,18 @@
     });
   };
   const render = (graphNodesText, cb) => {
-    if (!graphNodesText.length) { return $graphCanvas.text('No results found :('); }
+    const query = $queryBox.property('value');
+    if (!graphNodesText.length) { return $graphCanvas.text(`No nodes matching ${query} where found :(`); }
     $graphCanvas.text('');
     $graphCanvas.graphviz()
       .transition(function () {
           return d3.transition("main")
               .ease(d3.easeLinear)
               // .delay(500)
-              .duration(500);
+              .duration(300);
       })
       .fade(true)
-      .renderDot(['digraph G{', graphNodesText, '}'].join(''))
+      .renderDot(`digraph G{ ${graphNodesText} }`)
       .on("end", cb);
   };
   const bindings = () => {
