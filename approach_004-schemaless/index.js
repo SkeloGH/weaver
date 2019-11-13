@@ -1,4 +1,4 @@
-const logging  = require('debug');
+const logging = require('debug');
 
 const WeaverCollect = require('./collect');
 const WeaverDigest = require('./digest');
@@ -21,9 +21,8 @@ class Weaver {
    * @returns {this} this
    */
   constructor(config) {
-    this.__cache = {};
     this.collect = new WeaverCollect(config);
-    this.digest  = new WeaverDigest(config);
+    this.digest = new WeaverDigest(config);
     return this._configure(config);
   }
 
@@ -38,12 +37,12 @@ class Weaver {
    * @returns {this} this
    */
   _configure(config) {
-    this.logging     = logging(`Weaver`);
-    this.queries     = config.queries;
+    this.logging = logging('Weaver');
+    this.queries = config.queries;
     this.dataClients = config.dataClients;
-    this.jsonConfig  = config.jsonConfig;
-    this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
-    this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
+    this.jsonConfig = config.jsonConfig;
+    this.dataSources = this.dataClients.filter((client) => client.config.type === 'source');
+    this.dataTargets = this.dataClients.filter((client) => client.config.type === 'target');
     return this;
   }
 
@@ -53,7 +52,7 @@ class Weaver {
    * @param {Object} results
    * @returns {Promise.<Object>} A `Promise` resolution carrying the original `results` argument.
    */
-  showResults = (results) => {
+  showResults(results) {
     const dataEntries = Object.keys(results);
     this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
     this.logging(`Total dataEntries: ${dataEntries.length}`);
@@ -66,10 +65,9 @@ class Weaver {
    * @param {Array.<WeaverMongoClient>} clients - List of `WeaverMongoClient` isntances.
    * @returns {Promise.<Object>} A `Promise` resolution of all connections.
    */
-  connectClients = (clients) => {
-    return Promise.all(
-      clients.map(client => client.connect())
-    ).catch(this.logging);
+  connectClients(clients) {
+    const result = clients.map((client) => client.connect());
+    return Promise.all(result).catch(this.logging);
   }
 
   /**
@@ -92,12 +90,12 @@ class Weaver {
    * @param {Array} results - If an insertion oparation was executed, it will return
    *  the document or documents insertion results.
    */
-  run = (cb) => {
+  run(cb) {
     this.connectClients(this.dataTargets)
       .then(() => this.connectClients(this.dataSources))
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
-      .then(this.showResults)
+      .then(this.showResults.bind(this))
       .then(this.digest.saveJSON)
       .then(this.digest.dump)
       .catch(this.logging)
@@ -110,7 +108,9 @@ class Weaver {
  * @TODO delegate initialization to external module consumer
  */
 if (require.main === module) {
-  new Weaver(require('./config')).run((err) => {
+  const CFG = require('./config');
+  new Weaver(CFG).run((err) => {
+    if (err) logging(err);
     logging('Done');
     process.exit();
   });
