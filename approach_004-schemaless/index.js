@@ -21,6 +21,7 @@ class Weaver {
    * @returns {this} this
    */
   constructor(config) {
+    this.__cache = {};
     this.collect = new WeaverCollect(config);
     this.digest = new WeaverDigest(config);
     return this._configure(config);
@@ -52,7 +53,7 @@ class Weaver {
    * @param {Object} results
    * @returns {Promise.<Object>} A `Promise` resolution carrying the original `results` argument.
    */
-  showResults(results) {
+  showResults = (results) => {
     const dataEntries = Object.keys(results);
     this.logging(`Found interlaced dataEntries: ${dataEntries.join(', ')}`);
     this.logging(`Total dataEntries: ${dataEntries.length}`);
@@ -65,9 +66,9 @@ class Weaver {
    * @param {Array.<WeaverMongoClient>} clients - List of `WeaverMongoClient` isntances.
    * @returns {Promise.<Object>} A `Promise` resolution of all connections.
    */
-  connectClients(clients) {
-    const result = clients.map((client) => client.connect());
-    return Promise.all(result).catch(this.logging);
+  connectClients = (clients) => {
+    const results = clients.map((client) => client.connect());
+    return Promise.all(results).catch(this.logging);
   }
 
   /**
@@ -90,12 +91,12 @@ class Weaver {
    * @param {Array} results - If an insertion oparation was executed, it will return
    *  the document or documents insertion results.
    */
-  run(cb) {
+  run = (cb) => {
     this.connectClients(this.dataTargets)
       .then(() => this.connectClients(this.dataSources))
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
-      .then(this.showResults.bind(this))
+      .then(this.showResults)
       .then(this.digest.saveJSON)
       .then(this.digest.dump)
       .catch(this.logging)
@@ -108,9 +109,9 @@ class Weaver {
  * @TODO delegate initialization to external module consumer
  */
 if (require.main === module) {
-  const CFG = require('./config');
-  new Weaver(CFG).run((err) => {
+  new Weaver(require('./config')).run((err) => {
     if (err) logging(err);
+    if (err) throw err;
     logging('Done');
     process.exit();
   });
