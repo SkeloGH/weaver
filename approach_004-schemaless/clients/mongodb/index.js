@@ -1,12 +1,10 @@
-const mongo   = require('mongodb');
-const tunnel  = require('tunnel-ssh');
+const mongo = require('mongodb');
 const logging = require('debug');
-const md5     = require('md5');
+const md5 = require('md5');
 
-const Utils   = require('./util');
+const Utils = require('./util');
 
-const MongoClient = mongo.MongoClient;
-const ObjectId    = mongo.ObjectID;
+const { MongoClient } = mongo;
 
 
 /**
@@ -18,38 +16,27 @@ class WeaverMongoClient extends Utils {
  * Consumes the given configuration object and initializes dependencies.
  * @constructor
  * @param {Object} config
- *   @param {'source' | 'target'} config.type - the type of db client:
- *    'source' - the client is a data source
- *    'target' - the client is a data target
- *   @param {Object} config.db
- *     @param {string} config.db.url - the db url address:
- *       example 'mongodb://localhost:27017'
- *     @param {string} config.db.name - the client db name:
- *      example 'my-app-store'
- *     @param {Object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
- *   @param {Object} config.client - WeaverMongoClient-specific configurations:
- *   @param {Array.<string>} config.client.ignoreFields - The list of collection names to avoid querying
- *   @param {Object} config.sshTunnelConfig - tunnel-ssh options:
- *       [https://www.npmjs.com/package/tunnel-ssh#config-example]
- *       [https://github.com/mscdex/ssh2#client-methods]
- *     @param {number} config.sshTunnelConfig.port
- *     @param {string} config.sshTunnelConfig.agent
- *     @param {string} config.sshTunnelConfig.username
- *     @param {string} config.sshTunnelConfig.privateKey
- *     @param {string} config.sshTunnelConfig.host
- *     @param {string} config.sshTunnelConfig.dstHost
- *     @param {number} config.sshTunnelConfig.dstPort
- *     @param {number} config.sshTunnelConfig.localPort
- *     @param {string} config.sshTunnelConfig.localhost
- * @return {undefined}
+ * @param {'source' | 'target'} config.type - the type of db client:
+ *  'source' - the client is a data source
+ *  'target' - the client is a data target
+ * @param {Object} config.db
+ * @param {string} config.db.url - the db url address:
+ *   example 'mongodb://localhost:27017'
+ * @param {string} config.db.name - the client db name:
+ *  example 'my-app-store'
+ * @param {Object} config.db.options - node-mongodb-native options: http://mongodb.github.io/node-mongodb-native/3.1/reference/connecting/connection-settings/]
+ * @param {Object} config.client - WeaverMongoClient-specific configurations:
+ * @param {Array.<string>} config.client.ignoreFields - The list of collection names to
+ *  avoid querying
+ * @return {WeaverMongoClient} this
 */
   constructor(config) {
     super(config);
-    this.db          = null;
-    this.remote      = null;
+    this.db = null;
+    this.remote = null;
     this.collections = [];
-    this.collNames   = [];
-    this.__cache     = {};
+    this.collNames = [];
+    this.__cache = {};
 
     this._configure(config);
   }
@@ -58,17 +45,18 @@ class WeaverMongoClient extends Utils {
    *
    * Splits `config` into `this` class properties.
    * @param {Object} config - The cass configuration object
-   * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients to run the queries on.
+   * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients to run
+   * the queries on.
    * @returns {this} - instance of WeaverMongoClient
    */
   _configure = (config) => {
     this.logging = logging(`WeaverMongoClient:${config.db.name}`);
-    this.type    = config.type;
-    this.config  = config;
-    this.ignoreFields = config.client && config.client.ignoreFields || [];
+    this.type = config.type;
+    this.config = config;
+    this.ignoreFields = (config.client && config.client.ignoreFields) || [];
 
     // Hide mongo deprecation notice by using the new url parser
-    this.config.db.options['useNewUrlParser'] = true;
+    this.config.db.options.useNewUrlParser = true;
     return this;
   }
 
@@ -79,23 +67,12 @@ class WeaverMongoClient extends Utils {
    * @returns {Promise.<Array>} The client DB collection names.
    */
   connect = () => {
-    const host    = this.config.db.url;
-    const options = this.config.db.options;
+    const host = this.config.db.url;
+    const { options } = this.config.db;
 
-    if (!this.config.sshTunnelConfig) {
-      this.logging('Connecting MongoDb client');
-      return MongoClient.connect(host, options)
-        .then(this._onClientConnect);
-    }
-
-    // this.remote = tunnel(this.config.sshTunnelConfig)
-    //   .then((error, server) => {
-    //     if (error){
-    //       this.onError(error);
-    //       return reject(error);
-    //     }
-    //     this._fetchCollections(resolve);
-    //   });
+    this.logging('Connecting MongoDb client');
+    return MongoClient.connect(host, options)
+      .then(this._onClientConnect);
   }
 
   /**
@@ -117,7 +94,7 @@ class WeaverMongoClient extends Utils {
   */
   _fetchCollections = () => {
     this.logging('Listing collections');
-    return this.db.listCollections({} , { nameOnly:true })
+    return this.db.listCollections({}, { nameOnly: true })
       .toArray()
       .then(this._saveCollections);
   }
@@ -130,7 +107,7 @@ class WeaverMongoClient extends Utils {
    */
   _saveCollections = (collections) => {
     this.collections = collections;
-    this.collNames = collections.map(result => result.name);
+    this.collNames = collections.map((result) => result.name);
     return Promise.resolve(this.collNames);
   }
 
@@ -143,11 +120,11 @@ class WeaverMongoClient extends Utils {
     const dbScans = this.collNames.map(this._fetchDocument.bind(this, query));
 
     return Promise.all(dbScans)
-    .catch(this.onError)
-    .then(results => {
-      const dataEntry = results.filter(result => !!result);
-      return Promise.resolve(dataEntry);
-    });
+      .catch(this.onError)
+      .then((results) => {
+        const dataEntry = results.filter((result) => !!result);
+        return Promise.resolve(dataEntry);
+      });
   }
 
   /**
@@ -166,9 +143,9 @@ class WeaverMongoClient extends Utils {
     if (this.ignoreFields.indexOf(collection) > -1) return Promise.resolve(queryCache);
 
     return this.db.collection(collection).findOne(query)
-    .catch(this.onError)
-    .then(document => {
-      if (document) {
+      .catch(this.onError)
+      .then((document) => {
+        if (document) {
           this.logging(`${collection}.findOne(${JSON.stringify(query)}):`);
           this.logging(`  ${JSON.stringify(document, null, 2)}`);
         }
@@ -181,7 +158,8 @@ class WeaverMongoClient extends Utils {
 
   /**
    * @todo Use a const to build the object, then return the const.
-   * @returns {Object} - Formatted reference to this db client name and the currently cached results.
+   * @returns {Object} - Formatted reference to this db client name and the currently
+   * cached results.
    */
   get data() {
     return {
@@ -231,20 +209,21 @@ class WeaverMongoClient extends Utils {
    * @param {Object} document - A list of data entries
    * @interface document.dataSet - The collection name
    * @interface document.data - The MongoDB document to be saved.
-   * @returns {Promise.<Object>} - The db document, if it existed, otherwise the insert operation client response.
+   * @returns {Promise.<Object>} - The db document, if it existed, otherwise the insert
+   * operation client response.
    * @todo rename `document.dataSet` to `document.collectionName`. Standardize the return response.
    */
   saveDocument = (document) => {
     const collection = document.dataSet;
-    const _id = document.data._id;
-    const query = { _id: _id };
+    const { _id } = document.data;
+    const query = { _id };
 
     return this.db.collection(collection)
       .findOne(query)
-      .then(result => {
+      .then((result) => {
         if (result) return this.handleSavedDocument(result);
         return this.db.collection(collection).insertOne(document.data);
-    });
+      });
   }
 
   /**
@@ -252,7 +231,7 @@ class WeaverMongoClient extends Utils {
    * @param {Object} document - A MongoDB document.
    * @returns {Promise.<Object>} - The given `document`.
    */
-  handleSavedDocument = (document) => {
+  static handleSavedDocument = (document) => {
     return Promise.resolve(document);
   }
 }

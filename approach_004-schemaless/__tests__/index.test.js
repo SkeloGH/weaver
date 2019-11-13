@@ -1,22 +1,23 @@
-require("@babel/polyfill");
-import Weaver from '../';
+require('@babel/polyfill');
 
-const logging  = require('debug');
+const logging = require('debug');
 const { ObjectId } = require('mongodb');
 const CONFIG = require('./config');
+const Weaver = require('../');
+
 const log = logging('Weaver:__tests__:root');
 
 describe('insert', () => {
-  let sourceClient1, sourceClient2, targetClient1, targetClient2;
+  let sourceClient1;
+  let targetClient1;
 
-  const mockUser = {_id: ObjectId('abcdef78901234abcdef1234'), name: 'John', orders: [ { orderId: '4321fedcbafedcba67890123' } ] };
-  const mockCart = {_id: ObjectId('fedcba67890123fedcba4321'), userId: 'abcdef78901234abcdef1234'};
-  const mockOrder = {_id: ObjectId('4321fedcbafedcba67890123'), cartId: 'fedcba67890123fedcba4321'};
+  const mockUser = { _id: ObjectId('abcdef78901234abcdef1234'), name: 'John', orders: [{ orderId: '4321fedcbafedcba67890123' }] };
+  const mockCart = { _id: ObjectId('fedcba67890123fedcba4321'), userId: 'abcdef78901234abcdef1234' };
+  const mockOrder = { _id: ObjectId('4321fedcbafedcba67890123'), cartId: 'fedcba67890123fedcba4321' };
 
   beforeAll(async () => {
     log('Initializing dataClients');
-    sourceClient1 = CONFIG.dataClients[0];
-    targetClient1 = CONFIG.dataClients[1];
+    [sourceClient1, targetClient1] = CONFIG.dataClients;
 
     await sourceClient1.connect();
     await targetClient1.connect();
@@ -75,14 +76,14 @@ describe('insert', () => {
 
   test('"showResults" returns the same input', async () => {
     const weaver = new Weaver(CONFIG);
-    const mockObj = { a: 'b', "c": "d" };
+    const mockObj = { a: 'b', c: 'd' };
     const results = await weaver.showResults(mockObj);
     expect(results).toBe(mockObj);
   });
 
   test('"connectClients" calls the connect methods', async () => {
     const weaver = new Weaver(CONFIG);
-    const client = { connect() { return Promise.resolve('works') } };
+    const client = { connect() { return Promise.resolve('works'); } };
     const mockClients = [client];
     const results = await weaver.connectClients(mockClients);
     expect(results).toEqual(['works']);

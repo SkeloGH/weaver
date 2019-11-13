@@ -7,6 +7,6 @@ module.exports = {
   ],
   dataClients,
   jsonConfig: {
-    filePath: `${process.env.PWD}/results/weaver.test.json`
-  }
-}
+    filePath: `${process.env.PWD}/results/weaver.test.json`,
+  },
+};

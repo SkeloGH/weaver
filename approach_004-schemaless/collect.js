@@ -1,7 +1,10 @@
-const logging  = require('debug');
-const ld       = {
-  array: require('lodash/array'),
-  object: require('lodash/object'),
+const logging = require('debug');
+const ldArray = require('lodash/array');
+const ldObject = require('lodash/object');
+
+const ld = {
+  array: ldArray,
+  object: ldObject,
 };
 
 /**
@@ -18,7 +21,7 @@ class WeaverCollect {
    * @returns {this} instance of WeaverCollect
    */
   constructor(config) {
-    this.__cache     = {};
+    this.__cache = {};
     return this._configure(config);
   }
 
@@ -27,27 +30,30 @@ class WeaverCollect {
    * Given the list of `dataClients` in `config`, filters out the ones with `type` `'source'` and
    * assigns them to `this.dataSources`.
    * @param {Object} config - the configuration object
-   * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients to run the queries on.
+   * @param {Array.<WeaverMongoClient>} config.dataClients - Instances of the clients
+   * to run the queries on.
    * @returns {this} WeaverCollect instance
    */
   _configure(config) {
-    this.logging     = logging(`WeaverCollect`);
+    this.logging = logging('WeaverCollect');
     // this.dataClients = config.dataClients;
-    this.dataSources = config.dataClients.filter(client => client.config.type === 'source');
+    this.dataSources = config.dataClients.filter((client) => client.config.type === 'source');
     return this;
   }
 
   /**
    *
-   * Iterates over each `result` in `results`, checking if its `_id` key has been cached already, if true, the `result` is filtered, leaving in only the ones that weren't already cached.
+   * Iterates over each `result` in `results`, checking if its `_id` key has been cached already,
+   * if true, the `result` is filtered, leaving in only the ones that weren't already cached.
    * @param {Array.<Object>} results - A list of result objects
    * @returns {Array} Filtered `results`.
    */
-  unCachedResults = (results) => {
-    return results.filter(result => {
+  unCachedResults = (_results) => {
+    const results = _results.filter((result) => {
       const cacheKey = result.data._id;
       return !this.__cache[cacheKey];
     });
+    return results;
   }
 
   /**
@@ -67,7 +73,8 @@ class WeaverCollect {
 
   /**
    *
-   * Stores in `this.__cache` the result of flattening `results`, by each `result`'s `data._id` field.
+   * Stores in `this.__cache` the result of flattening `results`, by each
+   * `result`'s `data._id` field.
    * @param {Array<Object>} results - A list of cacheable `Object`s.
    * @param {string} result._id - The cacheable `Object` identifier key.
    * @returns {Object} The cached `Object`.
@@ -107,13 +114,13 @@ class WeaverCollect {
 
     this.cacheResults(unCachedResults);
 
-    this.dataSources.forEach(client => {
+    this.dataSources.forEach((client) => {
       idsInDoc = idsInDoc.concat(client.idsInDoc(unCachedResults));
     });
 
     idsInDoc = ld.array.uniq(idsInDoc);
 
-    this.dataSources.forEach(client => {
+    this.dataSources.forEach((client) => {
       queries = queries.concat(client.idsToQuery(idsInDoc));
     });
 
@@ -136,18 +143,15 @@ class WeaverCollect {
    * @param {Object} query - The query in JSON format.
    */
   runQuery = (query) => {
-    return Promise.all(
-      this.dataSources.map(client => this.queryClient(query, client))
-    ).catch(this.logging)
+    const queries = this.dataSources.map((client) => this.queryClient(query, client));
+    return Promise.all(queries).catch(this.logging);
   }
 
   /**
    * Runs all the given `queries` against all the configured `this.dataSources`.
    * @param {Array<Object>} queries - The list of queries to be run.
    */
-  runQueries = (queries) => {
-    return Promise.all(queries.map(this.runQuery)).catch(this.logging)
-  }
+  runQueries = (queries) => Promise.all(queries.map(this.runQuery)).catch(this.logging)
 }
 
 module.exports = WeaverCollect;

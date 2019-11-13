@@ -1,6 +1,7 @@
 /**
  *
- * @todo - This file should pull either the testing configuration when running in test mode, or a `clients.out.js` file, when running in app/dev mode.
+ * @todo - This file should pull either the testing configuration when running in test mode,
+ * or a `clients.out.js` file, when running in app/dev mode.
  * @todo - Sinthezise access to the `secret` object by using variables.
  * @todo - Warn here about the use of secret file. Add instructions.
  * @todo - Make client options not required.
@@ -10,15 +11,17 @@ const path = require('path');
 
 /**
  *
- * 1. Load up the clients according to your needs, in this case we'll only use MongoDB, so we use `WeaverMongoClient`.
+ * 1. Load up the clients according to your needs, in this case we'll only use MongoDB,
+ * so we use `WeaverMongoClient`.
  */
-const WeaverMongoClient = require('../clients/mongodb');
 const logging = require('debug')('Weaver:config/clients.js');
+const WeaverMongoClient = require('../clients/mongodb');
 
 
 /**
  *
- * 2. For this example, we use a secrets file. There's a file named `secret.example.js`, copy it as `secret.out.js` and adjust accordingly.
+ * 2. For this example, we use a secrets file. There's a file named `secret.example.js`,
+ * copy it as `secret.out.js` and adjust accordingly.
  */
 const secretFileName = path.join(__dirname, 'secret.out.js');
 
@@ -58,11 +61,11 @@ const sourceLocalDbClient1 = new WeaverMongoClient({
      * This is the name of the DB where lookups will be done.
      */
     name: secret.local.db.sources[0].name,
-    options: secret.local.db.options
+    options: secret.local.db.options,
   },
   client: {
-    ignoreFields: secret.local.client.ignoreFields
-  }
+    ignoreFields: secret.local.client.ignoreFields,
+  },
 });
 
 const sourceLocalDbClient2 = new WeaverMongoClient({
@@ -70,8 +73,8 @@ const sourceLocalDbClient2 = new WeaverMongoClient({
   db: {
     url: secret.local.db.url,
     name: secret.local.db.sources[1].name,
-    options: {}
-  }
+    options: {},
+  },
 });
 
 
@@ -101,8 +104,8 @@ const targetLocalDbClient1 = new WeaverMongoClient({
      * This is the name of the DB where you want results to be saved. Prefix is not required.
      */
     name: `weaver-out-${secret.local.db.sources[0].name}`,
-    options: {}
-  }
+    options: {},
+  },
 });
 
 const targetLocalDbClient2 = new WeaverMongoClient({
@@ -111,39 +114,9 @@ const targetLocalDbClient2 = new WeaverMongoClient({
   db: {
     url: secret.local.db.url,
     name: `weaver-out-${secret.local.db.sources[1].name}`,
-    options: {}
-  }
+    options: {},
+  },
 });
-
-/**
- * WIP
- *
- *
- * const remoteDbClient = new WeaverMongoClient({
- *   type: 'source',
- *   db: {
- *     url: secret.remote.db.url,
- *     name: secret.remote.db.sources[0].name,
- *     options: {
- *       readPreference: 'secondary',
- *     }
- *   },
- *
- *   // https://www.npmjs.com/package/tunnel-ssh#config-example
- *   // https://github.com/mscdex/ssh2#client-methods
- *   sshTunnelConfig : {
- *     port: secret.ssh.port,
- *     agent: secret.ssh.agent,
- *     username: secret.ssh.username,
- *     privateKey: secret.ssh.private_key,
- *     host: secret.remote.host,
- *     dstHost: secret.remote.host,
- *     dstPort: secret.remote.dstPort,
- *     localPort: secret.remote.localPort,
- *     localhost: secret.remote.localhost,
- *   }
- * });
- */
 
 
 /**
@@ -157,5 +130,4 @@ module.exports = [
   sourceLocalDbClient2,
   targetLocalDbClient1,
   targetLocalDbClient2,
-  // remoteDbClient,
 ];

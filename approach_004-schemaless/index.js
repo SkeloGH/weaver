@@ -1,4 +1,4 @@
-const logging  = require('debug');
+const logging = require('debug');
 
 const WeaverCollect = require('./collect');
 const WeaverDigest = require('./digest');
@@ -23,7 +23,7 @@ class Weaver {
   constructor(config) {
     this.__cache = {};
     this.collect = new WeaverCollect(config);
-    this.digest  = new WeaverDigest(config);
+    this.digest = new WeaverDigest(config);
     return this._configure(config);
   }
 
@@ -38,12 +38,12 @@ class Weaver {
    * @returns {this} this
    */
   _configure(config) {
-    this.logging     = logging(`Weaver`);
-    this.queries     = config.queries;
+    this.logging = logging('Weaver');
+    this.queries = config.queries;
     this.dataClients = config.dataClients;
-    this.jsonConfig  = config.jsonConfig;
-    this.dataSources = this.dataClients.filter(client => client.config.type === 'source');
-    this.dataTargets = this.dataClients.filter(client => client.config.type === 'target');
+    this.jsonConfig = config.jsonConfig;
+    this.dataSources = this.dataClients.filter((client) => client.config.type === 'source');
+    this.dataTargets = this.dataClients.filter((client) => client.config.type === 'target');
     return this;
   }
 
@@ -67,9 +67,8 @@ class Weaver {
    * @returns {Promise.<Object>} A `Promise` resolution of all connections.
    */
   connectClients = (clients) => {
-    return Promise.all(
-      clients.map(client => client.connect())
-    ).catch(this.logging);
+    const results = clients.map((client) => client.connect());
+    return Promise.all(results).catch(this.logging);
   }
 
   /**
@@ -111,6 +110,8 @@ class Weaver {
  */
 if (require.main === module) {
   new Weaver(require('./config')).run((err) => {
+    if (err) logging(err);
+    if (err) throw err;
     logging('Done');
     process.exit();
   });
