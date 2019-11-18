@@ -12,7 +12,7 @@
     "restart": "osascript -e 'display notification \"App restarted due to:\n'$FILENAME'\" with title \"nodemon\"'"
   },
   "watch": [
-    "approach_004-schemaless/"
+    "src/"
   ],
   "env": {
     "NODE_ENV": "development"
