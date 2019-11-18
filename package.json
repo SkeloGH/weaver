@@ -4,9 +4,9 @@
   "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
   "main": "-",
   "scripts": {
-    "app": "DEBUG=* node --harmony approach_004-schemaless/index.js",
+    "app": "DEBUG=* node --harmony src/index.js",
     "clean": "rimraf node_modules",
-    "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
+    "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "test": "jest --detectOpenHandles"
   },
   "jest": {
