@@ -1,6 +1,8 @@
-.DS_Store
-schemas/*.coffee
-node_modules
 *.out
 *.out.*
+.DS_Store
+environment.ini
+node_modules
 npm-debug.log
+schema/*
+schemas/*

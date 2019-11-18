@@ -57,8 +57,9 @@ Or even visualize them automatically (coming soon).
 ## Getting started
 
 - `git clone https://github.com/SkeloGH/weaver.git`.
-- `npm install`.
+- `cd ./weaver`
 - `nvm use`.
+- `npm install`.
 - Configure according to your settings (see below).
 - `npm run app`.
 

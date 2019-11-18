@@ -5,6 +5,7 @@
   "main": "-",
   "scripts": {
     "app": "DEBUG=* node --harmony approach_004-schemaless/index.js",
+    "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./approach_004-schemaless/index.js",
     "test": "jest --detectOpenHandles"
   },
@@ -33,10 +34,12 @@
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
     "async": "^2.6.3",
+    "coffee-script": "^1.12.7",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "mongodb": "^3.3.3",
+    "rimraf": "^3.0.0",
     "tunnel-ssh": "^4.1.4"
   },
   "devDependencies": {
