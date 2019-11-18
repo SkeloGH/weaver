@@ -1,0 +1,36 @@
+SCHEMAS = require '${IMPORTS_OUT_DIRECTORY}/${IMPORTS_OUT_COFFEE}'
+fs = require 'fs'
+ld      = {
+  lang: require('lodash/lang')
+};
+
+union_char = '->'
+
+validate = (word='') ->
+  return word.toLowerCase().indexOf('id') > -1
+
+tree2Graph = (_result=[], _validationFn, tree, carry) ->
+  _carry = if carry? then carry else ''
+
+  isArray  = ld.lang.isArray(tree);
+  isObject = ld.lang.isPlainObject(tree);
+  isObjectLike = ld.lang.isObjectLike(tree);
+  ids      = carry || [];
+
+  if (isObject || isObjectLike)
+    leaves = Object.keys tree
+    union = if _carry.length > 0 then union_char else ''
+
+    for leaf in leaves
+      if _validationFn(leaf)
+        _result.push _carry+union+leaf
+        continue
+      else
+        tree2Graph _result, _validationFn, tree[leaf], _carry+union+leaf
+  else if _validationFn(_carry)
+    _result.push _carry
+  return _result
+
+graph = tree2Graph [], validate, SCHEMAS
+fs.writeFileSync('${IMPORTS2DOT_OUT_DIRECTORY}/${IMPORTS2DOT_OUT_JSON}', JSON.stringify(graph, null, 2), 'utf-8')
+console.log 'saved to ${IMPORTS2DOT_OUT_DIRECTORY}/${IMPORTS2DOT_OUT_JSON}'
