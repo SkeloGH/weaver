@@ -131,11 +131,11 @@ class Weaver {
  * @TODO delegate initialization to external module consumer
  */
 if (require.main === module) {
-  new Weaver(require('./config')).run((err) => {
-    if (err) logging(err);
-    if (err) throw err;
+  const weaver = new Weaver(require('./config'));
+  weaver.run((result) => {
+    logging('Result', result);
     logging('Done');
-    process.exit();
+    weaver.disconnect(process.exit);
   });
 }
 
