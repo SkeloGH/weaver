@@ -1,9 +1,11 @@
-const mongo   = require('mongodb');
-const ld      = {
-  lang: require('lodash/lang')
+const mongo = require('mongodb');
+const ldLang = require('lodash/lang');
+
+const ld = {
+  lang: ldLang,
 };
 
-const ObjectId    = mongo.ObjectID;
+const { ObjectId } = mongo;
 
 /**
  * @class Util
@@ -18,8 +20,8 @@ class Util {
    * @param {Object} config - The configuration `Object`.
    * @returns {undefined}
    */
-  constructor(config) {
-    this.__cache  = this.__cache || {};
+  constructor() {
+    this.__cache = this.__cache || {};
   }
 
   /**
@@ -35,7 +37,8 @@ class Util {
 
   /**
    *
-   * Formats the given `document` to cache under the provided `hash`, `collection` is kept for reference.
+   * Formats the given `document` to cache under the provided `hash`,
+   * `collection` is kept for reference.
    * @todo - return the cached entry
    * @param {String|Symbol} hash - The key under the data will be cached.
    * @param {String} collection - The name of the collection the data is from.
@@ -48,7 +51,7 @@ class Util {
       formattedResult = {
         database: this.config.db.name,
         dataSet: collection,
-        data: document
+        data: document,
       };
       this._cache(hash, formattedResult);
     }
@@ -62,19 +65,20 @@ class Util {
     *   ["12345678901234567890"]
   */
   idsInDoc = (document, carry) => {
-    const isArray  = ld.lang.isArray(document);
+    const isArray = ld.lang.isArray(document);
     const isObject = ld.lang.isPlainObject(document);
-    const ids      = carry || [];
+    const ids = carry || [];
 
     if (ld.lang.isEmpty(document)) return ids;
 
     if (ObjectId.isValid(document.toString())) {
       ids.push(document.toString());
     } else if (isArray) {
-      document.forEach(doc => ids.concat(this.idsInDoc(doc, ids)));
+      document.forEach((doc) => ids.concat(this.idsInDoc(doc, ids)));
     } else if (isObject) {
-      Object.keys(document).forEach(key => {
-        return ids.concat(this.idsInDoc(document[key], ids));
+      Object.keys(document).forEach((key) => {
+        const result = ids.concat(this.idsInDoc(document[key], ids));
+        return result;
       });
     }
 
@@ -82,14 +86,17 @@ class Util {
   }
 
   /**
-   * Given a list of stringified ObjectIds, creates query objects for those specific ids, converted into ObjectId.
+   * Given a list of stringified ObjectIds, creates query objects for those specific ids,
+   * converted into ObjectId.
    * @param {Array.<String>} ids - List of stringified ObjectIds
    * @returns {{Array.<Object>}} - The list of query objects.
    */
   idsToQuery = (ids) => {
-    return ids.map(_id => {
-      return { _id: ObjectId(_id)}
+    const result = ids.map((_id) => {
+      const query = { _id: ObjectId(_id) };
+      return query;
     });
+    return result;
   }
 }
 

@@ -57,14 +57,13 @@ Or even visualize them automatically (coming soon).
 ## Getting started
 
 - `git clone https://github.com/SkeloGH/weaver.git`.
-- `npm install`.
+- `cd ./weaver`
 - `nvm use`.
+- `npm install`.
 - Configure according to your settings (see below).
-- `npm run app`.
+- `npm run app` (or `npm run dev` if you want to see the full logging).
 
 ## Settings
-
-> Note: the project structure needs refactoring as it's still on POC stage, for now `cd` into `approach_004-schemaless/` to try this out, but feel encouraged to explore the rest of the project!.
 
 There are 3 main files to look at:
 

@@ -1,13 +1,13 @@
+const logging = require('debug');
 const WeaverMongoClient = require('../../clients/mongodb');
-const logging  = require('debug');
-const log = logging('Weaver:__tests__:config:clients');
 
+const log = logging('Weaver:__tests__:config:clients');
 let { MONGO_URL } = process.env;
-MONGO_URL = MONGO_URL.replace('?','');
+MONGO_URL = MONGO_URL.replace('?', '');
 
 const source1 = {
   name: 'weaver--test-source-1',
-  url: MONGO_URL + 'weaver--test-target-1',
+  url: `${MONGO_URL}weaver--test-target-1`,
 };
 
 log('process.env.MONGO_URL', MONGO_URL);
@@ -22,11 +22,11 @@ module.exports = [
     db: {
       url: source1.url,
       name: source1.name,
-      options: {}
+      options: {},
     },
     client: {
-      ignoreFields: []
-    }
+      ignoreFields: [],
+    },
   }),
 
   // /**
@@ -36,9 +36,9 @@ module.exports = [
     type: 'target',
     origin: source1.name, // << note how is using source 1 as ref
     db: {
-      url: MONGO_URL + 'weaver--test-target-1',
-      name: `weaver--test-target-1`,
-      options: {}
-    }
+      url: `${MONGO_URL}weaver--test-target-1`,
+      name: 'weaver--test-target-1',
+      options: {},
+    },
   }),
 ];
