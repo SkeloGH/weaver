@@ -7,7 +7,7 @@ const Weaver = require('../');
 
 const log = logging('Weaver:__tests__:root');
 
-describe('insert', () => {
+describe('Weaver main test suite', () => {
   let sourceClient1;
   let targetClient1;
 
@@ -46,14 +46,17 @@ describe('insert', () => {
     expect(insertedUser).toEqual(mockUser);
     expect(insertedCart).toEqual(mockCart);
     expect(insertedOrder).toEqual(mockOrder);
+    await sourceClient1.database.close();
+    await targetClient1.database.close();
   });
 
-  afterAll(async () => {
-    await sourceClient1.db.close();
-    await sourceClient1.connection.close();
-    await targetClient1.db.close();
-    await targetClient1.connection.close();
-  });
+  /**
+   *  I pretended to use this hook to dispose connections, but for some
+   *  reason is not disconnecting properly, need to fix it
+   *  in the mean time close them manually when not in use.
+   * afterAll(async () => {
+   * });
+  */
 
   test('Public methods are defined', () => {
     const weaver = new Weaver(CONFIG);
@@ -90,6 +93,7 @@ describe('insert', () => {
   });
 
   test('Weaver interwines', async (done) => {
+    const weaver = new Weaver(CONFIG);
     /**
      * TODO: refactor method for testability
      * 1. [x] Test clients connected successfully
@@ -114,9 +118,8 @@ describe('insert', () => {
       expect(insertedUser).toEqual(mockUser);
       expect(insertedCart).toEqual(mockCart);
       expect(insertedOrder).toEqual(mockOrder);
-      done();
+      weaver.disconnect(done);
     }
-    const weaver = new Weaver(CONFIG);
     weaver.run(cb);
   });
 });

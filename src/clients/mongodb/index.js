@@ -61,18 +61,27 @@ class WeaverMongoClient extends Utils {
 
   /**
    *
-   * Initializes each of the `clients` connections by calling their own `connect method.
-   * @param {Array.<WeaverMongoClient>} clients - List of `WeaverMongoClient` instances.
+   * Initializes the `client` connection by calling MongoClent.prototype.connect.
    * @returns {Promise.<Array>} The client DB collection names.
    */
   connect = () => {
     const host = this.config.db.url;
     const { options } = this.config.db;
+    this.client = MongoClient;
 
     this.logging('Connecting MongoDb client');
-    return MongoClient.connect(host, options)
+    return this.client.connect(host, options)
       .then(this._onClientConnect);
   }
+
+  /**
+   *
+   * Close the db and its underlying connections
+   * @param {Boolean} force - Force close, emitting no events
+   * @param {CallableFunction} cb - The result callback
+   * @returns {Promise.<Array>} The client DB collection names.
+   */
+  disconnect = (force, cb) => this.database.close(force, cb)
 
   /**
    * MongoClient connection success handler.
@@ -81,6 +90,7 @@ class WeaverMongoClient extends Utils {
    * @returns {Promise.<Array>} The client DB collection names.
    */
   _onClientConnect = (database) => {
+    this.database = database;
     this.db = database.db(this.config.db.name);
     this.logging('Connection success');
     return this._fetchCollections();
@@ -176,18 +186,6 @@ class WeaverMongoClient extends Utils {
   onError = (error, message) => {
     if (message) this.logging(message, error);
     return this.config.onError && this.config.onError(error);
-  }
-
-  /**
-   * Closes any connection to a remote host. And calls the custom callback
-   * @todo data param is no longer in use, deprecate.
-   * should wait until remote successfully closes.
-   * cb should expect an error object.
-   * @returns undefined
-   */
-  disconnect = (data, cb) => {
-    this.remote.close();
-    cb();
   }
 
   /**
