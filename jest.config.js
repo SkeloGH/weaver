@@ -24,7 +24,7 @@ module.exports = {
   // collectCoverageFrom: null,
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: "coverage",
+  coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
@@ -89,7 +89,7 @@ module.exports = {
 
   // A preset that is used as a base for Jest's configuration
   // preset: null,
-  "preset": "@shelf/jest-mongodb",
+  preset: '@shelf/jest-mongodb',
 
   // Run tests from one or more projects
   // projects: null,
@@ -140,9 +140,9 @@ module.exports = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    "**/__tests__/**/*.test.[jt]s?(x)",
+    '**/__tests__/**/*.test.[jt]s?(x)'
     // "**/?(*.)+(spec|test).[tj]s?(x)"
-  ],
+  ]
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
@@ -183,4 +183,4 @@ module.exports = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-};
+}

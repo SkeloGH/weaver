@@ -6,7 +6,6 @@ const Utils = require('./util');
 
 const { MongoClient } = mongo;
 
-
 /**
  * @class WeaverMongoClient A MongoDB client interface for Weaver
 */

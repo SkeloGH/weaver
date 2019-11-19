@@ -6,8 +6,6 @@
  * @todo - Warn here about the use of secret file. Add instructions.
  * @todo - Make client options not required.
  */
-const fs = require('fs');
-const path = require('path');
 
 /**
  *
@@ -17,24 +15,17 @@ const path = require('path');
 const logging = require('debug')('Weaver:config/clients.js');
 const WeaverMongoClient = require('../clients/mongodb');
 
-
 /**
  *
  * 2. For this example, we use a secrets file. There's a file named `secret.example.js`,
- * copy it as `secret.out.js` and adjust accordingly.
+ * copy it as `secret.out.js` to keep it untracked.
  */
-const secretFileName = path.join(__dirname, 'secret.out.js');
+const secret = require('./secret.example');
 
-if (!fs.existsSync(secretFileName)) {
-  logging(`
-    \n\n********** Missing secret config file **********
-    ${secretFileName}
-    \n\nHave you tried renaming secret.example.js to secret.out.js?\n\n
-  `);
-  process.exit();
-}
-const secret = require('./secret.out');
-
+logging(`
+  Config:
+    ${secret}
+`);
 
 /**
  *
@@ -77,7 +68,6 @@ const sourceLocalDbClient2 = new WeaverMongoClient({
   },
 });
 
-
 /**
  *
  * 4. Create your `"target"` DB clients, for each `"target"`, there must be a `"source"` client.
@@ -117,7 +107,6 @@ const targetLocalDbClient2 = new WeaverMongoClient({
     options: {},
   },
 });
-
 
 /**
  *

@@ -2,7 +2,9 @@
     "parser": "babel-eslint",
     "extends": "airbnb-base",
     "env": {
-        "jest": true
+        "jest": true,
+        "browser": false,
+        "es6": true
     },
     "settings": {
         "import/resolver": {
@@ -18,6 +20,7 @@
         }
     },
     "rules": {
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "no-multi-str": "off"
     }
 }
