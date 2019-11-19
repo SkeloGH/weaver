@@ -115,7 +115,7 @@ class WeaverDigest {
       Promise.resolve(results);
     }
 
-    this.logging(`Saving to: ${this.jsonConfig.filePath}`);
+    this.logging(`Saving JSON to: ${this.jsonConfig.filePath}`);
     fs.writeFileSync(this.jsonConfig.filePath, fileContent, 'utf8');
     return Promise.resolve(results);
   }

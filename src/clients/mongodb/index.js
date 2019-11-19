@@ -76,7 +76,7 @@ class WeaverMongoClient extends Utils {
 
   /**
    *
-   * Close the db and its underlying connections
+   * Closes the `client` connection by calling MongoClent.database.close.
    * @param {Boolean} force - Force close, emitting no events
    * @param {CallableFunction} cb - The result callback
    * @returns {Promise.<Array>} The client DB collection names.
@@ -196,7 +196,7 @@ class WeaverMongoClient extends Utils {
    * @returns {Promise.<Object>} - The insert operation client response.
    */
   digest = (dbContent) => {
-    this.logging(dbContent);
+    this.logging('digesting:', dbContent);
     return Promise.all(dbContent.map(this.saveDocument));
   }
 
