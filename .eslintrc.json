@@ -6,7 +6,8 @@
     "extends": "airbnb-base",
     "env": {
         "jest": true,
-        "browser": false
+        "browser": false,
+        "amd": true
     },
     "settings": {
         "import/resolver": {

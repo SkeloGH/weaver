@@ -50,9 +50,15 @@ OR! You could use this tool instead to find all the relationships, replicate the
 
 Or even visualize them automatically (coming soon).
 
-![Basic visualization of collection relationships](/images/example_graph.png?raw=true)
+![Basic visualization of collection relationships](https://github.com/SkeloGH/weaver/raw/develop/images/example_graph.png?raw=true)
 
 # Usage
+
+# Requirements
+
+- [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
+- [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
+- [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
 
 ## Getting started
 
@@ -60,6 +66,7 @@ Or even visualize them automatically (coming soon).
 - `cd ./weaver`
 - `nvm use`.
 - `npm install`.
+- `npm test`.
 - Configure according to your settings (see below).
 - `npm run app` (or `npm run dev` if you want to see the full logging).
 
@@ -201,9 +208,3 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
 
 [See what's been worked on](https://github.com/SkeloGH/weaver/projects)
 
-
-# Requirements
-
-- [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
-- [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
-- [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
