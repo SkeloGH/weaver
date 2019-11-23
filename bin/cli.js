@@ -6,15 +6,10 @@ const Debug = require('debug');
 const argv = require('yargs');
 
 const logging = Debug('Weaver:CLI');
-const {
-  configPath,
-  applyConfig,
-} = require('./handlers/options');
+const options = require('./options');
+const cmd = require('./commands');
 
-const verboseMode = () => {
-  if (argv.parsed.argv.verbose) Debug.enable('Weaver:*');
-  return true;
-};
+const verboseMode = () => (argv.parsed.argv.verbose && Debug.enable('Weaver:*')) || true;
 const isCalledWithParams = () => process.argv.length > 2; // [node, weaver, ...]
 
 argv
@@ -25,7 +20,7 @@ argv
   // Options start
   .option('config', {
     alias: 'c',
-    describe: `Read or set path of config file\ndefault ${configPath}`,
+    describe: `Read or set path of config file\ndefault ${options.configPath}`,
     type: 'string',
   })
   .option('dry', {
@@ -60,82 +55,10 @@ argv
   })
   // Options end
   // Commands start
-  .command(
-    'run',
-    'Runs the app with the loaded configuration',
-    (yargs) => yargs,
-    (_argv) => {
-      logging('run with the current configuration');
-      return _argv;
-    },
-  )
-  .command(
-    'configure',
-    'Interactive configuration wizard',
-    (yargs) => yargs,
-    (_argv) => {
-      logging('launch configuration wizard');
-      return _argv;
-    },
-  )
-  .command(
-    'add',
-    'Interactive creation of client, query or ignoreField',
-    (yargs) => {
-      const cmd = yargs.command('client', 'Interactive creation of a new client',
-        (_yargs) => _yargs,
-        (params) => {
-          logging('client params', params);
-          return params;
-        })
-        .command('query', 'Interactive creation of a new query',
-          (_yargs) => _yargs,
-          (params) => {
-            logging('query params', params);
-            return params;
-          })
-        .command('ignoreField', 'Interactive creation of a new ignoreField',
-          (_yargs) => _yargs,
-          (params) => {
-            logging('ignoreField params', params);
-            return params;
-          });
-      return cmd;
-    },
-    (_argv) => {
-      logging('_argv', _argv);
-      return _argv;
-    },
-  )
-  .command(
-    'remove',
-    'Interactive removal of clients, queries or ignoreFields',
-    (yargs) => {
-      const cmd = yargs.command('client', 'Interactive removal of one or more clients',
-        (_yargs) => _yargs,
-        (params) => {
-          logging('client params', params);
-          return params;
-        })
-        .command('query', 'Interactive removal of one or more queries',
-          (_yargs) => _yargs,
-          (params) => {
-            logging('query params', params);
-            return params;
-          })
-        .command('ignoreField', 'Interactive removal of one or more ignoreFields',
-          (_yargs) => _yargs,
-          (params) => {
-            logging('ignoreField params', params);
-            return params;
-          });
-      return cmd;
-    },
-    (_argv) => {
-      logging('_argv', _argv);
-      return _argv;
-    },
-  )
+  .command(cmd.run.name, cmd.run.description, cmd.run.setup, cmd.run.parse)
+  .command(cmd.cfg.name, cmd.cfg.description, cmd.cfg.setup, cmd.cfg.parse)
+  .command(cmd.add.name, cmd.add.description, cmd.add.setup, cmd.add.parse)
+  .command(cmd.remove.name, cmd.remove.description, cmd.remove.setup, cmd.remove.parse)
   // Commands end
   .strict(true)
   .check(isCalledWithParams)
@@ -160,6 +83,6 @@ const exec = () => {
     info,
   } = argv.parsed.argv;
   logging(config, verbose, dry, info);
-  applyConfig(config);
+  options.applyConfig(config);
 };
 exec();
