@@ -1,7 +1,7 @@
 {
   "name": "weaver",
   "version": "1.0.0",
-  "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
+  "description": "A tool to migrate model-related entities from NOSQL databases.",
   "main": "-",
   "scripts": {
     "app": "DEBUG=* node --harmony src/index.js",
