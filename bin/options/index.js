@@ -1,25 +1,45 @@
 const Debug = require('debug');
-const shell = require('shelljs');
+const { CONFIG_PATH } = require('../lib/constants');
 
-const logging = Debug('Weaver:CLI:commands');
+const logging = Debug('Weaver:CLI:options');
 
-const homePath = process.env.PWD.replace(process.env.HOME, '~');
-let configPath = `${homePath}/src/config/index.js`;
-
-const applyConfig = (config) => {
-  if (!config) return;
-  logging('current configPath', configPath);
-  // validate path
-  // - path and file exist
-  // - file format is correct
-  // - file content is valid
-  if (typeof config === 'string') {
-    configPath = config;
-  }
-  shell.echo('configuration file path:', configPath);
+const options = {
+  config: {
+    alias: 'c',
+    describe: `Read or set path of config file\ndefault ${CONFIG_PATH}`,
+    type: 'string',
+  },
+  dry: {
+    describe: 'Run but don\'t save.',
+    type: 'boolean',
+  },
+  info: {
+    describe: 'Displays the current settings',
+    type: 'boolean',
+  },
+  json: {
+    describe: 'Write the output in the configured JSON file',
+    type: 'boolean',
+  },
+  'json-file': {
+    describe: 'The JSON filepath where output will be streamed to',
+    type: 'string',
+  },
+  limit: {
+    describe: 'The max amount of docs to retrieve',
+    type: 'number',
+  },
+  verbose: {
+    alias: 'V',
+    describe: 'Enable highest level of logging, same as DEBUG=*',
+    type: 'boolean',
+  },
+  version: {
+    alias: 'v',
+    describe: 'Print version information and quit',
+    type: 'boolean',
+  },
 };
+logging('options', options);
 
-module.exports = {
-  configPath,
-  applyConfig,
-};
+module.exports = options;
