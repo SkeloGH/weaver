@@ -72,6 +72,28 @@ class Weaver {
   }
 
   /**
+   *
+   * Closes each of the dataClients and their underlying connections.
+   * @param {CallableFunction} cb - The result callback
+   * @returns {undefined}
+   */
+  disconnect = async (cb) => {
+    const onClose = (onCloseCb) => {
+      let count = 0;
+      const numClients = this.dataClients.length;
+      return (err) => {
+        count += 1;
+        if (count === numClients) { onCloseCb(err); }
+      };
+    };
+    const closeCb = onClose(cb);
+    await this.dataClients.forEach(async (client) => {
+      await client.disconnect(true, closeCb);
+    });
+    this.logging(`disconnected ${this.dataClients.length} clients...`);
+  }
+
+  /**
    * Runs the whole program.
    *
    * Once `this.dataTargets` & `this.dataSources` have connected successfully, it
@@ -109,11 +131,11 @@ class Weaver {
  * @TODO delegate initialization to external module consumer
  */
 if (require.main === module) {
-  new Weaver(require('./config')).run((err) => {
-    if (err) logging(err);
-    if (err) throw err;
+  const weaver = new Weaver(require('./config'));
+  weaver.run((result) => {
+    logging('Result', result);
     logging('Done');
-    process.exit();
+    weaver.disconnect(process.exit);
   });
 }
 
