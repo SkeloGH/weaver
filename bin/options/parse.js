@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const argv = require('yargs');
 
-const applyConfig = require('./config');
+const { applyConfig } = require('./config');
 
 const logging = Debug('Weaver:parse');
 
