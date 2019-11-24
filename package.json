@@ -7,7 +7,11 @@
     "app": "DEBUG=* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest",
+    "test-debug": "DEBUG=Weaver* jest --detectOpenHandles"
+  },
+  "bin": {
+    "weaver": "bin/cli.js"
   },
   "jest": {
     "transform": {
@@ -39,7 +43,9 @@
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "mongodb": "^3.3.3",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.0",
+    "shelljs": "^0.8.3",
+    "yargs": "^15.0.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",
