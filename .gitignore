@@ -1,6 +1,7 @@
 *.out
 *.out.*
 .DS_Store
+coverage/*
 environment.ini
 node_modules
 npm-debug.log
