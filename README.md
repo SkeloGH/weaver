@@ -70,15 +70,15 @@ Or even visualize them automatically (coming soon).
 - Configure according to your settings (see below).
 - `npm run app` (or `npm run dev` if you want to see the full logging).
 
-## Settings
+### Add data sources and targets
 
 There are 3 main files to look at:
 
-1. `config/clients.js`: This is where you create instances of the db clients to be queried/replicated onto, you'll see 2 instances of `WeaverMongoClient`, which is just a wrapper around `mongodb.MongoClient`:
+1. `src/config/clients.js`: This is where you create instances of the db `source` & `target` clients to be queried and replicated onto. For every `source` client there should be a matching `target` client. You'll see 2 instances of `WeaverMongoClient`, which is just a wrapper of `mongodb.MongoClient`:
 
 ```javascript
 module.exports = [
-  // This is the collection that has your source data, where you want to query against.
+  // This is the client that has your source data, where you want to run the queries against.
   new WeaverMongoClient({
     type: 'source',  // The type of db client
     db: {
@@ -101,7 +101,7 @@ module.exports = [
   // This is the collection where you want to copy the data to.
   new WeaverMongoClient({
     type: 'target',
-    origin: 'my-app-store-prod', // IMPORTANT The name of the db you'll be pulling from
+    origin: 'my-app-store-prod', // IMPORTANT The name of the db you'll be pulling from ^
     db: {
       url: 'mongodb://localhost:27017/my-app-store-local', // Local db
       name: 'my-app-store-local',
@@ -111,21 +111,21 @@ module.exports = [
 ];
 ```
 
-2. `config/index.js`: This is where you'll be changing things around more often, here you need to set the initial query that Weaver will fetch and start looking up from:
+2. `src/config/index.js`: This is where you'll be changing things around more often, here you need to set the initial query that Weaver will use as a seed to start looking up for references:
 
 ```javascript
-const dataClients = require('./clients');
+const dataClients = require('./clients'); // Modified in step 1
 
 // The main app configuration.
 module.exports = {
 
-  // These are the trigger queries, it will find the document in `users` collection
-  // and use its field values to lookup against related documents across collections
+  // These are the seed queries, it will lookup the documents in every data source
+  // and read their fields to look up for related documents between data clients
   queries: [
-    { _id: ObjectId('abcdef78901234abcdef1234') }, // < this is the `user` id in the example
+    { _id: ObjectId('abcdef78901234abcdef1234') }, // < this is the `user` id in the README example
   ],
 
-  dataClients: dataClients,
+  dataClients,
   jsonConfig: {
     // Here you define where the JSON output should be saved to:
     filePath: '${process.env.PWD}/results/weaver.out.json' < this one is checked into the repo, give it a look.
@@ -133,7 +133,13 @@ module.exports = {
 };
 ```
 
-Once the replication is complete, the results will be also printed to a JSON file. Each key is the document's `_id` and the content is a summary of the document found and where it was found:
+### Run the app
+
+`npm run app`
+
+### See the results
+
+Once the replication is complete, the results will be present in the `target` client(s). Additionally, the operation results will be printed to a JSON file. Each key is the document's `_id` and the content is a summary of the document found and where it was found, for our example:
 
 ```json
 {
@@ -173,38 +179,20 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
 
 # Roadmap
 
-## MVP
-
-- ~~Ability to map the schemas.~~
-- ~~Ability to render a dendogram visualizer.~~
-- ~~Ability to render a graph vizualizer.~~
-- ~~Ability to find between collections.~~
-- ~~Ability to install the retrieved collection data locally.~~
-- ~~Ability to find between dbs.~~
-
-## Foundations
-
-- ~~In-code documentation.~~
-- ~~Initial test coverage.~~
-- Cleanup, refactor and definitive project structure. [Current WIP]
-
-## Future
-
-- Full test coverage.
+- [WIP] `weaver` CLI bin
+- [WIP] Full test coverage.
 - Add plugins for different data sources.
   + ~~MongoDB~~
   + ElasticSearch
   + DinamoDB
   + Cassandra
   + and so on...
-- API/SDK
-
-## Nice to have
-
+- API/SDK (?)
 - Client UI
 - Output truth validation.
-- Ability to find/install in remote DBs.
+- Ability to find/install in remote DBs without port forwarding.
 - Doc pages
 
-[See what's been worked on](https://github.com/SkeloGH/weaver/projects)
+[See what's been worked on](https://github.com/SkeloGH/weaver/projects).
+Questions? [create an issue!](https://github.com/SkeloGH/weaver/issues).
 
