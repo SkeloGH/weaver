@@ -4,10 +4,6 @@ const { DEFAULT_CONFIG_PATH } = require('../lib/constants');
 const logging = Debug('Weaver:CLI:options');
 
 const options = {
-  init: {
-    describe: `Creates a placeholder configuration file ${DEFAULT_CONFIG_PATH}`,
-    type: 'string',
-  },
   config: {
     alias: 'c',
     describe: `Read or set path of config file, default: ${DEFAULT_CONFIG_PATH}`,

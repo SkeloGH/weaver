@@ -8,7 +8,7 @@ const argv = require('yargs');
 const logging = Debug('Weaver:CLI');
 const options = require('./options');
 const cmd = require('./commands');
-const parseOptions = require('./options/parse');
+const { parseOptions } = require('./options/parse');
 const {
   verboseMode,
   isCalledWithParams,
@@ -41,4 +41,4 @@ argv
   .help()
   .argv;
 
-parseOptions();
+parseOptions(argv.parsed.argv);
