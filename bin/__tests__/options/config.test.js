@@ -5,23 +5,26 @@ const logging = require('debug')('Weaver:__tests__:cli');
 const shell = require('shelljs');
 const path = require('path');
 const { DEFAULT_CONFIG_PATH } = require('../../lib/constants');
+const CFG = require('./../../.config');
 const {
-  applyConfig,
+  pathExists,
   getJSONContent,
   isJSONFile,
   isValidConfigObject,
-  pathExists,
-  showConfig,
   validateConfig,
+  showConfig,
   validationFeedback,
+  saveConfigPath,
+  applyConfig,
 } = require('../../options/config');
 
 const MOCKS_DIR = path.resolve(__dirname, '../__mock__');
 
 
 describe('weaver --config tests', () => {
-  beforeAll(() => {
-    logging('beforeAll');
+  afterAll(() => {
+    logging('restoring config to original values', CFG.config.filePath);
+    saveConfigPath(CFG.config.filePath);
   });
 
   test('Base behavior', () => {
@@ -50,6 +53,9 @@ describe('weaver --config tests', () => {
 
   test('Input assimilation', () => {
     const mockDir = `${MOCKS_DIR}/.weaver.mock.json`;
+    expect(saveConfigPath(mockDir)).toEqual(true);
+    expect(saveConfigPath(null)).toEqual(true);
+    expect(saveConfigPath({})).toEqual(true);
     expect(applyConfig(mockDir)).toEqual(mockDir);
   });
 });

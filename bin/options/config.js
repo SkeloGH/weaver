@@ -85,8 +85,10 @@ const saveConfigPath = (configFilePath) => {
   try {
     fs.writeFileSync(cfgAbsPath, JSON.stringify(configContent, null, 2));
     if (!TEST_NODE_ENV) shell.echo('Updated config file:\n\t', configContent.config);
+    return true;
   } catch (error) {
     if (!TEST_NODE_ENV) shell.echo('Couldn\'t updated config file', error);
+    return false;
   }
 };
 
@@ -98,12 +100,13 @@ const applyConfig = (configFilePath) => {
 };
 
 module.exports = {
-  applyConfig,
+  pathExists,
   getJSONContent,
   isJSONFile,
   isValidConfigObject,
-  pathExists,
-  showConfig,
   validateConfig,
+  showConfig,
   validationFeedback,
+  saveConfigPath,
+  applyConfig,
 };
