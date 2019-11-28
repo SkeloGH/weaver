@@ -128,7 +128,7 @@ module.exports = {
   dataClients,
   jsonConfig: {
     // Here you define where the JSON output should be saved to:
-    filePath: '${process.env.PWD}/results/weaver.out.json' < this one is checked into the repo, give it a look.
+    filePath: '${process.env.PWD}/results/weaver.out.json' // < this one is checked into the repo, give it a look.
   }
 };
 ```
