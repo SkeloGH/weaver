@@ -5,7 +5,6 @@ const shell = require('shelljs');
 
 const CFG = require('../.config');
 const {
-  DEFAULT_CONFIG_PATH,
   TEST_NODE_ENV,
   REQUIRED_CONFIG_KEYS,
 } = require('../lib/constants');
@@ -77,11 +76,6 @@ const validationFeedback = (validation, config) => {
   if (!TEST_NODE_ENV && !validation.valid) {
     shell.echo('Error: Invalid config file path!', config);
     shell.echo(validation);
-    if (validateConfig(DEFAULT_CONFIG_PATH).valid) {
-      shell.echo('Default config file:\n\t', DEFAULT_CONFIG_PATH);
-    } else {
-      shell.echo('Suggestion:\n\tweaver --init');
-    }
   }
 };
 
@@ -96,7 +90,7 @@ const saveConfigPath = (configFilePath) => {
   }
 };
 
-const applyConfig = (configFilePath = DEFAULT_CONFIG_PATH) => {
+const applyConfig = (configFilePath) => {
   const validated = validateConfig(configFilePath);
   validationFeedback(validated, configFilePath);
   if (validated.valid) saveConfigPath(configFilePath);
