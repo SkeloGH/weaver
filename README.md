@@ -1,3 +1,6 @@
+![Entity-relationship graph](https://github.com/SkeloGH/weaver/raw/develop/images/athenian-weaver.png?raw=true)
+
+
 # Weaver
 
 Migrate related document objects within and across different databases.
