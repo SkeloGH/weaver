@@ -1,10 +1,13 @@
 # Weaver
 
-A tool for mapping, visualizing and importing relational-data in NRDBs
+Migrate related document objects within and across different databases.
 
 [![codebeat badge](https://codebeat.co/badges/d6101e2d-7c26-4c19-a820-d90a96a5fd54)](https://codebeat.co/projects/github-com-skelogh-weaver-master) [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com) [![Coverage Status](https://coveralls.io/repos/github/SkeloGH/weaver/badge.svg)](https://coveralls.io/github/SkeloGH/weaver) [![CircleCI](https://circleci.com/gh/SkeloGH/weaver.svg?style=svg)](https://circleci.com/gh/SkeloGH/weaver)
 
 # Context
+
+- [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
+- [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
 
 Often times when working with NRDBs like MongoDB, documents reference to other documents from different collections (or even DBs). This becomes a challenge when trying to replicate an interwined dataset to be used in a different environment.
 
@@ -33,24 +36,24 @@ For example, a database has the following collections/documents:
 
 Note how `user` relates to `order`, and `order` relates to `cart`.
 
-If you wanted to replicate the `orders` and `carts` associated to the `user` in your local environment, for example, you need to:
+If you wanted to migrate the `orders` and `carts` associated to the `user` to your local environment, you'd need to:
 
 1. Go to the `[users|orders|carts] collection` and find the document.
 2. Check if any of the fields is a reference to another collection.
 3. Copy the reference value.
 4. Repeat from step 1.
 
-OR! You could use this tool instead to find all the relationships, replicate them in your local db.
+This tool finds the relationships, and migrates them to a destination db:
 
-| Query                                                   | prod db     | local db  |
-| ------------------------------------------------------- | ----------- | --------- |
-| db.users.findOne(ObjectId('abcdef78901234abcdef1234'))  |    found 1  |  found 1  |
-| db.orders.findOne(ObjectId('4321fedcbafedcba67890123')) |    found 1  |  found 1  |
-| db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))  |    found 1  |  found 1  |
+| Query                                                    | source db   | target db   |
+| -------------------------------------------------------- | ----------- | ----------- |
+| `db.users.findOne(ObjectId('abcdef78901234abcdef1234'))` |      1      |      1      |
+| `db.orders.findOne(ObjectId('4321fedcbafedcba67890123'))`|      1      |      1      |
+| `db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))` |      1      |      1      |
 
-Or even visualize them automatically (coming soon).
+It can also plot the entity-relationship graph (coming soon).
 
-![Basic visualization of collection relationships](https://github.com/SkeloGH/weaver/raw/develop/images/example_graph.png?raw=true)
+![Entity-relationship graph](https://github.com/SkeloGH/weaver/raw/develop/images/example_graph.png?raw=true)
 
 # Usage
 
@@ -179,8 +182,7 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
 
 # Roadmap
 
-- [WIP] `weaver` CLI bin
-- [WIP] Full test coverage.
+- [WIP] `weaver` CLI [(follow the issue)](https://github.com/SkeloGH/weaver/projects/2)
 - Add plugins for different data sources.
   + ~~MongoDB~~
   + ElasticSearch
@@ -189,8 +191,7 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
   + and so on...
 - API/SDK (?)
 - Client UI
-- Output truth validation.
-- Ability to find/install in remote DBs without port forwarding.
+- Connect via SSH.
 - Doc pages
 
 [See what's been worked on](https://github.com/SkeloGH/weaver/projects).
