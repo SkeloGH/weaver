@@ -1,6 +1,15 @@
+"use strict";
+
 const Debug = require('debug');
-const { absPathname } = require('./shared');
-const { showConfig, applyConfig } = require('./config');
+
+const {
+  absPathname
+} = require('./shared');
+
+const {
+  showConfig,
+  applyConfig
+} = require('./config');
 
 const logging = Debug('Weaver:parse');
 
@@ -15,7 +24,6 @@ const parseOptions = (argvparsed = {}) => {
   }
 };
 
-
 module.exports = {
-  parseOptions,
+  parseOptions
 };

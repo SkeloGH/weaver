@@ -1,5 +1,3 @@
-require('@babel/polyfill');
-
 const HOMEDIR = require('os').homedir();
 const logging = require('debug')('Weaver:__tests__:cli');
 const shell = require('shelljs');
