@@ -1,5 +1,3 @@
-require('@babel/polyfill');
-
 const logging = require('debug')('Weaver:__tests__:cli');
 const { parseOptions } = require('../../options/parse');
 

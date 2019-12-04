@@ -1,5 +1,3 @@
-require('@babel/polyfill');
-
 const logging = require('debug')('Weaver:__tests__:options:shared');
 const {
   absPathname,

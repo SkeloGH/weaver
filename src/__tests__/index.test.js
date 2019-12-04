@@ -1,5 +1,3 @@
-require('@babel/polyfill');
-
 const logging = require('debug');
 const { ObjectId } = require('mongodb');
 const CONFIG = require('./config');

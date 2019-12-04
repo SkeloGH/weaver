@@ -4,6 +4,9 @@
   "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
   "main": "-",
   "scripts": {
+    "build": "npm run build-cli && npm run build-app && npm run test",
+    "build-cli": "babel bin/ -d dist/bin",
+    "build-app": "babel src/ -d dist/src",
     "app": "DEBUG=* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
@@ -11,7 +14,7 @@
     "test-debug": "DEBUG=Weaver* jest --detectOpenHandles"
   },
   "bin": {
-    "weaver": "bin/cli.js"
+    "weaver": "dist/bin/cli.js"
   },
   "jest": {
     "transform": {
@@ -36,8 +39,8 @@
   },
   "homepage": "https://github.com/SkeloGH/weaver#readme",
   "dependencies": {
-    "@babel/polyfill": "^7.6.0",
     "async": "^2.6.3",
+    "core-js": "^3.4.7",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
@@ -47,8 +50,10 @@
     "yargs": "^15.0.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-env": "^7.7.4",
     "@shelf/jest-mongodb": "^1.1.3",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
