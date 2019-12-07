@@ -7,7 +7,7 @@
     "build": "npm run build-cli && npm run build-app && npm run test",
     "build-cli": "babel bin/ -d dist/bin",
     "build-app": "babel src/ -d dist/src",
-    "app": "DEBUG=* node --harmony src/index.js",
+    "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "test": "jest",
@@ -26,13 +26,16 @@
     "url": "git+https://github.com/SkeloGH/weaver.git"
   },
   "keywords": [
+    "weaver",
+    "dbs",
     "mongodb",
-    "visualize",
-    "import",
-    "relational",
-    "graphviz"
+    "replication",
+    "visualization",
+    "schema",
+    "entity-relationship-diagram",
+    "entity-relationship-models"
   ],
-  "author": "Aaron G.H.",
+  "author": "Aaron Gonzalez",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/SkeloGH/weaver/issues"
