@@ -2,7 +2,7 @@
 
 const Debug = require('debug');
 
-const logging = Debug('Weaver:CLI:commands');
+const logging = Debug('Weaver:bin:commands:configure');
 module.exports = {
   name: 'configure',
   description: 'Interactive configuration wizard',
