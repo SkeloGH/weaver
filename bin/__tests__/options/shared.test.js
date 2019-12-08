@@ -4,7 +4,7 @@ const {
 } = require('../../options/shared');
 
 
-describe('weaver argument parser', () => {
+describe('weaver argument parser tests', () => {
   beforeAll(() => {
     logging('beforeAll');
   });
