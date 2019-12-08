@@ -1,6 +1,6 @@
 const Debug = require('debug');
 
-const logging = Debug('Weaver:CLI:commands');
+const logging = Debug('Weaver:bin:commands:remove');
 
 module.exports = {
   name: 'remove',

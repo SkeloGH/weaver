@@ -5,7 +5,7 @@ const {
 } = require('../lib/config');
 const Weaver = require('../../src');
 
-const logging = Debug('Weaver:CLI:commands');
+const logging = Debug('Weaver:bin:commands:run');
 
 module.exports = {
   name: 'run',

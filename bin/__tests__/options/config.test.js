@@ -1,5 +1,5 @@
 const HOMEDIR = require('os').homedir();
-const logging = require('debug')('Weaver:__tests__:cli');
+const logging = require('debug')('Weaver:bin:__tests__:options:config');
 const shell = require('shelljs');
 const path = require('path');
 const { DEFAULT_CONFIG_PATH } = require('../../lib/constants');

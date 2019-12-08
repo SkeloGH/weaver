@@ -2,7 +2,7 @@ const Debug = require('debug');
 const { absPathname } = require('./shared');
 const { showConfig, applyConfig } = require('./config');
 
-const logging = Debug('Weaver:parse');
+const logging = Debug('Weaver:bin:options:parse');
 
 const parseOptions = (argvparsed = {}) => {
   const cfg = argvparsed.config;

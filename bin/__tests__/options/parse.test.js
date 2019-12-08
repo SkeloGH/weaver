@@ -1,4 +1,4 @@
-const logging = require('debug')('Weaver:__tests__:cli');
+const logging = require('debug')('Weaver:bin:__tests__:options:parse');
 const { parseOptions } = require('../../options/parse');
 
 

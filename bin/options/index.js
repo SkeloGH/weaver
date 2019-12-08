@@ -1,7 +1,7 @@
 const Debug = require('debug');
 const { DEFAULT_CONFIG_PATH } = require('../lib/constants');
 
-const logging = Debug('Weaver:CLI:options');
+const logging = Debug('Weaver:CLI:options:index');
 
 const options = {
   config: {

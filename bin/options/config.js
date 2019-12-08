@@ -11,7 +11,7 @@ const {
 const { absPathname } = require('./shared');
 
 
-const logging = Debug('Weaver:parse');
+const logging = Debug('Weaver:bin:options:config');
 
 const pathExists = (pathname) => {
   try {

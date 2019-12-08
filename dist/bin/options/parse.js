@@ -11,7 +11,7 @@ const {
   applyConfig
 } = require('./config');
 
-const logging = Debug('Weaver:parse');
+const logging = Debug('Weaver:CLI:options:parse');
 
 const parseOptions = (argvparsed = {}) => {
   const cfg = argvparsed.config;

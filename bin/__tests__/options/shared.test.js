@@ -1,4 +1,4 @@
-const logging = require('debug')('Weaver:__tests__:options:shared');
+const logging = require('debug')('Weaver:bin:__tests__:options:shared');
 const {
   absPathname,
 } = require('../../options/shared');
