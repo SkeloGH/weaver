@@ -10,9 +10,6 @@
         "amd": true,
         "node": true
     },
-    "ignorePatterns": [
-        "dist/*"
-    ],
     "settings": {
         "import/resolver": {
             "node": {
