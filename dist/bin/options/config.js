@@ -16,10 +16,14 @@ const {
 } = require('../lib/constants');
 
 const {
+  InvalidJSONFileError
+} = require('../lib/utils');
+
+const {
   absPathname
 } = require('./shared');
 
-const logging = Debug('Weaver:parse');
+const logging = Debug('Weaver:bin:options:config');
 
 const pathExists = pathname => {
   try {
@@ -39,9 +43,10 @@ const getJSONContent = filePath => {
     logging(`getJSONContent:content ${content}`);
     return parsedContent;
   } catch (error) {
-    logging(`getJSONContent:Error ${error}`);
-    if (error instanceof SyntaxError) console.error('error', error);
-    return null;
+    const errorName = error.constructor.prototype.name.split(' ')[0];
+    const handledErrs = ['SyntaxError', 'TypeError'];
+    if (handledErrs.indexOf(errorName)) return null;
+    throw error;
   }
 };
 
@@ -81,10 +86,11 @@ const showConfig = () => {
   return false;
 };
 
-const validationFeedback = (validation, config) => {
+const validationFeedback = (validation, filePath) => {
   if (!TEST_NODE_ENV && !validation.valid) {
-    shell.echo('Error: Invalid config file path!', config);
+    shell.echo('Error: Invalid config file path!', filePath);
     shell.echo(validation);
+    throw new InvalidJSONFileError(filePath);
   }
 };
 

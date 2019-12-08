@@ -6,7 +6,7 @@ const {
   DEFAULT_CONFIG_PATH
 } = require('../lib/constants');
 
-const logging = Debug('Weaver:CLI:options');
+const logging = Debug('Weaver:CLI:options:index');
 const options = {
   config: {
     alias: 'c',
@@ -32,6 +32,11 @@ const options = {
   limit: {
     describe: 'The max amount of docs to retrieve',
     type: 'number'
+  },
+  queries: {
+    alias: 'qq',
+    describe: 'Document ids to get relationships from, e.g.: 2a3b4c5d6e7f8g9h2a3b4c5d e7f8g9h2a3b4c5d2a3b4c5d6',
+    type: 'array'
   },
   verbose: {
     alias: 'V',
