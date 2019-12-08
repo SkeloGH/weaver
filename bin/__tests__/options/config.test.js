@@ -1,5 +1,5 @@
 const HOMEDIR = require('os').homedir();
-const logging = require('debug')('Weaver:__tests__:cli');
+const logging = require('debug')('Weaver:bin:__tests__:options:config');
 const shell = require('shelljs');
 const path = require('path');
 const { DEFAULT_CONFIG_PATH } = require('../../lib/constants');
@@ -16,6 +16,7 @@ const {
   applyConfig,
 } = require('../../options/config');
 
+const CLI_DIR = path.resolve(__dirname, '../../cli.js');
 const MOCKS_DIR = path.resolve(__dirname, '../__mock__');
 
 
@@ -26,7 +27,7 @@ describe('weaver --config tests', () => {
   });
 
   test('Base behavior', () => {
-    expect(() => shell.exec('weaver --config')).not.toThrow();
+    expect(() => shell.exec(`node --harmony ${CLI_DIR} --config`)).not.toThrow();
     expect(() => showConfig()).not.toThrow();
     expect(() => validationFeedback()).not.toThrow();
     expect(applyConfig()).toEqual(DEFAULT_CONFIG_PATH);

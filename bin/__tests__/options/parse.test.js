@@ -1,4 +1,4 @@
-const logging = require('debug')('Weaver:__tests__:cli');
+const logging = require('debug')('Weaver:bin:__tests__:options:parse');
 const { parseOptions } = require('../../options/parse');
 
 
@@ -8,8 +8,11 @@ describe('weaver argument parser', () => {
   });
 
   test('Base behavior', () => {
-    expect(() => parseOptions()).not.toThrow();
-    expect(() => parseOptions({ config: '' })).not.toThrow();
-    expect(() => parseOptions({ config: './' })).not.toThrow();
+    const invalidConfig1 = undefined;
+    const invalidConfig2 = { config: '' };
+    const invalidConfig3 = { config: './' };
+    expect(() => parseOptions(invalidConfig1)).not.toThrow();
+    expect(() => parseOptions(invalidConfig2)).not.toThrow();
+    expect(() => parseOptions(invalidConfig3)).not.toThrow();
   });
 });

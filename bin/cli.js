@@ -5,7 +5,7 @@
 const Debug = require('debug');
 const argv = require('yargs');
 
-const logging = Debug('Weaver:CLI');
+const logging = Debug('Weaver:bin:cli');
 const options = require('./options');
 const cmd = require('./commands');
 const { parseOptions } = require('./options/parse');
