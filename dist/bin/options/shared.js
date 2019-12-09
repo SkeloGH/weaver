@@ -1,11 +1,1 @@
-"use strict";
-
-const path = require('path');
-
-const Debug = require('debug');
-
-const logging = Debug('Weaver:bin:options:shared');
-const absPathname = path.resolve;
-module.exports = {
-  absPathname
-};
+"use strict";const path=require("path"),Debug=require("debug"),logging=Debug("Weaver:bin:options:shared"),absPathname=path.resolve;module.exports={absPathname};
