@@ -24,6 +24,8 @@
         }
     },
     "rules": {
+        "global-require": 0,
+        "no-unused-vars": 1,
         "no-underscore-dangle": "off",
         "no-multi-str": "off"
     }
