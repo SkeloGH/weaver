@@ -22,9 +22,13 @@ module.exports = {
     const validConfig = hasDataClients && hasQueries;
 
     if (!hasDataClients) {
-      message = `Error: dataClients not set, try adding them:
-      - To the configuration file, or
-      - Using the configuration wizard
+      message = `Error: dataClients not set, try:
+      weaver add [client|query|ignoreField]
+      `;
+    }
+    if (!hasQueries) {
+      message = `Error: queries not set, try:
+      weaver run --queries <a document id>
       `;
     }
     shell.echo(message);

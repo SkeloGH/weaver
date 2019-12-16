@@ -12,9 +12,22 @@ InvalidJSONFileError.prototype.name = 'InvalidJSONFileError';
 
 const verboseMode = () => (argv.parsed.argv.verbose && Debug.enable('Weaver:*')) || true;
 const isCalledWithParams = () => process.argv.length > 2; // [node, weaver, ...]
+const generateId = (options = {}) => {
+  const maxlen = options.length ? options.length : 8;
+  let rand = `${options.prefix ? options.prefix : ''}`;
+  let num = 0;
+  while (rand.length < maxlen) {
+    num = Math.ceil(Math.random() * 100);
+    rand += num;
+  }
+  rand = `${rand}${options.suffix ? options.suffix : ''}`;
+  rand = rand.slice(0, maxlen);
+  return rand;
+};
 
 module.exports = {
   InvalidJSONFileError,
+  generateId,
   verboseMode,
   isCalledWithParams,
 };

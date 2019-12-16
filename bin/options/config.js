@@ -91,7 +91,7 @@ const saveConfigPath = (configFilePath) => {
     if (!TEST_NODE_ENV) shell.echo('Updated config file:\n\t', configContent.config);
     return true;
   } catch (error) {
-    if (!TEST_NODE_ENV) shell.echo('Couldn\'t updated config file', error);
+    if (!TEST_NODE_ENV) shell.echo('Couldn\'t update config file', error);
     return false;
   }
 };
