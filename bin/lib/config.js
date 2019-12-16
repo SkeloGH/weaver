@@ -1,4 +1,5 @@
 const fs = require('fs');
+const shell = require('shelljs');
 const CLI_CONFIG = require('../.config');
 
 const {
@@ -88,7 +89,7 @@ const setConfig = (config = {}) => {
       fs.writeFileSync(cfgAbsPath, JSON.stringify(config, null, 2));
       return true;
     } catch (e) {
-      console.log(e);
+      shell.echo(JSON.stringify(e));
       return false;
     }
   }
