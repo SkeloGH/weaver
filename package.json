@@ -4,13 +4,14 @@
   "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
   "main": "-",
   "scripts": {
-    "build": "npm run build-cli && npm run build-app && npm run test",
-    "build-cli": "babel bin/ -d dist/bin",
-    "build-app": "babel src/ -d dist/src",
+    "build": "npm run build-cli && npm run build-app && npm run test-coverage",
+    "build-cli": "babel bin/ -d dist/bin --ignore \"bin/**/*.test.js\"",
+    "build-app": "babel src/ -d dist/src --ignore \"src/__tests__/*\"",
     "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "test": "jest",
+    "test-coverage": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "test-debug": "DEBUG=Weaver* jest --detectOpenHandles"
   },
   "bin": {
@@ -61,6 +62,7 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
     "babel-preset-minify": "^0.5.1",
+    "coveralls": "^3.0.9",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
