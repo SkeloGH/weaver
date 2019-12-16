@@ -1,6 +1,7 @@
 *.out
 *.out.*
 .DS_Store
+bin/.config.json
 coverage/*
 environment.ini
 node_modules
