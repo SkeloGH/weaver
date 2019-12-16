@@ -5,6 +5,7 @@ const {
   getConfig,
 } = require('../lib/config');
 const Weaver = require('../../src');
+const WeaverMongoClient = require('../../src/clients/mongodb');
 
 const logging = Debug('Weaver:bin:commands:run');
 
@@ -20,6 +21,11 @@ module.exports = {
     const hasQueries = config.queries && config.queries.length > 0;
     const hasDataClients = config.dataClients && config.dataClients.length > 0;
     const validConfig = hasDataClients && hasQueries;
+
+    config.dataClients = config.dataClients.map((c) => {
+      if (c.family.indexOf('mongo') > -1) { return new WeaverMongoClient(c); }
+      return c;
+    });
 
     if (!hasDataClients) {
       message = `Error: dataClients not set, try:
