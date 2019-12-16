@@ -1,6 +1,8 @@
 const Debug = require('debug');
 const shell = require('shelljs');
+const mongo = require('mongodb');
 
+const ObjectId = mongo.ObjectID;
 const {
   getConfig,
 } = require('../lib/config');
@@ -22,11 +24,6 @@ module.exports = {
     const hasDataClients = config.dataClients && config.dataClients.length > 0;
     const validConfig = hasDataClients && hasQueries;
 
-    config.dataClients = config.dataClients.map((c) => {
-      if (c.family.indexOf('mongo') > -1) { return new WeaverMongoClient(c); }
-      return c;
-    });
-
     if (!hasDataClients) {
       message = `Error: dataClients not set, try:
       weaver add [client|query|ignoreField]
@@ -38,12 +35,20 @@ module.exports = {
       `;
     }
     shell.echo(message);
-
     if (!validConfig) return _argv;
+
+    // TODO: need to delegate this conversion to each client
+    // once starting to add new client families
+    config.dataClients = config.dataClients.map((c) => {
+      if (c.family.indexOf('mongo') > -1) { return new WeaverMongoClient(c); }
+      return c;
+    });
+    config.queries = config.queries.map((q) => ({ _id: ObjectId(q) }));
+    // end TODO
     const weaver = new Weaver(config);
     weaver.run((result) => {
       logging('Result', result);
-      logging('Done');
+      shell.echo('Done');
       weaver.disconnect(process.exit);
     });
     return _argv;
