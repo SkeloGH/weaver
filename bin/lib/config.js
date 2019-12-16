@@ -55,10 +55,10 @@ const readCLISettings = () => {
 const getQueries = (fileCfg, cliCfg) => {
   let queries = null;
   if (fileCfg.queries && fileCfg.queries.length > 0) {
-    queries = fileCfg.queries;
+    ({ queries } = fileCfg);
   }
   if (!queries && cliCfg.queries && cliCfg.queries.length) {
-    queries = cliCfg.queries;
+    ({ queries } = cliCfg);
   }
   queries = queries || [];
   return queries;
