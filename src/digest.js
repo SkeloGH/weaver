@@ -54,6 +54,7 @@ class WeaverDigest {
     const unreferenced = this.dataTargets.filter((client) => !client.config.origin);
     const sourceDbs = this.dataSources.map((client) => client.config.db.name);
     const originDbs = this.dataTargets.map((client) => client.config.origin);
+    const targetDbs = this.dataTargets.map((client) => client.config.db.name);
 
     if (unreferenced.length > 0) {
       validation.error = 'Error: There are dataTargets without "origin" assignment.';
@@ -62,7 +63,11 @@ class WeaverDigest {
 
     if (!ld.lang.isEqual(sourceDbs, originDbs)) {
       validation.error = 'Error: Different dataTargets and dataSources assignment.';
-      validation.error += `\n\tsourceDbs: ${sourceDbs} \n\toriginDbs ${originDbs}`;
+      validation.error += `
+      \n\tsourceDbs: ${JSON.stringify(sourceDbs)}\
+       \n\toriginDbs ${JSON.stringify(originDbs)}\
+       \n\ttargetDbs ${JSON.stringify(targetDbs)}\
+       `;
       return validation;
     }
 
@@ -111,8 +116,11 @@ class WeaverDigest {
    */
   saveJSON = (results) => {
     const fileContent = JSON.stringify(results, null, 2);
-    if (!this.jsonConfig || !Object.keys(this.jsonConfig).length) {
-      Promise.resolve(results);
+    if (!this.jsonConfig
+      || !Object.keys(this.jsonConfig).length
+      || !this.jsonConfig.filePath
+    ) {
+      return Promise.resolve(results);
     }
 
     this.logging(`Saving JSON to: ${this.jsonConfig.filePath}`);
