@@ -153,33 +153,6 @@ describe('clientExists', () => {
   });
 });
 
-// describe('commandName', () => {
-//   test('commandName', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.commandName(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
-
-// describe('commandDesc', () => {
-//   test('commandDesc', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.commandDesc(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
-
-// describe('commandSpec', () => {
-//   test('commandSpec', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.commandSpec(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
-
 // describe('commandHandler', () => {
 //   test('commandHandler', () => {
 //     const case1 = null;
@@ -189,41 +162,75 @@ describe('clientExists', () => {
 //   });
 // });
 
-// describe('isSameFamily', () => {
-//   test('isSameFamily', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.isSameFamily(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('isSameFamily', () => {
+  test('false if different', () => {
+    const expected = false;
+    const versionA = { family: validFamily };
+    const versionB = { family: `${validFamily}-B` };
+    const result = importedModule.isSameFamily(versionA, versionB);
+    expect(result).toBe(expected);
+  });
+  test('true if match', () => {
+    const expected = true;
+    const versionA = { family: validFamily };
+    const result = importedModule.isSameFamily(versionA, versionA);
+    expect(result).toBe(expected);
+  });
+});
 
-// describe('isSameType', () => {
-//   test('isSameType', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.isSameType(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('isSameType', () => {
+  test('false if different', () => {
+    const expected = false;
+    const versionA = { type: validTypeSource };
+    const versionB = { type: validTypeTarget };
+    const result = importedModule.isSameType(versionA, versionB);
+    expect(result).toBe(expected);
+  });
+  test('true if match', () => {
+    const expected = true;
+    const versionA = { type: validTypeSource };
+    const result = importedModule.isSameType(versionA, versionA);
+    expect(result).toBe(expected);
+  });
+});
 
-// describe('isSameName', () => {
-//   test('isSameName', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.isSameName(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('isSameName', () => {
+  test('false if different', () => {
+    const expected = false;
+    const versionA = { db: { name: validSourceName } };
+    const versionB = { name: validTargetName };
+    const result = importedModule.isSameName(versionA, versionB);
+    expect(result).toBe(expected);
+  });
+  test('true if match', () => {
+    const expected = true;
+    const versionA = { db: { name: validSourceName } };
+    const versionB = { name: validSourceName };
+    const result = importedModule.isSameName(versionA, versionB);
+    expect(result).toBe(expected);
+  });
+});
 
-// describe('validateParams', () => {
-//   test('validateParams', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.validateParams(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('validateParams', () => {
+  test('false if invalid', () => {
+    const case1 = { type: '', name: '', url: '' };
+    const case2 = null;
+    const case3 = undefined;
+    const expected = false;
+    const result1 = importedModule.validateParams(case1);
+    const result2 = importedModule.validateParams(case2);
+    const result3 = importedModule.validateParams(case3);
+    expect(result1.valid).toBe(expected);
+    expect(result2.valid).toBe(expected);
+    expect(result3.valid).toBe(expected);
+  });
+  test('true if valid', () => {
+    const case1 = validSourceClient;
+    const expected = true;
+    const result1 = importedModule.validateParams(case1);
+    expect(result1.valid).toBe(expected);
+  });
+});
 
 // describe('validateConfig', () => {
 //   test('validateConfig', () => {
