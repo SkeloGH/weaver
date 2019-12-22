@@ -232,11 +232,29 @@ describe('validateParams', () => {
   });
 });
 
-// describe('validateConfig', () => {
-//   test('validateConfig', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.validateConfig(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('validateConfig', () => {
+  const initialConfig = { ...getConfig() };
+  beforeAll(() => {
+    const sourceClient = addClient(validSourceClient);
+    setConfig(sourceClient);
+  });
+  afterAll(() => { setConfig(initialConfig); });
+  test('invalid if parity is found', () => {
+    const case1 = validSourceClient;
+    const expected = false;
+    const result1 = importedModule.validateConfig(case1).valid;
+    expect(result1).toBe(expected);
+  });
+  test('valid if parity is not found', () => {
+    const case1 = validTargetClient;
+    const expected = true;
+    const result1 = importedModule.validateConfig(case1).valid;
+    expect(result1).toBe(expected);
+  });
+  test('invalid if config is invalid', () => {
+    const case1 = { type: '', name: '', url: '' };
+    const expected = false;
+    const result1 = importedModule.validateConfig(case1).valid;
+    expect(result1).toBe(expected);
+  });
+});
