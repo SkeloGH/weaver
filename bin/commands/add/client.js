@@ -6,9 +6,13 @@ const { generateId } = require('../../lib/utils');
 const defaultMsg = `Usage
   weaver add client -f [mongodb] -t [source|target] -o [<source.name>] -n my_source_db -u mongodb://localhost:27017
 `;
+const commandName = 'client';
+const commandDesc = 'Interactive creation of a new client';
+
 const isSameFamily = (c, _c) => c.family === _c.family;
 const isSameType = (c, _c) => c.type === _c.type;
 const isSameName = (c, _c) => c.db.name === _c.name;
+
 const clientExists = (client) => {
   const config = { ...getConfig() };
   const { dataClients } = config;
@@ -73,12 +77,9 @@ const addClient = (config = {}) => {
 
   const newSettings = { ...getConfig() };
   const { dataClients } = newSettings;
-  logging(`Saving new settings ${newSettings}`);
   dataClients.push({
     clientId, family, type, origin, db: { url, name, options: {} },
   });
-  setConfig(newSettings);
-  shell.echo('Saved new settings:', JSON.stringify(newSettings, null, 2));
   return newSettings;
 };
 
@@ -124,13 +125,30 @@ const commandSpec = (yargs) => {
 
 const commandHandler = (params) => {
   logging('client params', params);
-  addClient(params);
+  const newClientConfig = addClient(params);
+  if (newClientConfig) {
+    try {
+      logging('Saving new client');
+      setConfig(newClientConfig);
+      shell.echo('Saved new settings:', JSON.stringify(newClientConfig, null, 2));
+    } catch (error) {
+      shell.echo(error);
+      return false;
+    }
+  }
   return params;
 };
 
 module.exports = {
-  commandName: 'client',
-  commandDesc: 'Interactive creation of a new client',
+  addClient,
+  clientExists,
+  commandName,
+  commandDesc,
   commandSpec,
   commandHandler,
+  isSameFamily,
+  isSameType,
+  isSameName,
+  validateParams,
+  validateConfig,
 };
