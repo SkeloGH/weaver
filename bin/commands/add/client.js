@@ -29,18 +29,19 @@ const clientExists = (client) => {
   });
   return res;
 };
-const validateParams = (config = {}) => {
+const validateParams = (config) => {
+  const _config = config || {};
   const msgIntro = '[Invalid or missing parameter value]';
   const validation = { valid: true, message: null };
-  if (config.type === 'target' && (!config.origin || !config.origin.length)) {
+  if (_config.type === 'target' && (!_config.origin || !_config.origin.length)) {
     validation.valid = false;
     validation.message = `${msgIntro} 'origin', a target client's 'origin' should be the name of a 'source' client.`;
   }
-  if (!config.name || !config.name.length) {
+  if (!_config.name || !_config.name.length) {
     validation.valid = false;
-    validation.message = `${msgIntro} 'name', the client database name, ex: my_${config.type}_db .`;
+    validation.message = `${msgIntro} 'name', the client database name, ex: my_${_config.type}_db .`;
   }
-  if (!config.url || !config.url.length) {
+  if (!_config.url || !_config.url.length) {
     validation.valid = false;
     validation.message = `${msgIntro} 'url', the client database url, ex: mongodb://localhost:27017 .`;
   }
