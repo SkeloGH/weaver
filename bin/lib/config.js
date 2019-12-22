@@ -97,10 +97,16 @@ const setConfig = (config = {}) => {
   return false;
 };
 
+const getClientIDs = () => {
+  const CFG = { ...getConfig() };
+  return CFG.dataClients.map((c) => c.clientId);
+};
+
 module.exports = {
-  readConfigFile,
+  getClientIDs,
+  getConfig,
   parseCLIConfig,
   readCLISettings,
-  getConfig,
+  readConfigFile,
   setConfig,
 };
