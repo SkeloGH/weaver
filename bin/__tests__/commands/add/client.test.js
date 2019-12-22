@@ -2,28 +2,17 @@ const importedModule = require('../../../commands/add/client');
 const { getConfig, setConfig } = require('../../../lib/config');
 
 const { addClient, clientExists } = importedModule;
-const validFamily = 'mongodb';
-const validTypeSource = 'source';
-const validTypeTarget = 'target';
-const validSourceName = 'my-source-db';
-const validTargetName = 'my-target-db';
-const validOrigin = validSourceName;
-const validUrl = 'mongodb://localhost:27017';
-const validBaseClient = {
-  family: validFamily,
-  url: validUrl,
-};
-const validSourceClient = {
-  type: validTypeSource,
-  name: validSourceName,
-  ...validBaseClient,
-};
-const validTargetClient = {
-  type: validTypeTarget,
-  name: validTargetName,
-  origin: validOrigin,
-  ...validBaseClient,
-};
+const {
+  validFamily,
+  validTypeSource,
+  validTypeTarget,
+  validSourceName,
+  validTargetName,
+  validOrigin,
+  validUrl,
+  validSourceClient,
+  validTargetClient,
+} = require('../../__mock__/constants');
 
 describe('weaver add client command tests', () => {
   test('Base behavior', () => {
