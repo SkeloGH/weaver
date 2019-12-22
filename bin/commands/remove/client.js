@@ -1,11 +1,7 @@
 const shell = require('shelljs');
 const logging = require('debug')('Weaver:bin:commands:add:client');
-const { getConfig, setConfig } = require('../../lib/config');
+const { getConfig, setConfig, getClientIDs } = require('../../lib/config');
 
-const getClientIDs = () => {
-  const CFG = { ...getConfig() };
-  return CFG.dataClients.map((c) => c.clientId);
-};
 const clientIdString = getClientIDs().join(' ');
 const defaultMsg = `Usage
   weaver remove client -i ${clientIdString}
@@ -13,12 +9,14 @@ const defaultMsg = `Usage
 const commandName = 'client';
 const commandDesc = 'Interactive removal of one or more existing clients';
 
-
-const removeClient = (params = {}) => {
-  const newSettings = { ...getConfig() };
-  const { dataClients } = newSettings;
-  newSettings.dataClients = dataClients.filter((c) => params.clientIds.indexOf(c.clientId) > -1);
-  return newSettings;
+const removeClients = (params = {}) => {
+  const CFG = { ...getConfig() };
+  const { dataClients } = CFG;
+  if (params && params.clientIds) {
+    const clientIds = params.clientIds.map((i) => i.toString());
+    CFG.dataClients = dataClients.filter((c) => clientIds.indexOf(c.clientId) < 0);
+  }
+  return CFG;
 };
 
 const commandSpec = (yargs) => {
@@ -35,7 +33,7 @@ const commandSpec = (yargs) => {
 
 const commandHandler = (params) => {
   logging('client params', params);
-  const newClientConfig = removeClient(params);
+  const newClientConfig = removeClients(params);
   if (newClientConfig) {
     try {
       logging('Removing client with clientId');
@@ -50,9 +48,9 @@ const commandHandler = (params) => {
 };
 
 module.exports = {
-  removeClient,
-  commandName,
   commandDesc,
-  commandSpec,
   commandHandler,
+  commandName,
+  commandSpec,
+  removeClients,
 };
