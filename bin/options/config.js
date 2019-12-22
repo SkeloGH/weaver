@@ -3,14 +3,12 @@ const fs = require('fs');
 const Debug = require('debug');
 const shell = require('shelljs');
 
-const CFG = require('../.config');
 const {
   TEST_NODE_ENV,
   REQUIRED_CONFIG_KEYS,
 } = require('../lib/constants');
 const { InvalidJSONFileError } = require('../lib/utils');
-const { absPathname } = require('./shared');
-
+const { cfgAbsPath, getJSONContent, getCLIJSONContent } = require('./shared');
 
 const logging = Debug('Weaver:bin:options:config');
 
@@ -20,22 +18,6 @@ const pathExists = (pathname) => {
   } catch (error) {
     logging(`pathExists:Error ${error}`);
     return false;
-  }
-};
-
-const getJSONContent = (filePath) => {
-  logging(`getJSONContent:filePath ${filePath}`);
-
-  try {
-    const content = fs.readFileSync(filePath);
-    const parsedContent = JSON.parse(content);
-    logging(`getJSONContent:content ${content}`);
-    return parsedContent;
-  } catch (error) {
-    const errorName = error.constructor.prototype.name.split(' ')[0];
-    const handledErrs = ['SyntaxError', 'TypeError'];
-    if (handledErrs.indexOf(errorName)) return null;
-    throw error;
   }
 };
 
@@ -70,6 +52,7 @@ const validateConfig = (filePath) => {
 };
 
 const showConfig = () => {
+  const CFG = getCLIJSONContent();
   const cfgString = JSON.stringify(CFG, null, 2);
   if (!TEST_NODE_ENV) shell.echo(cfgString);
   return false;
@@ -84,14 +67,14 @@ const validationFeedback = (validation, filePath) => {
 };
 
 const saveConfigPath = (configFilePath) => {
-  const cfgAbsPath = absPathname(__dirname, './../.config.json');
+  const CFG = getCLIJSONContent();
   const configContent = ld.assign({}, CFG, { config: { filePath: configFilePath } });
   try {
     fs.writeFileSync(cfgAbsPath, JSON.stringify(configContent, null, 2));
     if (!TEST_NODE_ENV) shell.echo('Updated config file:\n\t', configContent.config);
     return true;
   } catch (error) {
-    if (!TEST_NODE_ENV) shell.echo('Couldn\'t updated config file', error);
+    if (!TEST_NODE_ENV) shell.echo('Couldn\'t update config file', error);
     return false;
   }
 };
@@ -105,7 +88,6 @@ const applyConfig = (configFilePath) => {
 
 module.exports = {
   pathExists,
-  getJSONContent,
   isJSONFile,
   isValidConfigObject,
   validateConfig,
