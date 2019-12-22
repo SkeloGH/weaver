@@ -1,5 +1,8 @@
 {
   "config": {
     "filePath": null
-  }
+  },
+  "queries": [],
+  "dataClients": [],
+  "jsonConfig": {}
 }

@@ -1,18 +1,18 @@
 const fs = require('fs');
 const shell = require('shelljs');
-const CLI_CONFIG = require('../.config');
 
 const {
   getJSONContent,
   validateConfig,
   isValidConfigObject,
 } = require('../options/config');
-const { absPathname } = require('../options/shared');
+const { absPathname, getCLIJSONContent } = require('../options/shared');
 
 let CLI_ARGS = {};
 
 const readConfigFile = () => {
   let config = {};
+  const CLI_CONFIG = getCLIJSONContent();
   const path = CLI_CONFIG.filePath;
   const isValid = validateConfig(path).valid;
   if (isValid) {
@@ -42,6 +42,7 @@ const parseCLIConfig = () => {
 
 const readCLISettings = () => {
   const stdin = parseCLIConfig();
+  const CLI_CONFIG = getCLIJSONContent();
   const queries = stdin.queries || CLI_CONFIG.queries;
   const dataClients = stdin.dataClients || CLI_CONFIG.dataClients;
   const jsonConfig = stdin.jsonConfig || CLI_CONFIG.jsonConfig;

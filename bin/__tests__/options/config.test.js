@@ -3,10 +3,8 @@ const logging = require('debug')('Weaver:bin:__tests__:options:config');
 const shell = require('shelljs');
 const path = require('path');
 const { DEFAULT_CONFIG_PATH } = require('../../lib/constants');
-const CFG = require('./../../.config');
 const {
   pathExists,
-  getJSONContent,
   isJSONFile,
   isValidConfigObject,
   validateConfig,
@@ -15,12 +13,14 @@ const {
   saveConfigPath,
   applyConfig,
 } = require('../../options/config');
+const { getCLIJSONContent, getJSONContent } = require('../../options/shared');
 
 const CLI_DIR = path.resolve(__dirname, '../../cli.js');
 const MOCKS_DIR = path.resolve(__dirname, '../__mock__');
 
 
 describe('weaver --config tests', () => {
+  const CFG = getCLIJSONContent();
   afterAll(() => {
     logging('restoring config to original values', CFG.config.filePath);
     saveConfigPath(CFG.config.filePath);
@@ -38,13 +38,11 @@ describe('weaver --config tests', () => {
     const valid = `${MOCKS_DIR}/.weaver.mock.json`;
 
     expect(pathExists(invalid)).toEqual(false);
-    expect(getJSONContent(invalid)).toEqual(null);
     expect(isJSONFile(invalid)).toEqual(false);
     expect(validateConfig(invalid).valid).toEqual(false);
     expect(isValidConfigObject(invalid)).toEqual(false);
 
     expect(pathExists(valid)).toEqual(true);
-    expect(getJSONContent(valid)).not.toEqual(null);
     expect(isJSONFile(valid)).toEqual(true);
     expect(validateConfig(valid).valid).toEqual(true);
     expect(isValidConfigObject(getJSONContent(valid))).toEqual(true);
