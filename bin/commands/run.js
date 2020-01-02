@@ -1,6 +1,7 @@
 const Debug = require('debug');
 const shell = require('shelljs');
 const mongo = require('mongodb');
+const ldLang = require('lodash');
 
 const ObjectId = mongo.ObjectID;
 const {
@@ -10,6 +11,9 @@ const Weaver = require('../../src');
 const WeaverMongoClient = require('../../src/clients/mongodb');
 
 const logging = Debug('Weaver:bin:commands:run');
+const clientsByFamily = {
+  mongodb: WeaverMongoClient,
+};
 
 module.exports = {
   name: 'run',
@@ -20,8 +24,8 @@ module.exports = {
     const config = getConfig(_argv);
     const configStr = JSON.stringify(config, null, 2);
     let message = `Running with the current configuration"\n ${configStr}`;
-    const hasQueries = config.queries && config.queries.length > 0;
-    const hasDataClients = config.dataClients && config.dataClients.length > 0;
+    const hasQueries = !ldLang.isEmpty(config.queries);
+    const hasDataClients = !ldLang.isEmpty(config.dataClients);
     const validConfig = hasDataClients && hasQueries;
 
     if (!hasDataClients) {
@@ -40,11 +44,12 @@ module.exports = {
     // TODO: need to delegate this conversion to each client
     // once starting to add new client families
     config.dataClients = config.dataClients.map((c) => {
-      if (c.family.indexOf('mongo') > -1) { return new WeaverMongoClient(c); }
+      const ClientConstructor = clientsByFamily[c.family];
+      if (ClientConstructor) { return new ClientConstructor(c); }
       return c;
     });
     config.queries = config.queries.map((q) => ({ _id: ObjectId(q) }));
-    // end TODO
+
     const weaver = new Weaver(config);
     weaver.run((result) => {
       logging('Result', result);
