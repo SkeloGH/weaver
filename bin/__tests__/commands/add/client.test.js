@@ -29,6 +29,7 @@ describe('weaver add client command tests', () => {
       'isSameFamily',
       'isSameType',
       'isSameName',
+      'isSameURL',
       'validateParams',
       'validateConfig',
     ];
