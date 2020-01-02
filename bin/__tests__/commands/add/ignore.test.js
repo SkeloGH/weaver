@@ -3,7 +3,7 @@ const { addClient } = require('../../../commands/add/client');
 const importedModule = require('../../../commands/add/ignore');
 const { getConfig, setConfig } = require('../../../lib/config');
 
-const { addIgnores } = importedModule;
+const { addIgnores, commandHandler } = importedModule;
 const {
   validFamily,
   validTypeSource,
@@ -11,6 +11,15 @@ const {
   validUrl,
   validSourceClient,
 } = require('../../__mock__/constants');
+
+const generateParams = () => {
+  const CFG = { ...getConfig() };
+  const clientid = CFG.dataClients[0].clientId;
+  const testNS = 'test';
+  const namespaces = [testNS];
+  const params = { clientid, namespaces, testNS };
+  return params;
+};
 
 describe('weaver add ignore command tests', () => {
   test('Base behavior', () => {
@@ -43,11 +52,8 @@ describe('addIgnores', () => {
     afterAll(() => { setConfig(initialConfig); });
 
     test('returns the new config object if ignores are valid', () => {
-      const CFG = { ...getConfig() };
-      const clientid = CFG.dataClients[0].clientId;
-      const testNS = 'test';
-      const namespaces = [testNS];
-      const result = addIgnores({ clientid, namespaces });
+      const params = generateParams();
+      const result = addIgnores(params);
 
       expect(result.config).not.toBe(undefined);
       expect(result.dataClients).not.toBe(undefined);
@@ -58,9 +64,29 @@ describe('addIgnores', () => {
       expect(result.dataClients[0].type).toBe(validTypeSource);
       expect(result.dataClients[0].client).not.toBe(undefined);
       expect(result.dataClients[0].client.ignoreFields).not.toBe(undefined);
-      expect(result.dataClients[0].client.ignoreFields[0]).toBe(testNS);
+      expect(result.dataClients[0].client.ignoreFields[0]).toBe(params.testNS);
       expect(result.jsonConfig).not.toBe(undefined);
       expect(result.queries).not.toBe(undefined);
+    });
+  });
+});
+describe('commandHandler', () => {
+  describe('returns the new config object if params are valid', () => {
+    const initialConfig = { ...getConfig() };
+    beforeAll(() => {
+      const clientIds = initialConfig.dataClients.map((c) => c.clientId);
+      const freshCfg = removeClients({ clientIds });
+      setConfig(freshCfg);
+      const sourceClient = addClient(validSourceClient);
+      setConfig(sourceClient);
+    });
+    afterAll(() => { setConfig(initialConfig); });
+
+    test('returns the new config object if ignores are valid', () => {
+      const params = generateParams();
+      const result = commandHandler(params);
+
+      expect(result).toBe(params);
     });
   });
 });
