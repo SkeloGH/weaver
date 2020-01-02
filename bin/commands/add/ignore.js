@@ -28,7 +28,7 @@ const commandSpec = (yargs) => {
         describe: 'The client id that will skip reading from the provided namespace.',
         type: 'string',
       },
-      namespace: {
+      namespaces: {
         alias: 'n',
         demandOption: true,
         describe: 'The namespaces to avoid querying upon.',
@@ -45,7 +45,9 @@ const addIgnores = (params = {}) => {
   const clientOpts = newClient.client ? newClient.client : {};
   let { ignoreFields = [] } = clientOpts;
 
-  ignoreFields = ignoreFields.concat(params.namespace);
+  if (clientIdx < 0) return CFG;
+
+  ignoreFields = ignoreFields.concat(params.namespaces);
   clientOpts.ignoreFields = ldArray.uniq(ignoreFields);
   newClient.client = ldObject.assign({}, clientOpts);
   CFG.dataClients[clientIdx] = newClient;
@@ -74,4 +76,5 @@ module.exports = {
   commandDesc,
   commandSpec,
   commandHandler,
+  addIgnores,
 };
