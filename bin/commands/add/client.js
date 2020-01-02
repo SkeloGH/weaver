@@ -7,7 +7,7 @@ const defaultMsg = `Usage
   weaver add client -f [mongodb] -t [source|target] -o [<source.name>] -n my_source_db -u mongodb://localhost:27017
 `;
 const commandName = 'client';
-const commandDesc = 'Interactive creation of a new client';
+const commandDesc = 'Creation of a new client';
 
 const isSameFamily = (c, _c) => c.family === _c.family;
 const isSameType = (c, _c) => c.type === _c.type;
