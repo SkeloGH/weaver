@@ -1,5 +1,5 @@
 "use strict";const Debug=require("debug"),shell=require("shelljs"),mongo=require("mongodb"),ObjectId=mongo.ObjectID,{getConfig}=require("../lib/config"),Weaver=require("../../src"),WeaverMongoClient=require("../../src/clients/mongodb"),logging=Debug("Weaver:bin:commands:run");module.exports={name:"run",description:"Runs the app with the loaded configuration",setup:a=>a,parse:a=>{logging(`getting config from argv ${a}`);const b=getConfig(a),c=JSON.stringify(b,null,2);let d=`Running with the current configuration"\n ${c}`;const e=b.queries&&0<b.queries.length,f=b.dataClients&&0<b.dataClients.length;if(f||(d=`Error: dataClients not set, try:
-      weaver add [client|query|ignoreField]
+      weaver add [client|query|ignore]
       `),e||(d=`Error: queries not set, try:
       weaver run --queries <a document id>
       `),shell.echo(d),!(f&&e))return a;// TODO: need to delegate this conversion to each client

@@ -26,7 +26,7 @@ module.exports = {
 
     if (!hasDataClients) {
       message = `Error: dataClients not set, try:
-      weaver add [client|query|ignoreField]
+      weaver add [client|query|ignore]
       `;
     }
     if (!hasQueries) {

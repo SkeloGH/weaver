@@ -1,4 +1,6 @@
-const ld = require('lodash');
+const ldLang = require('lodash/lang');
+const ldArray = require('lodash/array');
+const ldObject = require('lodash/object');
 const fs = require('fs');
 const Debug = require('debug');
 const shell = require('shelljs');
@@ -28,9 +30,9 @@ const isJSONFile = (filePath) => {
 };
 
 const isValidConfigObject = (cfg) => {
-  const isPlainObject = ld.isPlainObject(cfg);
-  const keys = ld.keys(cfg);
-  const matchingKeys = ld.intersection(REQUIRED_CONFIG_KEYS, keys);
+  const isPlainObject = ldLang.isPlainObject(cfg);
+  const keys = ldObject.keys(cfg);
+  const matchingKeys = ldArray.intersection(REQUIRED_CONFIG_KEYS, keys);
   return isPlainObject && matchingKeys.length === REQUIRED_CONFIG_KEYS.length;
 };
 
@@ -68,7 +70,7 @@ const validationFeedback = (validation, filePath) => {
 
 const saveConfigPath = (configFilePath) => {
   const CFG = getCLIJSONContent();
-  const configContent = ld.assign({}, CFG, { config: { filePath: configFilePath } });
+  const configContent = ldObject.assign({}, CFG, { config: { filePath: configFilePath } });
   try {
     fs.writeFileSync(cfgAbsPath, JSON.stringify(configContent, null, 2));
     if (!TEST_NODE_ENV) shell.echo('Updated config file:\n\t', configContent.config);

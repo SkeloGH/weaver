@@ -7,4 +7,7 @@ describe('weaver add command tests', () => {
   test('Client logic is exported', () => {
     expect(importedModule.client).not.toBe(undefined);
   });
+  test('Ignores logic is exported', () => {
+    expect(importedModule.ignore).not.toBe(undefined);
+  });
 });
