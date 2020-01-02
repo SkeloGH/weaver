@@ -12,6 +12,7 @@ const commandDesc = 'Interactive creation of a new client';
 const isSameFamily = (c, _c) => c.family === _c.family;
 const isSameType = (c, _c) => c.type === _c.type;
 const isSameName = (c, _c) => c.db.name === _c.name;
+const isSameURL = (c, _c) => c.db.url === _c.url;
 
 const clientExists = (client) => {
   const config = { ...getConfig() };
@@ -21,8 +22,9 @@ const clientExists = (client) => {
     const matchFam = isSameFamily(c, client);
     const matchName = isSameName(c, client);
     const matchType = isSameType(c, client);
-    const isSibling = matchFam && matchName && matchType;
-    const sourceIsTarget = matchFam && matchName && !matchType;
+    const matchUrl = isSameURL(c, client);
+    const isSibling = matchFam && matchName && matchType && matchUrl;
+    const sourceIsTarget = matchFam && matchName && !matchType && matchUrl;
     if (isSibling) res.message = 'Error: client exists';
     if (sourceIsTarget) res.message = 'Error: source and target clients are the same';
     return isSibling || sourceIsTarget;
@@ -150,6 +152,7 @@ module.exports = {
   isSameFamily,
   isSameType,
   isSameName,
+  isSameURL,
   validateParams,
   validateConfig,
 };
