@@ -3,7 +3,7 @@ const logging = require('debug')('Weaver:bin:commands:add:client');
 const { getConfig, setConfig } = require('../../lib/config');
 const { generateId } = require('../../lib/utils');
 
-const defaultMsg = `Usage
+const defaultMsg = `Usage:\n
   weaver add client -f [mongodb] -t [source|target] -o [<source.name>] -n my_source_db -u mongodb://localhost:27017
 `;
 const commandName = 'client';

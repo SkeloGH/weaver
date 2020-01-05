@@ -6,15 +6,15 @@ const logging = require('debug')('Weaver:bin:commands:add:ignore');
 const { getConfig, setConfig, getClientIDs } = require('../../lib/config');
 
 const clientIDs = getClientIDs();
-let defaultMsg = 'No clients are configured yet, try adding a client first.';
+let defaultMsg = `Usage:\n
+    weaver add ignore -i [clientID] -n [<namespace> ...]
+`;
 if (clientIDs.length) {
-  defaultMsg = `
-  Usage
-    weaver add ignore -i [clientID] -ns [<namespace> ...]
-
-  Available clientIDs: ${clientIDs.join(' ')}
-  `;
+  defaultMsg += `\nAvailable clientIDs: ${clientIDs.join(' ')}\n`;
+} else {
+  defaultMsg += '\nNo clients are configured yet, try adding a client first.\n';
 }
+
 const commandName = 'ignore';
 const commandDesc = 'Add a collection/index namespace to ignore when performing queries';
 const commandSpec = (yargs) => {

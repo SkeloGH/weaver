@@ -3,7 +3,7 @@ const logging = require('debug')('Weaver:bin:commands:add:client');
 const { getConfig, setConfig, getClientIDs } = require('../../lib/config');
 
 const clientIdString = getClientIDs().join(' ');
-const defaultMsg = `Usage
+const defaultMsg = `Usage:\n
   weaver remove client -i ${clientIdString}
 `;
 const commandName = 'client';
