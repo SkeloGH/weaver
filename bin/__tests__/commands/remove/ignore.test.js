@@ -22,7 +22,7 @@ const generateParams = () => {
   return params;
 };
 
-describe('weaver add ignore command tests', () => {
+describe('weaver remove ignore command tests', () => {
   test('Base behavior', () => {
     expect(importedModule).not.toBe(undefined);
   });
