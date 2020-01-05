@@ -80,8 +80,11 @@ describe('addClient', () => {
   });
 
   describe('returns the new config object if clients are valid', () => {
-    const initialConfig = { ...getConfig() };
-    afterEach(() => { setConfig(initialConfig); });
+    let initialConfig = {};
+    beforeAll(() => {
+      initialConfig = { ...getConfig() };
+    });
+    afterAll(() => { setConfig(initialConfig); });
 
     test('returns the new config object if source is valid', () => {
       const result = addClient(validSourceClient);
@@ -122,8 +125,9 @@ describe('clientExists', () => {
     });
   });
   describe('returns true if already saved', () => {
-    const initialConfig = { ...getConfig() };
+    let initialConfig = {};
     beforeAll(() => {
+      initialConfig = { ...getConfig() };
       const sourceClient = addClient(validSourceClient);
       setConfig(sourceClient);
 
@@ -223,8 +227,9 @@ describe('validateParams', () => {
 });
 
 describe('validateConfig', () => {
-  const initialConfig = { ...getConfig() };
+  let initialConfig = {};
   beforeAll(() => {
+    initialConfig = { ...getConfig() };
     const sourceClient = addClient(validSourceClient);
     setConfig(sourceClient);
   });
