@@ -41,8 +41,9 @@ describe('weaver add ignore command tests', () => {
 
 describe('addIgnores', () => {
   describe('returns the new config object if params are valid', () => {
-    const initialConfig = { ...getConfig() };
+    let initialConfig = {};
     beforeAll(() => {
+      initialConfig = { ...getConfig() };
       const clientIds = initialConfig.dataClients.map((c) => c.clientId);
       if (clientIds) {
         const freshCfg = removeClients({ clientIds });
@@ -74,8 +75,9 @@ describe('addIgnores', () => {
 });
 describe('commandHandler', () => {
   describe('returns the new config object if params are valid', () => {
-    const initialConfig = { ...getConfig() };
+    let initialConfig = {};
     beforeAll(() => {
+      initialConfig = { ...getConfig() };
       const clientIds = initialConfig.dataClients.map((c) => c.clientId);
       if (clientIds) {
         const freshCfg = removeClients({ clientIds });
