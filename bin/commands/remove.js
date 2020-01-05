@@ -1,30 +1,31 @@
 const Debug = require('debug');
-const { client } = require('./remove/');
+const { client, ignore } = require('./remove/');
 
 const logging = Debug('Weaver:bin:commands:remove');
 
 module.exports = {
   name: 'remove',
-  description: 'Interactive removal of clients, queries or ignores',
+  description: 'Removal of clients, queries or ignores',
   setup: (yargs) => {
-    const cmd = yargs.command(
-      client.commandName,
-      client.commandDesc,
-      client.commandSpec,
-      client.commandHandler,
-    )
-      .command('query', 'Interactive removal of one or more queries',
+    const cmd = yargs
+      .command(
+        client.commandName,
+        client.commandDesc,
+        client.commandSpec,
+        client.commandHandler,
+      )
+      .command('query', 'Removal of one or more queries',
         (_yargs) => _yargs,
         (params) => {
           logging('query params', params);
           return params;
         })
-      .command('ignore', 'Interactive removal of one or more ignores',
-        (_yargs) => _yargs,
-        (params) => {
-          logging('ignore params', params);
-          return params;
-        });
+      .command(
+        ignore.commandName,
+        ignore.commandDesc,
+        ignore.commandSpec,
+        ignore.commandHandler,
+      );
     return cmd;
   },
   parse: (_argv) => {
