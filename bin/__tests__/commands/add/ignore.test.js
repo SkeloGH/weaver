@@ -44,8 +44,10 @@ describe('addIgnores', () => {
     const initialConfig = { ...getConfig() };
     beforeAll(() => {
       const clientIds = initialConfig.dataClients.map((c) => c.clientId);
-      const freshCfg = removeClients({ clientIds });
-      setConfig(freshCfg);
+      if (clientIds) {
+        const freshCfg = removeClients({ clientIds });
+        setConfig(freshCfg);
+      }
       const sourceClient = addClient(validSourceClient);
       setConfig(sourceClient);
     });
@@ -75,8 +77,10 @@ describe('commandHandler', () => {
     const initialConfig = { ...getConfig() };
     beforeAll(() => {
       const clientIds = initialConfig.dataClients.map((c) => c.clientId);
-      const freshCfg = removeClients({ clientIds });
-      setConfig(freshCfg);
+      if (clientIds) {
+        const freshCfg = removeClients({ clientIds });
+        setConfig(freshCfg);
+      }
       const sourceClient = addClient(validSourceClient);
       setConfig(sourceClient);
     });
