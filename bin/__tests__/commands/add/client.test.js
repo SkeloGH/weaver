@@ -45,7 +45,6 @@ describe('addClient', () => {
       const arg1 = undefined;
       const expected = false;
       const result = importedModule.addClient(arg1);
-      console.log('result', result);
       expect(result).toBe(expected);
     });
     test('returns false if config is empty obj', () => {
