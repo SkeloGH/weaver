@@ -87,16 +87,16 @@ describe('addClient', () => {
     afterAll(() => { setConfig(initialConfig); });
 
     test('returns the new config object if source is valid', () => {
-      // const result = addClient(validSourceClient);
-      // expect(result.config).not.toBe(undefined);
-      // expect(result.dataClients).not.toBe(undefined);
-      // expect(result.dataClients[0].db.name).toBe(validSourceName);
-      // expect(result.dataClients[0].db.url).toBe(validUrl);
-      // expect(result.dataClients[0].family).toBe(validFamily);
-      // expect(result.dataClients[0].origin).toBe(undefined);
-      // expect(result.dataClients[0].type).toBe(validTypeSource);
-      // expect(result.jsonConfig).not.toBe(undefined);
-      // expect(result.queries).not.toBe(undefined);
+      const result = addClient(validSourceClient);
+      expect(result.config).not.toBe(undefined);
+      expect(result.dataClients).not.toBe(undefined);
+      expect(result.dataClients[0].db.name).toBe(validSourceName);
+      expect(result.dataClients[0].db.url).toBe(validUrl);
+      expect(result.dataClients[0].family).toBe(validFamily);
+      expect(result.dataClients[0].origin).toBe(undefined);
+      expect(result.dataClients[0].type).toBe(validTypeSource);
+      expect(result.jsonConfig).not.toBe(undefined);
+      expect(result.queries).not.toBe(undefined);
     });
     test('returns the new config object if target is valid', () => {
       const result = addClient(validTargetClient);
