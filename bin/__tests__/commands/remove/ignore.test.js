@@ -93,10 +93,10 @@ describe('commandHandler', () => {
     afterAll(() => { setConfig(initialConfig); });
 
     test('returns the new config object if ignores are valid', () => {
-      // const params = generateParams();
-      // const result = commandHandler(params);
+      const params = generateParams();
+      const result = commandHandler(params);
 
-      // expect(result).toBe(params);
+      expect(result).toBe(params);
     });
   });
 });
