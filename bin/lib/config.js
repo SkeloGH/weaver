@@ -8,7 +8,7 @@ const {
 } = require('../options/config');
 const { absPathname, getCLIJSONContent } = require('../options/shared');
 
-let CLI_ARGS = {};
+var CLI_ARGS = {};
 
 const readConfigFile = () => {
   let config = {};
