@@ -41,12 +41,12 @@ describe('weaver add client command tests', () => {
 
 describe('addClient', () => {
   describe('returns false if config is invalid', () => {
-    // test('returns false if config is undefined', () => {
-    //   const arg1 = undefined;
-    //   const expected = false;
-    //   const result = importedModule.addClient(arg1);
-    //   expect(result).toBe(expected);
-    // });
+    test('returns false if config is undefined', () => {
+      const arg1 = undefined;
+      const expected = false;
+      const result = importedModule.addClient(arg1);
+      expect(result).toBe(expected);
+    });
     test('returns false if config is empty obj', () => {
       const arg1 = {};
       const expected = false;
