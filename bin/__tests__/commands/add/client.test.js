@@ -70,7 +70,7 @@ describe('addClient', () => {
       const expected = false;
 
       const result1 = importedModule.addClient(case1);
-      console.log('======result1======', result1);
+      // console.log('======result1======', result1);
       // const result2 = importedModule.addClient(case2);
       // const result3 = importedModule.addClient(case3);
 
