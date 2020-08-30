@@ -11,7 +11,7 @@ const getJSONContent = (filePath) => {
 
   try {
     const content = fs.readFileSync(filePath);
-    if (!content || !content.length) return null
+    if (!content || !content.length) return null;
     const parsedContent = JSON.parse(content);
     logging(`getJSONContent:content ${content}`);
     return parsedContent;
