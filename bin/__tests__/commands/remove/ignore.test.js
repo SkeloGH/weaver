@@ -58,7 +58,7 @@ describe('removeIgnores', () => {
     });
     afterAll(() => { setConfig(initialConfig); });
 
-    // test('returns the new config object if ignores are valid', () => {
+    test('returns the new config object if ignores are valid', () => {
     //   const params = generateParams();
     //   const result = removeIgnores(params);
 
@@ -74,7 +74,7 @@ describe('removeIgnores', () => {
     //   expect(result.dataClients[0].client.ignoreFields.length).toBe(0);
     //   expect(result.jsonConfig).not.toBe(undefined);
     //   expect(result.queries).not.toBe(undefined);
-    // });
+    });
   });
 });
 describe('commandHandler', () => {
