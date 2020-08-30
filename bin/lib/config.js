@@ -15,7 +15,7 @@ const readConfigFile = () => {
   const CLI_CONFIG = getCLIJSONContent() || {};
   const path = CLI_CONFIG.filePath;
   const isValid = validateConfig(path).valid;
-  if (isValid) {
+  if (path && isValid) {
     config = getJSONContent(path);
   }
   return {
