@@ -54,26 +54,26 @@ describe('addClient', () => {
       expect(result).toBe(expected);
     });
     test('returns false if config is invalid, mix', () => {
-      // const case1 = {
-      //   family: '', origin: '', type: '', name: '', url: '',
-      // };
-      // const case2 = {
-      //   family: 0, origin: null, type: false, name: null, url: undefined,
-      // };
-      // const case3 = {
-      //   family: validFamily,
-      //   origin: null,
-      //   type: validTypeTarget,
-      //   name: validSourceName,
-      //   url: validUrl,
-      // };
-      // const expected = false;
+      const case1 = {
+        family: '', origin: '', type: '', name: '', url: '',
+      };
+      const case2 = {
+        family: 0, origin: null, type: false, name: null, url: undefined,
+      };
+      const case3 = {
+        family: validFamily,
+        origin: null,
+        type: validTypeTarget,
+        name: validSourceName,
+        url: validUrl,
+      };
+      const expected = false;
 
-      // const result1 = importedModule.addClient(case1);
+      const result1 = importedModule.addClient(case1);
       // const result2 = importedModule.addClient(case2);
       // const result3 = importedModule.addClient(case3);
 
-      // expect(result1).toBe(expected);
+      expect(result1).toBe(expected);
       // expect(result2).toBe(expected);
       // expect(result3).toBe(expected);
     });
