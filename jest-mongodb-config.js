@@ -15,7 +15,8 @@ module.exports = {
     },
     binary: {
       // version?: string, // by default 'latest'
-      version: '4.0.3',
+      // version: '4.0.3',
+      version: 'latest',
       // downloadDir?: string, // by default node_modules/.cache/mongodb-memory-server/mongodb-binaries
       // platform?: string, // by default os.platform()
       // arch?: string, // by default os.arch()
