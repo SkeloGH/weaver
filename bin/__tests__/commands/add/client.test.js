@@ -71,11 +71,11 @@ describe('addClient', () => {
 
       const result1 = importedModule.addClient(case1);
       const result2 = importedModule.addClient(case2);
-      // const result3 = importedModule.addClient(case3);
+      const result3 = importedModule.addClient(case3);
 
       expect(result1).toBe(expected);
       expect(result2).toBe(expected);
-      // expect(result3).toBe(expected);
+      expect(result3).toBe(expected);
     });
   });
 
