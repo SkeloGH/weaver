@@ -22,7 +22,7 @@ const getJSONContent = (filePath) => {
     throw error;
   }
 };
-const getCLIJSONContent = () => getJSONContent(cfgAbsPath);
+const getCLIJSONContent = () => getJSONContent(cfgAbsPath) || {};
 
 module.exports = {
   absPathname,
