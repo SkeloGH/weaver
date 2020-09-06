@@ -12,7 +12,7 @@ let CLI_ARGS = {};
 
 const readConfigFile = () => {
   let config = {};
-  const CLI_CONFIG = getCLIJSONContent() || {};
+  const CLI_CONFIG = getCLIJSONContent();
   const path = CLI_CONFIG.filePath;
   const isValid = validateConfig(path).valid;
   if (path && isValid) {

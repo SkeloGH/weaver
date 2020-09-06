@@ -52,7 +52,7 @@
     "mongodb": "^3.3.3",
     "rimraf": "^3.0.0",
     "shelljs": "^0.8.3",
-    "yargs": "^15.3.1"
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -63,6 +63,7 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
     "babel-preset-minify": "^0.5.1",
+    "bl": ">=2.2.1",
     "coveralls": "^3.0.9",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
