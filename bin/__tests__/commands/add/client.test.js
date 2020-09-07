@@ -81,16 +81,23 @@ describe('addClient', () => {
 
   describe('returns the new config object if clients are valid', () => {
     let initialConfig = {};
+    const validSourceClient_copy = { ...validSourceClient };
+    const validTargetClient_copy = { ...validTargetClient };
+    validSourceClient_copy.options = {test:true};
+    validTargetClient_copy.options = {test:true};
+
     beforeAll(() => {
       initialConfig = { ...getConfig() };
     });
     afterAll(() => { setConfig(initialConfig); });
 
     test('returns the new config object if source is valid', () => {
-      const result = addClient(validSourceClient);
+      const result = addClient(validSourceClient_copy);
       expect(result.config).not.toBe(undefined);
       expect(result.dataClients).not.toBe(undefined);
       expect(result.dataClients[0].db.name).toBe(validSourceName);
+      expect(result.dataClients[0].db.options).not.toBe(undefined);
+      expect(result.dataClients[0].db.options.test).toBe(true);
       expect(result.dataClients[0].db.url).toBe(validUrl);
       expect(result.dataClients[0].family).toBe(validFamily);
       expect(result.dataClients[0].origin).toBe(undefined);
@@ -99,10 +106,12 @@ describe('addClient', () => {
       expect(result.queries).not.toBe(undefined);
     });
     test('returns the new config object if target is valid', () => {
-      const result = addClient(validTargetClient);
+      const result = addClient(validTargetClient_copy);
       expect(result.config).not.toBe(undefined);
       expect(result.dataClients).not.toBe(undefined);
       expect(result.dataClients[0].db.name).toBe(validTargetName);
+      expect(result.dataClients[0].db.options).not.toBe(undefined);
+      expect(result.dataClients[0].db.options.test).toBe(true);
       expect(result.dataClients[0].db.url).toBe(validUrl);
       expect(result.dataClients[0].family).toBe(validFamily);
       expect(result.dataClients[0].origin).toBe(validOrigin);

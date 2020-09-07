@@ -2,9 +2,18 @@ const shell = require('shelljs');
 const logging = require('debug')('Weaver:bin:commands:add:client');
 const { getConfig, setConfig } = require('../../lib/config');
 const { generateId } = require('../../lib/utils');
+const { CFG_ABS_PATH } = require('../../lib/constants');
 
-const defaultMsg = `Usage:\n
-  weaver add client -f [mongodb] -t [source|target] -o [<source.name>] -n my_source_db -u mongodb://localhost:27017
+const defaultMsg = `
+Usage: weaver add client -fntou --options.<option_name>
+
+  -f [mongodb]          <String> The client db family, mongodb is only supported for now.
+  -n <name>             <String> The client db name.
+  -t [source|target]    <String> source if the data will be pulled from it, target otherwise.
+  -o [<source.name>]    <String> The target's origin db where the data will be copied from.
+  -u <url>              <String> The client db URL.
+  --options.<opt_name>  <Any> Client db-specific options, for now MongoClient options, use dot notation to set each option
+                        Example: --options.readPreference secondaryPreferred
 `;
 const commandName = 'client';
 const commandDesc = 'Creation of a new client';
@@ -70,6 +79,7 @@ const addClient = (config = {}) => {
   const {
     family, origin, type, name, url,
   } = config;
+  const options = config.options || {};
   const clientId = generateId({ length: 8 });
   const validation = validateConfig(config);
 
@@ -81,7 +91,7 @@ const addClient = (config = {}) => {
   const newSettings = { ...getConfig() };
   const { dataClients } = newSettings;
   dataClients.push({
-    clientId, family, type, origin, db: { url, name, options: {} },
+    clientId, family, type, origin, db: { url, name, options },
   });
   return newSettings;
 };
@@ -123,6 +133,9 @@ const commandSpec = (yargs) => {
         describe: 'The client db url',
         type: 'string',
       },
+      options: {
+        describe: 'The client db options, use dot notation, ex: --options.readPreference',
+      },
     });
 };
 
@@ -134,6 +147,7 @@ const commandHandler = (params) => {
       logging('Saving new client');
       setConfig(newClientConfig);
       shell.echo('Saved new settings:', JSON.stringify(newClientConfig, null, 2));
+      shell.echo('Saved at:', CFG_ABS_PATH);
     } catch (error) {
       shell.echo(error);
       return false;

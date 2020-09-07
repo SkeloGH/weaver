@@ -1,6 +1,7 @@
 const fs = require('fs');
 const shell = require('shelljs');
 
+const { CFG_ABS_PATH } = require('./constants');
 const {
   getJSONContent,
   validateConfig,
@@ -84,10 +85,9 @@ const getConfig = (_argv = {}) => {
 
 const setConfig = (config = {}) => {
   const isValid = isValidConfigObject(config);
-  const cfgAbsPath = absPathname(__dirname, './../.config.json');
   if (isValid) {
     try {
-      fs.writeFileSync(cfgAbsPath, JSON.stringify(config, null, 2));
+      fs.writeFileSync(CFG_ABS_PATH, JSON.stringify(config, null, 2));
       return true;
     } catch (e) {
       shell.echo(JSON.stringify(e));
