@@ -10,7 +10,7 @@
     "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
-    "test": "DEBUG=Weaver* jest",
+    "test": "jest",
     "test-coverage": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "test-debug": "DEBUG=Weaver* jest --detectOpenHandles"
   },
