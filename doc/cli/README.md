@@ -2,7 +2,7 @@
 
 ## Install the npm package
 
-- For now, only dev version can be installed, refer to "How to test the CLI in dev mode" below.
+- For now, only dev version can be installed, refer to ["How to test the CLI in dev mode"](#how-to-test-the-cli-in-dev-mode) below.
 
 ## Using the CLI tool
 
