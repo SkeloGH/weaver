@@ -70,6 +70,9 @@ Assume the following local server settings for `target`:
 weaver add client -f mongodb -n development -t target -o production -u mongodb://127.0.0.1:27017
 ```
 
+**Important** `-o production` is used to map where the data will be pulled from, useful when dealing with multiple `source` and `target` databases.
+
+
 ### 2. Find the document to clone
 
 On the `source` database, find the document you want to copy to the `target` database and use the _id string:
