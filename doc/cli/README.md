@@ -1,12 +1,21 @@
 # Getting started
 
-## Install the npm package
+## Install via npm
 
 - For now, only dev version can be installed, refer to ["How to test the CLI in dev mode"](#how-to-test-the-cli-in-dev-mode) below.
 
+## How to test the CLI in dev mode
+
+### Install the CLI tool
+
+- After cloning the repo and installing dependencies, run `npm run build`.
+- Run `npm pack` on the project root.
+- A file `weaver-<VERSION>.tgz` will be created.
+- Run `npm install -g weaver-<VERSION>.tgz`, it will install the package globally.
+
 ## Using the CLI tool
 
-- After installing, just issue the `weaver` command, the CLI help will display:
+- After installing, just issue the `weaver` command, the CLI help will display the CLI help:
 
 ```
 Usage: weaver [OPTIONS] COMMAND [ARG...]
@@ -32,9 +41,7 @@ Options:
 
 ### 1. Add clients
 
-To pull data from a db into another, you'll need to add both the `source` and `target` client. `source` is where the data will be retrieved from, and `target` is where you want to save the retrieved data.
-
-- On the CLI, issue the `weaver add client` command, the CLI help will display:
+In the CLI, run `weaver add client`, the following help will display:
 
 ```
 Usage: weaver add client -fntou --options.<option_name>
@@ -48,60 +55,60 @@ Usage: weaver add client -fntou --options.<option_name>
                         Example: --options.readPreference secondaryPreferred
 ```
 
+To pull data from a db into another, you'll need to add both the `source` and `target` clients. The `source` is where the document we want is stored, and `target` is where you want to copy to.
+
 Example:
 
 Assume the following remote server settings for `source`:
-- Type: mongodb
-- IP: 100.101.102.103
+- Family: mongodb
+- Type: source
+- IP: 172.17.0.4
 - Port: 27017
 - Database name: production
 
 ```
-weaver add client -f mongodb -n production -t source -u mongodb://100.101.102.103:27017
+weaver add client -f mongodb -n production -t source -u mongodb://172.17.0.4:27017
 ```
 
 Assume the following local server settings for `target`:
-- Type: mongodb
+- Family: mongodb
+- Type: target
 - IP: 127.0.0.1
 - Port: 27017
 - Database name: development
+- Origin: production (This is used to map where the data will be pulled from, useful when dealing with multiple `source` and `target` databases.)
 
 ```
 weaver add client -f mongodb -n development -t target -o production -u mongodb://127.0.0.1:27017
 ```
 
-**Important** `-o production` is used to map where the data will be pulled from, useful when dealing with multiple `source` and `target` databases.
-
 
 ### 2. Find the document to clone
 
-On the `source` database, find the document you want to copy to the `target` database and use the _id string:
-
-Assume the following mongodb document in the `source` database, `pets` collection:
+From the `source` database, find the document you want to copy to the `target` database and copy the stringified `_id`:
 
 ```
+// Assume the following mongodb document in the `production` database, `pets` collection:
 {
     _id: ObjectId("507f1f77bcf86cd799439011"),
     name: "fluffy"
 }
 ```
 
-You'll then just copy `507f1f77bcf86cd799439011`.
+### 3. Clone the document(s)
 
-### 3. Copy document(s)
-
-Once steps 1 & 2 are done, just issue the following command:
+Once steps 1 & 2 are done, just run the following command:
 
 ```
 weaver run --queries 507f1f77bcf86cd799439011
 ```
 
-If all is correct, you should now have a copy of the document in your `target` database, even if the collection didn't exist previously:
+If all is setup correctly, you should now have a copy of the document in your `target` database, it will create the collection even if it didn't exist before:
 
 ```
 > mongodb
 mongodb> use development
-mongodb> db.pets.find("507f1f77bcf86cd799439011")
+mongodb> db.pets.find(ObjectId("507f1f77bcf86cd799439011"))
 
 {
     _id: ObjectId("507f1f77bcf86cd799439011"),
@@ -111,14 +118,6 @@ mongodb> db.pets.find("507f1f77bcf86cd799439011")
 >
 ```
 
-## How to test the CLI in dev mode
-
-### Install the CLI tool
-
-- After cloning the repo and installing dependencies, run `npm run build`.
-- Run `npm pack` on the project root.
-- A file `weaver-<VERSION>.tgz` will be created.
-- Run `npm install -g weaver-<VERSION>.tgz`, it will install the package globally.
 
 ## Uninstall the CLI tool
 
@@ -126,5 +125,6 @@ mongodb> db.pets.find("507f1f77bcf86cd799439011")
 
 ## Notes
 
-- `export DEBUG=*` to see what's going on under the hood.
+- Use `export DEBUG=* weaver <command>` to see what's going on under the hood.
+- Use `export DEBUG=Weaver* weaver <command>` to print only weaver output, useful for debugging.
 
