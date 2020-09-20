@@ -70,6 +70,8 @@ It can also plot the entity-relationship graph (coming soon).
 
 ## Getting started
 
+*NEW* [CLI instructions here](https://github.com/SkeloGH/weaver/blob/develop/doc/cli/README.md).
+
 - `git clone https://github.com/SkeloGH/weaver.git`.
 - `cd ./weaver`
 - `nvm use`.
@@ -188,6 +190,7 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
 # Roadmap
 
 - [WIP] `weaver` CLI [(follow the issue)](https://github.com/SkeloGH/weaver/projects/2)
+  + Read the CLI instructions [here](https://github.com/SkeloGH/weaver/blob/develop/doc/cli/README.md).
 - Add plugins for different data sources.
   + ~~MongoDB~~
   + ElasticSearch
