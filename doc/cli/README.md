@@ -124,3 +124,7 @@ mongodb> db.pets.find("507f1f77bcf86cd799439011")
 
 - Run `npm uninstall -g weaver`.
 
+## Notes
+
+- `export DEBUG=*` to see what's going on under the hood.
+
