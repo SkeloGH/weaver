@@ -1,4 +1,4 @@
-![Entity-relationship graph](https://github.com/SkeloGH/weaver/raw/develop/images/athenian-weaver.png?raw=true)
+![Athenian weaver](https://github.com/SkeloGH/weaver/raw/develop/images/athenian-weaver.png?raw=true)
 
 
 # Weaver
@@ -13,6 +13,8 @@ Migrate related document objects within and across different databases.
 - [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
 
 Often times when working with NRDBs like MongoDB, documents reference to other documents from different collections (or even DBs). This becomes a challenge when trying to replicate an interwined dataset to be used in a different environment.
+
+![Weaver overview diagram](https://github.com/SkeloGH/weaver/raw/develop/doc/img/overview.png?raw=true)
 
 For example, a database has the following collections/documents:
 
