@@ -1,6 +1,6 @@
 {
   "name": "@skelogh/weaver",
-  "version": "1.0.0",
+  "version": "1.0.0-pre-release-1",
   "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
   "main": "-",
   "scripts": {
