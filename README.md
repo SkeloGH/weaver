@@ -68,129 +68,137 @@ It can also plot the entity-relationship graph (coming soon).
 - [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
 - [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
 
-## Getting started
+# Getting started
 
-*NEW* [CLI instructions here](https://github.com/SkeloGH/weaver/blob/develop/doc/cli/README.md).
+Weaver runs on NodeJS >= 10
 
-- `git clone https://github.com/SkeloGH/weaver.git`.
-- `cd ./weaver`
-- `nvm use`.
-- `npm install`.
-- `npm test`.
-- Configure according to your settings (see below).
-- `npm run app` (or `npm run dev` if you want to see the full logging).
+## Install via npm
 
-### Add data sources and targets
+`npm i -g @skelogh/weaver`
 
-There are 3 main files to look at:
+## How to test the CLI in dev mode
 
-1. `src/config/clients.js`: This is where you create instances of the db `source` & `target` clients to be queried and replicated onto. For every `source` client there should be a matching `target` client. You'll see 2 instances of `WeaverMongoClient`, which is just a wrapper of `mongodb.MongoClient`:
+### Install the CLI tool
 
-```javascript
-module.exports = [
-  // This is the client that has your source data, where you want to run the queries against.
-  new WeaverMongoClient({
-    type: 'source',  // The type of db client
-    db: {
+- After cloning the repo and installing dependencies, run `npm run build`.
+- Run `npm pack` on the project root.
+- A file `weaver-<VERSION>.tgz` will be created.
+- Run `npm install -g weaver-<VERSION>.tgz`, it will install the package globally.
 
-      //    The source db url address, in this case using port forwarding
-      url: 'mongodb://localhost:27020/my-app-store-prod',
+## Using the CLI tool
 
-      //    The source db name
-      name: 'my-app-store-prod',
+- After installing, just issue the `weaver` command, the CLI help will display the CLI help:
 
-      //    node-mongodb-native options
-      options: {}
-    },
-    client: {
-      // The collection names to skip querying
-      ignoreFields: ['passwords']
-    }
-  }),
+```
+Usage: weaver [OPTIONS] COMMAND [ARG...]
+       weaver [ --help | -v | --version ]
 
-  // This is the collection where you want to copy the data to.
-  new WeaverMongoClient({
-    type: 'target',
-    origin: 'my-app-store-prod', // IMPORTANT The name of the db you'll be pulling from ^
-    db: {
-      url: 'mongodb://localhost:27017/my-app-store-local', // Local db
-      name: 'my-app-store-local',
-      options: {}
-    }
-  }),
-];
+Commands:
+  weaver run        Runs the app with the loaded configuration
+  weaver add        Creation of client, query or ignore
+  weaver remove     Removal of clients, queries or ignores
+
+Options:
+  --version, -v    Print version information and quit
+  --config, -c     Read or set path of config file, default: undefined
+  --dry            Run but don't save
+  --info           Displays the current settings
+  --json           Write the output in the configured JSON file
+  --json-file      The JSON filepath where output will be streamed to
+  --limit          The max amount of docs to retrieve
+  --queries, --qq  Document ids to get relationships from, e.g.: 2a3b4c5d6e7f8g9h2a3b4c5d e7f8g9h2a3b4c5d2a3b4c5d6
+  --verbose, -V    Enable highest level of logging, same as DEBUG=*
+  --help           Show help
 ```
 
-2. `src/config/index.js`: This is where you'll be changing things around more often, here you need to set the initial query that Weaver will use as a seed to start looking up for references:
+### 1. Add clients
 
-```javascript
-const dataClients = require('./clients'); // Modified in step 1
+In the CLI, run `weaver add client`, the following help will display:
 
-// The main app configuration.
-module.exports = {
+```
+Usage: weaver add client -fntou --options.<option_name>
 
-  // These are the seed queries, it will lookup the documents in every data source
-  // and read their fields to look up for related documents between data clients
-  queries: [
-    { _id: ObjectId('abcdef78901234abcdef1234') }, // < this is the `user` id in the README example
-  ],
-
-  dataClients,
-  jsonConfig: {
-    // Here you define where the JSON output should be saved to:
-    filePath: '${process.env.PWD}/results/weaver.out.json' // < this one is checked into the repo, give it a look.
-  }
-};
+  -f [mongodb]          <String> The client db family, mongodb is only supported for now.
+  -n <name>             <String> The client db name.
+  -t [source|target]    <String> source if the data will be pulled from it, target otherwise.
+  -o [<source.name>]    <String> The target's origin db where the data will be copied from.
+  -u <url>              <String> The client db URL.
+  --options.<opt_name>  <Any> Client db-specific options, for now MongoClient options, use dot notation to set each option
+                        Example: --options.readPreference secondaryPreferred
 ```
 
-### Run the app
+To pull data from a db into another, you'll need to add both the `source` and `target` clients. The `source` is where the document we want is stored, and `target` is where you want to copy to.
 
-`npm run app`
+Example:
 
-### See the results
+Assume the following remote server settings for `source`:
+- Family: mongodb
+- Type: source
+- IP: 172.17.0.4
+- Port: 27017
+- Database name: production
 
-Once the replication is complete, the results will be present in the `target` client(s). Additionally, the operation results will be printed to a JSON file. Each key is the document's `_id` and the content is a summary of the document found and where it was found, for our example:
+```
+weaver add client -f mongodb -n production -t source -u mongodb://172.17.0.4:27017
+```
 
-```json
+Assume the following local server settings for `target`:
+- Family: mongodb
+- Type: target
+- IP: 127.0.0.1
+- Port: 27017
+- Database name: development
+- Origin: production (This is used to map where the data will be pulled from, useful when dealing with multiple `source` and `target` databases.)
+
+```
+weaver add client -f mongodb -n development -t target -o production -u mongodb://127.0.0.1:27017
+```
+
+
+### 2. Find the document to clone
+
+From the `source` database, find the document you want to copy to the `target` database and copy the stringified `_id`:
+
+```
+// Assume the following mongodb document in the `production` database, `pets` collection:
 {
-  "abcdef78901234abcdef1234": {
-    "database": "my-app-store-prod",
-    "dataSet": "users",
-    "data": {
-      "_id": "abcdef78901234abcdef1234",
-      "name": "John",
-      "orders": [
-        {
-          "orderId": "4321fedcbafedcba67890123"
-        }
-      ]
-    }
-  },
-  "4321fedcbafedcba67890123": {
-    "database": "my-app-store-prod",
-    "dataSet": "orders",
-    "data": {
-      "_id": "4321fedcbafedcba67890123",
-      "cartId": "fedcba67890123fedcba4321"
-    }
-  },
-  "fedcba67890123fedcba4321": {
-    "database": "my-app-store-prod",
-    "dataSet": "carts",
-    "data": {
-      "_id": "fedcba67890123fedcba4321",
-      "userId": "abcdef78901234abcdef1234"
-    }
-  }
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    name: "fluffy"
 }
 ```
 
-You can try out all of the abobe running `npm run test`, check out the `__tests__` folder to see the details.
+### 3. Clone the document(s)
+
+Once steps 1 & 2 are done, just run the following command:
+
+```
+weaver run --queries 507f1f77bcf86cd799439011
+```
+
+
+
+### 4. See the results
+
+If all is setup correctly, you should now have a copy of the document in your `target` database, it will create the collection even if it didn't exist before:
+
+```
+> mongodb
+mongodb> use development
+mongodb> db.pets.find(ObjectId("507f1f77bcf86cd799439011"))
+
+{
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    name: "fluffy"
+}
+
+>
+```
+
+
 
 # Roadmap
 
 - [WIP] `weaver` CLI [(follow the issue)](https://github.com/SkeloGH/weaver/projects/2)
-  + Read the CLI instructions [here](https://github.com/SkeloGH/weaver/blob/develop/doc/cli/README.md).
 - Add plugins for different data sources.
   + ~~MongoDB~~
   + ElasticSearch
@@ -203,5 +211,6 @@ You can try out all of the abobe running `npm run test`, check out the `__tests_
 - Doc pages
 
 [See what's been worked on](https://github.com/SkeloGH/weaver/projects).
+
 Questions? [create an issue!](https://github.com/SkeloGH/weaver/issues).
 
