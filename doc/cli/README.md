@@ -1,8 +1,10 @@
 # Getting started
 
+Weaver runs on NodeJS >= 10
+
 ## Install via npm
 
-- For now, only dev version can be installed, refer to ["How to test the CLI in dev mode"](#how-to-test-the-cli-in-dev-mode) below.
+`npm i -g @skelogh/weaver`
 
 ## How to test the CLI in dev mode
 
