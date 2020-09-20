@@ -112,7 +112,7 @@ mongodb> db.pets.find("507f1f77bcf86cd799439011")
 
 ### Install the CLI tool
 
-- After installing the repo and dependencies, run `npm run build`.
+- After cloning the repo and installing dependencies, run `npm run build`.
 - Run `npm pack` on the project root.
 - A file `weaver-<VERSION>.tgz` will be created.
 - Run `npm install -g weaver-<VERSION>.tgz`, it will install the package globally.
