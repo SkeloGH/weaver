@@ -1,12 +1,14 @@
 {
   "name": "@skelogh/weaver",
   "version": "1.0.0-pre-release-2",
-  "description": "A mongoDB relational collection field mapping, visualizing and importing tool",
-  "main": "-",
+  "description": "A mongoDB relational document importing tool",
+  "main": "src/index.js",
   "scripts": {
     "build": "npm run build-cli && npm run build-app && npm run test-coverage",
     "build-cli": "babel bin/ -d dist/bin --ignore \"bin/**/*.test.js\"",
     "build-app": "babel src/ -d dist/src --ignore \"src/__tests__/*\"",
+    "build-pack": "npm run build && npm pack",
+    "build-pack-install": "npm run build && npm pack && npm i -g $(git status --porcelain | grep '??' | cut -d' ' -f 2) && weaver",
     "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
@@ -17,6 +19,9 @@
   "bin": {
     "weaver": "dist/bin/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "jest": {
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
