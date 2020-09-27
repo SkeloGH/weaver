@@ -14,6 +14,7 @@ const {
   isCalledWithParams,
 } = require('./lib/utils');
 
+Debug.enable('Weaver:*');
 argv
   .check(verboseMode)
   .scriptName('weaver')
@@ -27,7 +28,7 @@ argv
   .strict(true)
   .check(isCalledWithParams)
   .fail((msg, err, yargs) => {
-    logging('Error', yargs);
+    if (err) logging('Error', yargs);
     if (err) throw err; // preserve stack
     if (!isCalledWithParams()) {
       console.error(yargs.help());
