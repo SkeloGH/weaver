@@ -21,10 +21,10 @@ argv
   .usage('Usage: $0 [OPTIONS] COMMAND [ARG...]')
   .usage('       $0 [ --help | -v | --version ]')
   .options(options)
-  .command(cmd.run.name, cmd.run.description, cmd.run.setup, cmd.run.parse)
-  .command(cmd.cfg.name, cmd.cfg.description, cmd.cfg.setup, cmd.cfg.parse)
   .command(cmd.add.name, cmd.add.description, cmd.add.setup, cmd.add.parse)
   .command(cmd.rm.name, cmd.rm.description, cmd.rm.setup, cmd.rm.parse)
+  .command(cmd.run.name, cmd.run.description, cmd.run.setup, cmd.run.parse)
+  // .command(cmd.cfg.name, cmd.cfg.description, cmd.cfg.setup, cmd.cfg.parse)
   .strict(true)
   .check(isCalledWithParams)
   .fail((msg, err, yargs) => {
