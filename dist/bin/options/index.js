@@ -1,4 +1,8 @@
-"use strict";const Debug=require("debug"),logging=Debug("Weaver:CLI:options:index"),options={config:{alias:"c",describe:"Displays current configuration if called without arguments, or set the JSON config file destination.",type:"string"},dry:{describe:"Run but don't save.",type:"boolean"},// json: {
+"use strict";const Debug=require("debug"),logging=Debug("Weaver:CLI:options:index"),options={config:{alias:"c",describe:"Displays current configuration if called without arguments, or set the JSON config file destination.",type:"string"},// dry: {
+//   describe: 'Run but don\'t save.',
+//   type: 'boolean',
+// },
+// json: {
 //   describe: 'Write the output in the configured JSON file',
 //   type: 'boolean',
 // },
