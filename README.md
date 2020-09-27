@@ -194,15 +194,16 @@ mongodb> db.pets.find(ObjectId("507f1f77bcf86cd799439011"))
 
 # Roadmap
 
-- [WIP] `weaver` CLI [(follow the issue)](https://github.com/SkeloGH/weaver/projects/2)
+- ~`weaver` CLI [(follow the project)](https://github.com/SkeloGH/weaver/projects/2)~
+  + `npm i -g @skelogh/weaver` :tada:
 - Add plugins for different data sources.
   + ~~MongoDB~~
-  + ElasticSearch
+  + [WIP] ElasticSearch [(follow the project)](https://github.com/SkeloGH/weaver/projects/4)
   + DinamoDB
   + Cassandra
   + and so on...
-- API/SDK (?)
 - Client UI
+- API/SDK (?)
 - Connect via SSH.
 - Doc pages
 
