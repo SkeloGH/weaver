@@ -58,7 +58,6 @@ This tool finds the relationships, and migrates them to a destination db:
 | `db.orders.findOne(ObjectId('4321fedcbafedcba67890123'))`|      1      |      1      |
 | `db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))` |      1      |      1      |
 
-It can also plot the entity-relationship graph (coming soon).
 
 ![Entity-relationship graph](https://github.com/SkeloGH/weaver/raw/develop/images/example_graph.png?raw=true)
 
@@ -96,18 +95,13 @@ Usage: weaver [OPTIONS] COMMAND [ARG...]
        weaver [ --help | -v | --version ]
 
 Commands:
-  weaver run        Runs the app with the loaded configuration
   weaver add        Creation of client, query or ignore
   weaver remove     Removal of clients, queries or ignores
+  weaver run        Runs the app with the loaded configuration
 
 Options:
   --version, -v    Print version information and quit
   --config, -c     Read or set path of config file, default: undefined
-  --dry            Run but don't save
-  --info           Displays the current settings
-  --json           Write the output in the configured JSON file
-  --json-file      The JSON filepath where output will be streamed to
-  --limit          The max amount of docs to retrieve
   --queries, --qq  Document ids to get relationships from, e.g.: 2a3b4c5d6e7f8g9h2a3b4c5d e7f8g9h2a3b4c5d2a3b4c5d6
   --verbose, -V    Enable highest level of logging, same as DEBUG=*
   --help           Show help
