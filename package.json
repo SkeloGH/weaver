@@ -12,9 +12,9 @@
     "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
-    "test": "jest --runInBand",
-    "test-coverage": "jest --runInBand --coverage --coverageReporters=text-lcov | coveralls",
-    "test-debug": "DEBUG=Weaver* jest --runInBand --detectOpenHandles"
+    "test": "jest --clearCache && jest --runInBand",
+    "test-coverage": "jest --clearCache && jest --runInBand --coverage --coverageReporters=text-lcov | coveralls",
+    "test-debug": "DEBUG=Weaver* jest --clearCache && jest --runInBand --detectOpenHandles"
   },
   "bin": {
     "weaver": "dist/bin/cli.js"
@@ -68,7 +68,7 @@
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
-    "jest": "^24.9.0",
+    "jest": "^27.5.1",
     "nodemon": "^2.0.20"
   }
 }

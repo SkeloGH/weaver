@@ -90,7 +90,7 @@ describe('Weaver main test suite', () => {
     expect(results).toEqual(['works']);
   });
 
-  test('Weaver interwines', async (done) => {
+  test('Weaver interwines', (done) => {
     const weaver = new Weaver(CONFIG);
     /**
      * TODO: refactor method for testability
