@@ -17,6 +17,11 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - run:
+          name: Update PATH and Define Environment Variable at Runtime
+          command: |
+            echo 'export MONGOMS_DOWNLOAD_MIRROR="https://downloads.mongodb.org"' >> "$BASH_ENV"
+            source "$BASH_ENV"
       - checkout
 
       # Download and cache dependencies
