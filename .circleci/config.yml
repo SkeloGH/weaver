@@ -34,6 +34,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
+      - run: npm run test-cache-clear
       - run: npm run test-debug
 
       - store_test_results:
