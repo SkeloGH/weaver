@@ -50,6 +50,7 @@
     "lodash": "^4.17.21",
     "md5": "^2.2.1",
     "mongodb": "^3.3.3",
+    "mongodb-memory-server": "^8.9.0-beta.3",
     "rimraf": "^3.0.0",
     "shelljs": "^0.8.5",
     "yargs": "^15.4.1"
