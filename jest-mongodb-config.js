@@ -19,14 +19,14 @@ module.exports = {
       // downloadDir?: string, // by default node_modules/.cache/mongodb-memory-server/mongodb-binaries
       // platform?: string, // by default os.platform()
       // arch?: string, // by default os.arch()
-      // debug?: boolean, // by default false
+      debug: true, // by default false
       // checkMD5?: boolean, // by default false OR process.env.MONGOMS_MD5_CHECK
       skipMD5: true,
       // systemBinary?: string, // by default undefined or process.env.MONGOMS_SYSTEM_BINARY
     },
     // autoStart?: boolean, // by default true
     autoStart: false,
-    // debug?: boolean, // by default false
+    debug: true, // by default false
     debug: process.env.DEBUG === '*',
   },
 };
