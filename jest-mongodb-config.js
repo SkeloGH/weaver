@@ -25,7 +25,7 @@ module.exports = {
       // systemBinary?: string, // by default undefined or process.env.MONGOMS_SYSTEM_BINARY
     },
     // autoStart?: boolean, // by default true
-    autoStart: false,
+    autoStart: true,
     debug: true, // by default false
     debug: process.env.DEBUG === '*',
   },
