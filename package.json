@@ -4,17 +4,18 @@
   "description": "A mongoDB relational document importing tool",
   "main": "src/index.js",
   "scripts": {
+    "app": "DEBUG=Weaver* node --harmony src/index.js",
     "build": "npm run build-cli && npm run build-app && npm run test-coverage",
     "build-cli": "babel bin/ -d dist/bin --ignore \"bin/**/*.test.js\"",
     "build-app": "babel src/ -d dist/src --ignore \"src/__tests__/*\"",
     "build-pack": "npm run build && npm pack",
     "build-pack-install": "npm run build && npm pack && npm i -g $(git status --porcelain | grep '??' | cut -d' ' -f 2) && weaver",
-    "app": "DEBUG=Weaver* node --harmony src/index.js",
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
+    "debug-install": "MONGOMS_DEBUG=1 npm install --foreground-scripts",
     "test": "jest --runInBand",
     "test-coverage": "jest --runInBand --coverage --coverageReporters=text-lcov | coveralls",
-    "test-debug": "DEBUG=Weaver* jest --runInBand --detectOpenHandles"
+    "test-debug": "MONGOMS_DEBUG=1 DEBUG=Weaver* jest --runInBand --detectOpenHandles"
   },
   "bin": {
     "weaver": "dist/bin/cli.js"
