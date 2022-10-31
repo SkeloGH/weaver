@@ -3,7 +3,7 @@
 
 # Weaver
 
-Migrate related document objects within and across different databases.
+Weaver: Clone n-ary relationship sets across distinct databases.
 
 [NPM package: @skelogh/weaver](https://www.npmjs.com/package/@skelogh/weaver)
 
