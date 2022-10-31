@@ -132,7 +132,7 @@ class Weaver {
  */
 if (require.main === module) {
   const weaver = new Weaver(require('./config'));
-  weaver.run((result) => {
+  weaver.run(async (result) => {
     logging('Result', result);
     logging('Done');
     weaver.disconnect(process.exit);

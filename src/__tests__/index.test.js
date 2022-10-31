@@ -100,23 +100,26 @@ describe('Weaver main test suite', () => {
      * 4. [ ] Test JSON output
     */
     async function cb(opResult) {
-      log('interwine opResult: ', opResult);
-      expect(opResult).toBeDefined();
-      expect(opResult[0]).toBeDefined();
-      expect(opResult[0][0]).toBeDefined();
-      // expect(opResult[0][0].result).toEqual(expect.objectContaining({ ok: 1 }));
-
-      const users = targetClient1.db.collection('users');
-      const carts = targetClient1.db.collection('carts');
-      const orders = targetClient1.db.collection('orders');
-      const insertedUser = await users.findOne(mockUser);
-      const insertedCart = await carts.findOne(mockCart);
-      const insertedOrder = await orders.findOne(mockOrder);
-
-      expect(insertedUser).toEqual(mockUser);
-      expect(insertedCart).toEqual(mockCart);
-      expect(insertedOrder).toEqual(mockOrder);
-      weaver.disconnect(done);
+      try {
+        log('interwine opResult: ', opResult);
+        expect(opResult).toBeDefined();
+        expect(opResult[0]).toBeDefined();
+        expect(opResult[0][0]).toBeDefined();
+        expect(opResult[0][0].result).toEqual(expect.objectContaining({ ok: 1 }));
+  
+        const users = targetClient1.db.collection('users');
+        const carts = targetClient1.db.collection('carts');
+        const orders = targetClient1.db.collection('orders');
+        const insertedUser = await users.findOne(mockUser);
+        const insertedCart = await carts.findOne(mockCart);
+        const insertedOrder = await orders.findOne(mockOrder);
+  
+        expect(insertedUser).toEqual(mockUser);
+        expect(insertedCart).toEqual(mockCart);
+        expect(insertedOrder).toEqual(mockOrder);
+      } finally {
+        weaver.disconnect(done);
+      }
     }
     weaver.run(cb);
   });

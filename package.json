@@ -14,9 +14,9 @@
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "debug-install": "MONGOMS_DEBUG=1 npm install --foreground-scripts",
     "debug-test": "MONGOMS_DEBUG=1 DEBUG=Weaver* jest --clearCache && jest --runInBand --detectOpenHandles",
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles",
     "test-dev": "MONGOMS_DEBUG=1 jest --runInBand --detectOpenHandles --onlyChanged",
-    "test-coverage": "jest --runInBand --coverage --coverageReporters=text-lcov | coveralls"
+    "test-coverage": "jest  --runInBand --detectOpenHandles --coverage --coverageReporters=text-lcov | coveralls"
   },
   "bin": {
     "weaver": "dist/bin/cli.js"
