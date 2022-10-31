@@ -17,15 +17,13 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - checkout
+
       - run:
           name: Install dependencies
           command: |
             wget http://debian.mirror.ac.za/debian/pool/main/o/openssl/libssl1.1_1.1.1o-1_amd64.deb
             sudo dpkg -i libssl1.1_1.1.1o-1_amd64.deb
-
-
-
-      - checkout
 
       # Download and cache dependencies
       - restore_cache:
