@@ -48,16 +48,8 @@ describe('Weaver main test suite', () => {
     await targetClient1.database.close();
   });
 
-  /**
-   *  I pretended to use this hook to dispose connections, but for some
-   *  reason is not disconnecting properly, need to fix it
-   *  in the mean time close them manually when not in use.
-   * afterAll(async () => {
-   * });
-   */
   afterAll(async () => {
     [sourceClient1, targetClient1] = CONFIG.dataClients;
-
     await sourceClient1.disconnect();
     await targetClient1.disconnect();
   });
@@ -98,15 +90,10 @@ describe('Weaver main test suite', () => {
 
   test('Weaver interwines', async (done) => {
     const weaver = new Weaver(CONFIG);
-    /**
-     * TODO: refactor method for testability
-     * 1. [x] Test clients connected successfully
-     * 2. [x] Test warm up query
-     * 3. [ ] Test interlacing
-     * 4. [ ] Test JSON output
-    */
     const opResult = await weaver.run();
+    
     log('interwine opResult: ', opResult);
+    
     expect(opResult).toBeDefined();
     expect(opResult).toBeDefined();
     expect(opResult[0]).toBeDefined();
