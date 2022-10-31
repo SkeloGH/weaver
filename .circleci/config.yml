@@ -7,17 +7,23 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:10.8.0
+      - image: cimg/node:16.18.0
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
+      # - image: circleci/mongo:4.0.3
 
     working_directory: ~/repo
 
     steps:
       - checkout
+
+      - run:
+          name: Install dependencies
+          command: |
+            wget http://debian.mirror.ac.za/debian/pool/main/o/openssl/libssl1.1_1.1.1o-1_amd64.deb
+            sudo dpkg -i libssl1.1_1.1.1o-1_amd64.deb
 
       # Download and cache dependencies
       - restore_cache:
@@ -26,7 +32,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm install --no-package-lock
+      - run: npm run debug-install
 
       - save_cache:
           paths:
@@ -34,6 +40,6 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: npm test
+      - run: npm run debug-test
 
 
