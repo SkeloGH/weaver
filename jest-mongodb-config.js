@@ -28,7 +28,7 @@ module.exports = {
     // autoStart?: boolean, // by default true
     autoStart: false,
     // debug?: boolean, // by default false
-    debug: process.env.DEBUG === '*',
+    debug: process.env.MONGOMS_DEBUG !== undefined,
   },
   // useSharedDBForAllJestWorkers: false, // use separate database for each jest worker
   // instance: {}, // use dynamic database name
