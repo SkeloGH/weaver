@@ -114,7 +114,7 @@ class Weaver {
    *  the document or documents insertion results.
    */
   run = (cb) => {
-    this.connectClients(this.dataTargets)
+    const result = this.connectClients(this.dataTargets)
       .then(() => this.connectClients(this.dataSources))
       .then(() => this.collect.runQueries(this.queries))
       .then(this.collect.interlace)
@@ -123,6 +123,7 @@ class Weaver {
       .then(this.digest.dump)
       .catch(this.logging)
       .then(cb);
+    return result;
   }
 }
 

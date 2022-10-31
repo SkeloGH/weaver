@@ -48,13 +48,11 @@ describe('Weaver main test suite', () => {
     await targetClient1.database.close();
   });
 
-  /**
-   *  I pretended to use this hook to dispose connections, but for some
-   *  reason is not disconnecting properly, need to fix it
-   *  in the mean time close them manually when not in use.
-   * afterAll(async () => {
-   * });
-  */
+  afterAll(async () => {
+    [sourceClient1, targetClient1] = CONFIG.dataClients;
+    await sourceClient1.disconnect();
+    await targetClient1.disconnect();
+  });
 
   test('Public methods are defined', () => {
     const weaver = new Weaver(CONFIG);
@@ -92,32 +90,30 @@ describe('Weaver main test suite', () => {
 
   test('Weaver interwines', async (done) => {
     const weaver = new Weaver(CONFIG);
-    /**
-     * TODO: refactor method for testability
-     * 1. [x] Test clients connected successfully
-     * 2. [x] Test warm up query
-     * 3. [ ] Test interlacing
-     * 4. [ ] Test JSON output
-    */
-    async function cb(opResult) {
-      log('interwine opResult: ', opResult);
-      expect(opResult).toBeDefined();
-      expect(opResult[0]).toBeDefined();
-      expect(opResult[0][0]).toBeDefined();
-      // expect(opResult[0][0].result).toEqual(expect.objectContaining({ ok: 1 }));
+    const opResult = await weaver.run();
 
-      const users = targetClient1.db.collection('users');
-      const carts = targetClient1.db.collection('carts');
-      const orders = targetClient1.db.collection('orders');
-      const insertedUser = await users.findOne(mockUser);
-      const insertedCart = await carts.findOne(mockCart);
-      const insertedOrder = await orders.findOne(mockOrder);
+    log('interwine opResult: ', opResult);
 
-      expect(insertedUser).toEqual(mockUser);
-      expect(insertedCart).toEqual(mockCart);
-      expect(insertedOrder).toEqual(mockOrder);
-      weaver.disconnect(done);
-    }
-    weaver.run(cb);
+    expect(opResult).toBeDefined();
+    expect(opResult).toBeDefined();
+    expect(opResult[0]).toBeDefined();
+    expect(opResult[0][0]).toBeDefined();
+    expect(opResult[0][0].acknowledged).toBeDefined();
+    expect(opResult[0][0].acknowledged).toEqual(true);
+    expect(opResult[0][1].acknowledged).toBeDefined();
+    expect(opResult[0][1].acknowledged).toEqual(true);
+    expect(opResult[0][2].acknowledged).toBeDefined();
+    expect(opResult[0][2].acknowledged).toEqual(true);
+
+    const users = targetClient1.db.collection('users');
+    const carts = targetClient1.db.collection('carts');
+    const orders = targetClient1.db.collection('orders');
+    const insertedUser = await users.findOne(mockUser);
+    const insertedCart = await carts.findOne(mockCart);
+    const insertedOrder = await orders.findOne(mockOrder);
+
+    expect(insertedUser).toEqual(mockUser);
+    expect(insertedCart).toEqual(mockCart);
+    expect(insertedOrder).toEqual(mockOrder);
   });
 });
