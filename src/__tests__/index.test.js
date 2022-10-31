@@ -91,9 +91,9 @@ describe('Weaver main test suite', () => {
   test('Weaver interwines', async (done) => {
     const weaver = new Weaver(CONFIG);
     const opResult = await weaver.run();
-    
+
     log('interwine opResult: ', opResult);
-    
+
     expect(opResult).toBeDefined();
     expect(opResult).toBeDefined();
     expect(opResult[0]).toBeDefined();
