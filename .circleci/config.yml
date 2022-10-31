@@ -19,7 +19,11 @@ jobs:
     steps:
       - run:
           name: Install dependencies
-          command: sudo dpkg -i libssl1.1*.deb
+          command: |
+            wget http://debian.mirror.ac.za/debian/pool/main/o/openssl/libssl1.1_1.1.1o-1_amd64.deb
+            sudo dpkg -i libssl1.1_1.1.1o-1_amd64.deb
+
+
 
       - checkout
 
