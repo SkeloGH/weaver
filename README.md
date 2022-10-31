@@ -14,7 +14,7 @@ Weaver: Clone n-ary relationship sets across distinct databases.
 - [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
 - [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
 
-Often times when working with NRDBs like MongoDB, documents reference to other documents from different collections (or even DBs). This becomes a challenge when trying to replicate an interwined dataset to be used in a different environment.
+Debugging DB objects with n-ary relationships is often done manually, this tool is meant to automate copying these objects into desired databases.
 
 ![Weaver overview diagram](https://github.com/SkeloGH/weaver/raw/develop/doc/img/overview.png?raw=true)
 
@@ -66,7 +66,7 @@ This tool finds the relationships, and migrates them to a destination db:
 # Requirements
 
 - [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
-- [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
+- [node v16.18.0](https://nodejs.org/dist/v16.18.0/).
 - [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
 
 # Getting started
