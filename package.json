@@ -13,8 +13,9 @@
     "clean": "rimraf node_modules",
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "debug-install": "MONGOMS_DEBUG=1 npm install --foreground-scripts",
-    "debug-test": "MONGOMS_DEBUG=1 DEBUG=Weaver* jest --clearCache && jest --runInBand --detectOpenHandles --debug",
     "test": "jest --runInBand",
+    "test-ci": "MONGOMS_DEBUG=1 DEBUG=Weaver jest --runInBand",
+    "test-debug": "jest --clearCache && MONGOMS_DEBUG=1 DEBUG=Weaver* jest --runInBand --detectOpenHandles --debug",
     "test-dev": "MONGOMS_DEBUG=1 jest --runInBand --detectOpenHandles --onlyChanged",
     "test-coverage": "jest  --runInBand --detectOpenHandles --coverage --coverageReporters=text-lcov | coveralls"
   },
