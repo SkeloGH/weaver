@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+process.env.MONGOMS_DOWNLOAD_MIRROR = "https://fastdl.mongodb.org";
 module.exports = {
   mongodbMemoryServerOptions: {
     instance: {
@@ -15,7 +16,7 @@ module.exports = {
     },
     binary: {
       // version?: string, // by default 'latest'
-      version: '4.11.0',
+      version: '4.4.17',
       // downloadDir?: string, // by default node_modules/.cache/mongodb-memory-server/mongodb-binaries
       // platform?: string, // by default os.platform()
       // arch?: string, // by default os.arch()
@@ -30,5 +31,5 @@ module.exports = {
     debug: process.env.DEBUG === '*',
   },
   // useSharedDBForAllJestWorkers: false, // use separate database for each jest worker
-  instance: {}, // use dynamic database name
+  // instance: {}, // use dynamic database name
 };
