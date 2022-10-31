@@ -15,6 +15,7 @@
     "debug-install": "MONGOMS_DEBUG=1 npm install --foreground-scripts",
     "debug-test": "MONGOMS_DEBUG=1 DEBUG=Weaver* jest --clearCache && jest --runInBand --detectOpenHandles",
     "test": "jest",
+    "test-dev": "MONGOMS_DEBUG=1 jest --runInBand --detectOpenHandles --onlyChanged",
     "test-coverage": "jest --runInBand --coverage --coverageReporters=text-lcov | coveralls"
   },
   "bin": {
