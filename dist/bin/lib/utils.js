@@ -1,0 +1,3 @@
+"use strict";const Debug=require("debug"),argv=require("yargs");function InvalidJSONFileError(a){this.message=`
+  Error parsing JSON file at ${JSON.stringify(a)}
+  Make sure file exists and content is valid JSON`,this.stack=Error().stack}InvalidJSONFileError.prototype=Object.create(Error.prototype),InvalidJSONFileError.prototype.name="InvalidJSONFileError";const verboseMode=()=>argv.parsed.argv.verbose&&Debug.enable("Weaver:*")||!0,isCalledWithParams=()=>2<process.argv.length,generateId=(a={})=>{var b=Math.ceil;const c=a.length?a.length:8;let d=`${a.prefix?a.prefix:""}`,e=0;for(;d.length<c;)e=b(100*Math.random()),d+=e;return d=`${d}${a.suffix?a.suffix:""}`,d=d.slice(0,c),d};module.exports={InvalidJSONFileError,generateId,verboseMode,isCalledWithParams};

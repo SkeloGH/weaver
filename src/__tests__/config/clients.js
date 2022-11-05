@@ -2,7 +2,7 @@ const logging = require('debug');
 const WeaverMongoClient = require('../../clients/mongodb');
 
 const log = logging('Weaver:__tests__:config:clients');
-let { MONGO_URL } = process.env;
+let { MONGO_URL } = process.env || '';
 MONGO_URL = MONGO_URL.replace('?', '');
 
 const source1 = {

@@ -1,0 +1,3 @@
+"use strict";const Debug=require("debug"),{client,ignore}=require("./add/"),logging=Debug("Weaver:bin:commands:add");module.exports={name:"add",description:"Creation of client, query or ignore",setup:a=>{const b=`
+      You need at least one command before moving on
+        weaver add [${client.commandName}|query|${ignore.commandName}]`,c=a.command(client.commandName,client.commandDesc,client.commandSpec,client.commandHandler).command("query","Interactive creation of a new query",a=>a,a=>(logging("query params",a),a)).command(ignore.commandName,ignore.commandDesc,ignore.commandSpec,ignore.commandHandler).demandCommand(1,b);return c},parse:a=>(logging("_argv",a),a)};

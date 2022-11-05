@@ -1,12 +1,22 @@
+![Athenian weaver](https://github.com/SkeloGH/weaver/raw/develop/images/athenian-weaver.png?raw=true)
+
+
 # Weaver
 
-A tool for mapping, visualizing and importing relational-data in NRDBs
+Weaver: Clone n-ary relationship sets across distinct databases.
 
-[![codebeat badge](https://codebeat.co/badges/d6101e2d-7c26-4c19-a820-d90a96a5fd54)](https://codebeat.co/projects/github-com-skelogh-weaver-master) [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com) [![Coverage Status](https://coveralls.io/repos/github/SkeloGH/weaver/badge.svg)](https://coveralls.io/github/SkeloGH/weaver) [![CircleCI](https://circleci.com/gh/SkeloGH/weaver.svg?style=svg)](https://circleci.com/gh/SkeloGH/weaver)
+[NPM package: @skelogh/weaver](https://www.npmjs.com/package/@skelogh/weaver)
+
+[![NodeJS 10](https://img.shields.io/badge/node-0.10.x-brightgreen.svg)](https://nodejs.org/en/blog/release/v10.0.0/) [![npm version](https://badge.fury.io/js/%40skelogh%2Fweaver.svg)](https://badge.fury.io/js/%40skelogh%2Fweaver) [![codebeat badge](https://codebeat.co/badges/d6101e2d-7c26-4c19-a820-d90a96a5fd54)](https://codebeat.co/projects/github-com-skelogh-weaver-master) [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com) [![Coverage Status](https://coveralls.io/repos/github/SkeloGH/weaver/badge.svg?branch=develop)](https://coveralls.io/github/SkeloGH/weaver?branch=develop) [![CircleCI](https://circleci.com/gh/SkeloGH/weaver.svg?style=svg)](https://circleci.com/gh/SkeloGH/weaver)
 
 # Context
 
-Often times when working with NRDBs like MongoDB, documents reference to other documents from different collections (or even DBs). This becomes a challenge when trying to replicate an interwined dataset to be used in a different environment.
+- [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
+- [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
+
+Debugging DB objects with n-ary relationships is often done manually, this tool is meant to automate copying these objects into desired databases.
+
+![Weaver overview diagram](https://github.com/SkeloGH/weaver/raw/develop/doc/img/overview.png?raw=true)
 
 For example, a database has the following collections/documents:
 
@@ -33,177 +43,171 @@ For example, a database has the following collections/documents:
 
 Note how `user` relates to `order`, and `order` relates to `cart`.
 
-If you wanted to replicate the `orders` and `carts` associated to the `user` in your local environment, for example, you need to:
+If you wanted to migrate the `orders` and `carts` associated to the `user` to your local environment, you'd need to:
 
 1. Go to the `[users|orders|carts] collection` and find the document.
 2. Check if any of the fields is a reference to another collection.
 3. Copy the reference value.
 4. Repeat from step 1.
 
-OR! You could use this tool instead to find all the relationships, replicate them in your local db.
+This tool finds the relationships, and migrates them to a destination db:
 
-| Query                                                   | prod db     | local db  |
-| ------------------------------------------------------- | ----------- | --------- |
-| db.users.findOne(ObjectId('abcdef78901234abcdef1234'))  |    found 1  |  found 1  |
-| db.orders.findOne(ObjectId('4321fedcbafedcba67890123')) |    found 1  |  found 1  |
-| db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))  |    found 1  |  found 1  |
+| Query                                                    | source db   | target db   |
+| -------------------------------------------------------- | ----------- | ----------- |
+| `db.users.findOne(ObjectId('abcdef78901234abcdef1234'))` |      1      |      1      |
+| `db.orders.findOne(ObjectId('4321fedcbafedcba67890123'))`|      1      |      1      |
+| `db.carts.findOne(ObjectId('fedcba67890123fedcba4321'))` |      1      |      1      |
 
-Or even visualize them automatically (coming soon).
 
-![Basic visualization of collection relationships](/images/example_graph.png?raw=true)
+![Entity-relationship graph](https://github.com/SkeloGH/weaver/raw/develop/images/example_graph.png?raw=true)
 
 # Usage
 
-## Getting started
+# Requirements
 
-- `git clone https://github.com/SkeloGH/weaver.git`.
-- `cd ./weaver`
-- `nvm use`.
-- `npm install`.
-- Configure according to your settings (see below).
-- `npm run app` (or `npm run dev` if you want to see the full logging).
+- [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
+- [node v16.18.0](https://nodejs.org/dist/v16.18.0/).
+- [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
 
-## Settings
+# Getting started
 
-There are 3 main files to look at:
+Weaver runs on NodeJS >= 10
 
-1. `config/clients.js`: This is where you create instances of the db clients to be queried/replicated onto, you'll see 2 instances of `WeaverMongoClient`, which is just a wrapper around `mongodb.MongoClient`:
+## Install via npm
 
-```javascript
-module.exports = [
-  // This is the collection that has your source data, where you want to query against.
-  new WeaverMongoClient({
-    type: 'source',  // The type of db client
-    db: {
+`npm i -g @skelogh/weaver`
 
-      //    The source db url address, in this case using port forwarding
-      url: 'mongodb://localhost:27020/my-app-store-prod',
+## How to test the CLI in dev mode
 
-      //    The source db name
-      name: 'my-app-store-prod',
+### Install the CLI tool
 
-      //    node-mongodb-native options
-      options: {}
-    },
-    client: {
-      // The collection names to skip querying
-      ignoreFields: ['passwords']
-    }
-  }),
+- After cloning the repo and installing dependencies, run `npm run build`.
+- Run `npm pack` on the project root.
+- A file `weaver-<VERSION>.tgz` will be created.
+- Run `npm install -g weaver-<VERSION>.tgz`, it will install the package globally.
 
-  // This is the collection where you want to copy the data to.
-  new WeaverMongoClient({
-    type: 'target',
-    origin: 'my-app-store-prod', // IMPORTANT The name of the db you'll be pulling from
-    db: {
-      url: 'mongodb://localhost:27017/my-app-store-local', // Local db
-      name: 'my-app-store-local',
-      options: {}
-    }
-  }),
-];
+## Using the CLI tool
+
+- After installing, just issue the `weaver` command, the CLI help will display the CLI help:
+
+```
+Usage: weaver [OPTIONS] COMMAND [ARG...]
+       weaver [ --help | -v | --version ]
+
+Commands:
+  weaver add        Creation of client, query or ignore
+  weaver remove     Removal of clients, queries or ignores
+  weaver run        Runs the app with the loaded configuration
+
+Options:
+  --version, -v    Print version information and quit
+  --config, -c     Read or set path of config file, default: undefined
+  --queries, --qq  Document ids to get relationships from, e.g.: 2a3b4c5d6e7f8g9h2a3b4c5d e7f8g9h2a3b4c5d2a3b4c5d6
+  --verbose, -V    Enable highest level of logging, same as DEBUG=*
+  --help           Show help
 ```
 
-2. `config/index.js`: This is where you'll be changing things around more often, here you need to set the initial query that Weaver will fetch and start looking up from:
+### 1. Add clients
 
-```javascript
-const dataClients = require('./clients');
+In the CLI, run `weaver add client`, the following help will display:
 
-// The main app configuration.
-module.exports = {
+```
+Usage: weaver add client -fntou --options.<option_name>
 
-  // These are the trigger queries, it will find the document in `users` collection
-  // and use its field values to lookup against related documents across collections
-  queries: [
-    { _id: ObjectId('abcdef78901234abcdef1234') }, // < this is the `user` id in the example
-  ],
-
-  dataClients: dataClients,
-  jsonConfig: {
-    // Here you define where the JSON output should be saved to:
-    filePath: '${process.env.PWD}/results/weaver.out.json' < this one is checked into the repo, give it a look.
-  }
-};
+  -f [mongodb]          <String> The client db family, mongodb is only supported for now.
+  -n <name>             <String> The client db name.
+  -t [source|target]    <String> source if the data will be pulled from it, target otherwise.
+  -o [<source.name>]    <String> The target's origin db where the data will be copied from.
+  -u <url>              <String> The client db URL.
+  --options.<opt_name>  <Any> Client db-specific options, for now MongoClient options, use dot notation to set each option
+                        Example: --options.readPreference secondaryPreferred
 ```
 
-Once the replication is complete, the results will be also printed to a JSON file. Each key is the document's `_id` and the content is a summary of the document found and where it was found:
+To pull data from a db into another, you'll need to add both the `source` and `target` clients. The `source` is where the document we want is stored, and `target` is where you want to copy to.
 
-```json
+Example:
+
+Assume the following remote server settings for `source`:
+- Family: mongodb
+- Type: source
+- IP: 172.17.0.4
+- Port: 27017
+- Database name: production
+
+```
+weaver add client -f mongodb -n production -t source -u mongodb://172.17.0.4:27017
+```
+
+Assume the following local server settings for `target`:
+- Family: mongodb
+- Type: target
+- IP: 127.0.0.1
+- Port: 27017
+- Database name: development
+- Origin: production (This is used to map where the data will be pulled from, useful when dealing with multiple `source` and `target` databases.)
+
+```
+weaver add client -f mongodb -n development -t target -o production -u mongodb://127.0.0.1:27017
+```
+
+
+### 2. Find the document to clone
+
+From the `source` database, find the document you want to copy to the `target` database and copy the stringified `_id`:
+
+```
+// Assume the following mongodb document in the `production` database, `pets` collection:
 {
-  "abcdef78901234abcdef1234": {
-    "database": "my-app-store-prod",
-    "dataSet": "users",
-    "data": {
-      "_id": "abcdef78901234abcdef1234",
-      "name": "John",
-      "orders": [
-        {
-          "orderId": "4321fedcbafedcba67890123"
-        }
-      ]
-    }
-  },
-  "4321fedcbafedcba67890123": {
-    "database": "my-app-store-prod",
-    "dataSet": "orders",
-    "data": {
-      "_id": "4321fedcbafedcba67890123",
-      "cartId": "fedcba67890123fedcba4321"
-    }
-  },
-  "fedcba67890123fedcba4321": {
-    "database": "my-app-store-prod",
-    "dataSet": "carts",
-    "data": {
-      "_id": "fedcba67890123fedcba4321",
-      "userId": "abcdef78901234abcdef1234"
-    }
-  }
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    name: "fluffy"
 }
 ```
 
-You can try out all of the abobe running `npm run test`, check out the `__tests__` folder to see the details.
+### 3. Clone the document(s)
+
+Once steps 1 & 2 are done, just run the following command:
+
+```
+weaver run --queries 507f1f77bcf86cd799439011
+```
+
+
+
+### 4. See the results
+
+If all is setup correctly, you should now have a copy of the document in your `target` database, it will create the collection even if it didn't exist before:
+
+```
+> mongodb
+mongodb> use development
+mongodb> db.pets.find(ObjectId("507f1f77bcf86cd799439011"))
+
+{
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    name: "fluffy"
+}
+
+>
+```
+
+
 
 # Roadmap
 
-## MVP
-
-- ~~Ability to map the schemas.~~
-- ~~Ability to render a dendogram visualizer.~~
-- ~~Ability to render a graph vizualizer.~~
-- ~~Ability to find between collections.~~
-- ~~Ability to install the retrieved collection data locally.~~
-- ~~Ability to find between dbs.~~
-
-## Foundations
-
-- ~~In-code documentation.~~
-- ~~Initial test coverage.~~
-- Cleanup, refactor and definitive project structure. [Current WIP]
-
-## Future
-
-- Full test coverage.
+- ~`weaver` CLI [(follow the project)](https://github.com/SkeloGH/weaver/projects/2)~
+  + `npm i -g @skelogh/weaver` :tada:
 - Add plugins for different data sources.
   + ~~MongoDB~~
-  + ElasticSearch
+  + [WIP] ElasticSearch [(follow the project)](https://github.com/SkeloGH/weaver/projects/4)
   + DinamoDB
   + Cassandra
   + and so on...
-- API/SDK
-
-## Nice to have
-
 - Client UI
-- Output truth validation.
-- Ability to find/install in remote DBs.
+- API/SDK (?)
+- Connect via SSH.
 - Doc pages
 
-[See what's been worked on](https://github.com/SkeloGH/weaver/projects)
+[See what's been worked on](https://github.com/SkeloGH/weaver/projects).
 
+Questions? [create an issue!](https://github.com/SkeloGH/weaver/issues).
 
-# Requirements
-
-- [node v10.8.0](https://nodejs.org/dist/v10.8.0/).
-- [npm 6.4.1](https://www.npmjs.com/package/npm/v/6.4.1).
-- [nvm 0.33](https://github.com/creationix/nvm/tree/v0.33.11).
