@@ -1,5 +1,3 @@
-require('@babel/polyfill');
-
 const logging = require('debug');
 const { ObjectId } = require('mongodb');
 const CONFIG = require('./config');
@@ -7,7 +5,7 @@ const Weaver = require('../');
 
 const log = logging('Weaver:__tests__:root');
 
-describe('insert', () => {
+describe('Weaver main test suite', () => {
   let sourceClient1;
   let targetClient1;
 
@@ -46,13 +44,14 @@ describe('insert', () => {
     expect(insertedUser).toEqual(mockUser);
     expect(insertedCart).toEqual(mockCart);
     expect(insertedOrder).toEqual(mockOrder);
+    await sourceClient1.database.close();
+    await targetClient1.database.close();
   });
 
   afterAll(async () => {
-    await sourceClient1.db.close();
-    await sourceClient1.connection.close();
-    await targetClient1.db.close();
-    await targetClient1.connection.close();
+    [sourceClient1, targetClient1] = CONFIG.dataClients;
+    await sourceClient1.disconnect();
+    await targetClient1.disconnect();
   });
 
   test('Public methods are defined', () => {
@@ -90,33 +89,31 @@ describe('insert', () => {
   });
 
   test('Weaver interwines', async (done) => {
-    /**
-     * TODO: refactor method for testability
-     * 1. [x] Test clients connected successfully
-     * 2. [x] Test warm up query
-     * 3. [ ] Test interlacing
-     * 4. [ ] Test JSON output
-    */
-    async function cb(opResult) {
-      log('interwine opResult: ', opResult);
-      expect(opResult).toBeDefined();
-      expect(opResult[0]).toBeDefined();
-      expect(opResult[0][0]).toBeDefined();
-      expect(opResult[0][0].result).toEqual(expect.objectContaining({ ok: 1 }));
-
-      const users = targetClient1.db.collection('users');
-      const carts = targetClient1.db.collection('carts');
-      const orders = targetClient1.db.collection('orders');
-      const insertedUser = await users.findOne(mockUser);
-      const insertedCart = await carts.findOne(mockCart);
-      const insertedOrder = await orders.findOne(mockOrder);
-
-      expect(insertedUser).toEqual(mockUser);
-      expect(insertedCart).toEqual(mockCart);
-      expect(insertedOrder).toEqual(mockOrder);
-      done();
-    }
     const weaver = new Weaver(CONFIG);
-    weaver.run(cb);
+    const opResult = await weaver.run();
+
+    log('interwine opResult: ', opResult);
+
+    expect(opResult).toBeDefined();
+    expect(opResult).toBeDefined();
+    expect(opResult[0]).toBeDefined();
+    expect(opResult[0][0]).toBeDefined();
+    expect(opResult[0][0].acknowledged).toBeDefined();
+    expect(opResult[0][0].acknowledged).toEqual(true);
+    expect(opResult[0][1].acknowledged).toBeDefined();
+    expect(opResult[0][1].acknowledged).toEqual(true);
+    expect(opResult[0][2].acknowledged).toBeDefined();
+    expect(opResult[0][2].acknowledged).toEqual(true);
+
+    const users = targetClient1.db.collection('users');
+    const carts = targetClient1.db.collection('carts');
+    const orders = targetClient1.db.collection('orders');
+    const insertedUser = await users.findOne(mockUser);
+    const insertedCart = await carts.findOne(mockCart);
+    const insertedOrder = await orders.findOne(mockOrder);
+
+    expect(insertedUser).toEqual(mockUser);
+    expect(insertedCart).toEqual(mockCart);
+    expect(insertedOrder).toEqual(mockOrder);
   });
 });

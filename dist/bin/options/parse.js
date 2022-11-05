@@ -1,0 +1,1 @@
+"use strict";const Debug=require("debug"),{absPathname}=require("./shared"),{showConfig,applyConfig}=require("./config"),logging=Debug("Weaver:bin:options:parse"),parseOptions=(a={})=>{const b=a.config;logging(a);a&&("string"!=typeof b||(!b.length&&showConfig(),b.length&&applyConfig(absPathname(b))))};module.exports={parseOptions};

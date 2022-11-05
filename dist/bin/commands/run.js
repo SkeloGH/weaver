@@ -1,0 +1,7 @@
+"use strict";const Debug=require("debug"),shell=require("shelljs"),mongo=require("mongodb"),ldLang=require("lodash"),ObjectId=mongo.ObjectID,{getConfig}=require("../lib/config"),Weaver=require("../../src"),WeaverMongoClient=require("../../src/clients/mongodb"),logging=Debug("Weaver:bin:commands:run"),clientsByFamily={mongodb:WeaverMongoClient};module.exports={name:"run",description:"Runs the app with the loaded configuration",setup:a=>a,parse:a=>{logging(`getting config from argv ${a}`);const b=getConfig(a),c=JSON.stringify(b,null,2);let d=`Running with the current configuration"\n ${c}`;const e=!ldLang.isEmpty(b.queries),f=!ldLang.isEmpty(b.dataClients);if(f||(d=`Error: dataClients not set, try:
+      weaver add [client|query|ignore]
+      `),e||(d=`Error: queries not set, try:
+      weaver run --queries <a document id>
+      `),shell.echo(d),!(f&&e))return a;// TODO: need to delegate this conversion to each client
+// once starting to add new client families
+b.dataClients=b.dataClients.map(a=>{const b=clientsByFamily[a.family];return b?new b(a):a}),b.queries=b.queries.map(a=>({_id:ObjectId(a)}));const g=new Weaver(b);return g.run(a=>{logging("Result",a),shell.echo("Done"),g.disconnect(process.exit)}),a}};
