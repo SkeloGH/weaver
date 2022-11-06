@@ -1,4 +1,4 @@
-"use strict";function _defineProperty(a,b,c){return b in a?Object.defineProperty(a,b,{value:c,enumerable:!0,configurable:!0,writable:!0}):a[b]=c,a}const mongo=require("mongodb"),ldLang=require("lodash/lang"),ld={lang:ldLang},{ObjectId}=mongo;/**
+"use strict";function _defineProperty(a,b,c){return b in a?Object.defineProperty(a,b,{value:c,enumerable:!0,configurable:!0,writable:!0}):a[b]=c,a}const ObjectId=require("bson-objectid"),ldLang=require("lodash/lang"),ld={lang:ldLang};/**
  * @class Util
  * @classdesc Utility class for MongoDB client only.
  * @todo reconsider inheritance
