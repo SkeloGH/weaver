@@ -1,8 +1,6 @@
-const mongo = require('mongodb');
+const ObjectId = require("bson-objectid");
 
 const dataClients = require('./clients');
-
-const ObjectId = mongo.ObjectID;
 
 /**
  * The main app configuration.

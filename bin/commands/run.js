@@ -1,9 +1,8 @@
 const Debug = require('debug');
 const shell = require('shelljs');
-const mongo = require('mongodb');
+const ObjectId = require("bson-objectid");
 const ldLang = require('lodash');
 
-const ObjectId = mongo.ObjectID;
 const {
   getConfig,
 } = require('../lib/config');

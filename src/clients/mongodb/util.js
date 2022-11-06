@@ -1,11 +1,10 @@
-const mongo = require('mongodb');
+const ObjectId = require("bson-objectid");
 const ldLang = require('lodash/lang');
 
 const ld = {
   lang: ldLang,
 };
 
-const { ObjectId } = mongo;
 
 /**
  * @class Util
