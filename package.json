@@ -1,6 +1,6 @@
 {
   "name": "@skelogh/weaver",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A mongoDB relational document importing tool",
   "main": "src/index.js",
   "scripts": {
