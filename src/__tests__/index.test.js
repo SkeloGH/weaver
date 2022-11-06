@@ -1,7 +1,8 @@
 const logging = require('debug');
-const { ObjectId } = require('mongodb');
+const ObjectId = require('bson-objectid');
 const CONFIG = require('./config');
 const Weaver = require('../');
+const ldObject = require('lodash/object');
 
 const log = logging('Weaver:__tests__:root');
 
@@ -41,9 +42,9 @@ describe('Weaver main test suite', () => {
     const insertedCart = await carts.findOne(mockCart);
     const insertedOrder = await orders.findOne(mockOrder);
 
-    expect(insertedUser).toEqual(mockUser);
-    expect(insertedCart).toEqual(mockCart);
-    expect(insertedOrder).toEqual(mockOrder);
+    expect(ldObject.omit('_id', insertedUser)).toEqual(ldObject.omit('_id', mockUser));
+    expect(ldObject.omit('_id', insertedCart)).toEqual(ldObject.omit('_id', mockCart));
+    expect(ldObject.omit('_id', insertedOrder)).toEqual(ldObject.omit('_id', mockOrder));
     await sourceClient1.database.close();
     await targetClient1.database.close();
   });
@@ -112,8 +113,8 @@ describe('Weaver main test suite', () => {
     const insertedCart = await carts.findOne(mockCart);
     const insertedOrder = await orders.findOne(mockOrder);
 
-    expect(insertedUser).toEqual(mockUser);
-    expect(insertedCart).toEqual(mockCart);
-    expect(insertedOrder).toEqual(mockOrder);
+    expect(ldObject.omit('_id', insertedUser)).toEqual(ldObject.omit('_id', mockUser));
+    expect(ldObject.omit('_id', insertedCart)).toEqual(ldObject.omit('_id', mockCart));
+    expect(ldObject.omit('_id', insertedOrder)).toEqual(ldObject.omit('_id', mockOrder));
   });
 });

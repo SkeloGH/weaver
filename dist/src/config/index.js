@@ -1,4 +1,4 @@
-"use strict";const mongo=require("mongodb"),dataClients=require("./clients"),ObjectId=mongo.ObjectID;/**
+"use strict";const ObjectId=require("bson-objectid"),dataClients=require("./clients");/**
  * The main app configuration.
  */module.exports={/**
    * Edit `queries` field to retrieve the base set of documents to pull related documents from.
