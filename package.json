@@ -46,6 +46,7 @@
   "homepage": "https://github.com/SkeloGH/weaver#readme",
   "dependencies": {
     "async": "^2.6.4",
+    "bson-objectid": "^2.0.3",
     "core-js": "^3.4.7",
     "debug": "^4.1.1",
     "dot-prop": ">=5.1.1",

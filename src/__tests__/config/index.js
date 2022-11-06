@@ -1,4 +1,4 @@
-const { ObjectId } = require('mongodb');
+const ObjectId = require('bson-objectid');
 const dataClients = require('./clients');
 
 module.exports = {
