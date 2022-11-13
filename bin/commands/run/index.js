@@ -14,8 +14,6 @@ const clientsByFamily = {
   mongodb: WeaverMongoClient,
 };
 
-
-
 const parse = (_argv) => {
   logging(`getting config from argv ${_argv}`);
   const config = getConfig(_argv);
@@ -24,7 +22,7 @@ const parse = (_argv) => {
   const hasQueries = !ldLang.isEmpty(config.queries);
   const hasDataClients = !ldLang.isEmpty(config.dataClients);
   const validConfig = hasDataClients && hasQueries;
-  
+
   if (!hasDataClients) {
     message = `Error: dataClients not set, try:
     weaver add [client|query|ignore]
@@ -37,7 +35,7 @@ const parse = (_argv) => {
   }
   shell.echo(message);
   if (!validConfig) return _argv;
-  
+
   // TODO: need to delegate this conversion to each client
   // once starting to add new client families
   config.dataClients = config.dataClients.map((c) => {
@@ -46,7 +44,7 @@ const parse = (_argv) => {
     return c;
   });
   config.queries = config.queries.map((q) => ({ _id: ObjectId(q) }));
-  
+
   const weaver = new Weaver(config);
   weaver.run((result) => {
     logging('Result', result);
@@ -54,8 +52,8 @@ const parse = (_argv) => {
     weaver.disconnect(process.exit);
   });
   return _argv;
-}
+};
 
 module.exports = {
-  parse
+  parse,
 };
