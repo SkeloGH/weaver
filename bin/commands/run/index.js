@@ -16,6 +16,8 @@ const clientsByFamily = {
   mongodb: WeaverMongoClient,
 };
 
+// TODO: once starting to add new client families,
+// add `family` as required second param, as it will be used to define clients and queries
 const _hasValidQueries = (queries) => {
   let validQueries = ldLang.isArray(queries);
   validQueries = validQueries && !ldLang.isEmpty(queries);
@@ -24,6 +26,8 @@ const _hasValidQueries = (queries) => {
   return validQueries;
 };
 
+// TODO: once starting to add new client families,
+// add `family` as required second param, as it will be used to define clients and queries
 const _hasValidDataClient = (dataClient) => {
   let validDataClient = ldLang.isObject(dataClient);
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'type');
@@ -31,14 +35,33 @@ const _hasValidDataClient = (dataClient) => {
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.url');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.name');
+  validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.options');
+  validDataClient = validDataClient && ldLang.isObject(dataClient.db.options);
   return validDataClient;
 };
 
+// TODO: once starting to add new client families,
+// add `family` as required second param, as it will be used to define clients and queries
 const _hasValidDataClientss = (dataClients) => {
   let validDataClients = ldLang.isArray(dataClients);
   validDataClients = validDataClients && !ldLang.isEmpty(dataClients);
   validDataClients = validDataClients && ldColl.every(dataClients, _hasValidDataClient);
   return validDataClients;
+};
+
+// TODO: once starting to add new client families,
+// add `family` as required second param, as it will be used to define clients and queries
+const _parseClients = (dataClients) => dataClients.map((c) => {
+  const ClientConstructor = clientsByFamily[c.family];
+  if (ClientConstructor) { return new ClientConstructor(c); }
+  return c;
+});
+
+// TODO: once starting to add new client families,
+// add `family` as required second param, as it will be used to define clients and queries
+const _parseQueries = (queries) => {
+  const parsedQueries = queries.map((q) => ({ _id: ObjectId(q) }));
+  return parsedQueries;
 };
 
 const _isValidConfig = (config) => {
@@ -68,14 +91,8 @@ const parse = (_argv) => {
   shell.echo(message);
   if (!validConfig) return _argv;
 
-  // TODO: need to delegate this conversion to each client
-  // once starting to add new client families
-  config.dataClients = config.dataClients.map((c) => {
-    const ClientConstructor = clientsByFamily[c.family];
-    if (ClientConstructor) { return new ClientConstructor(c); }
-    return c;
-  });
-  config.queries = config.queries.map((q) => ({ _id: ObjectId(q) }));
+  config.dataClients = _parseClients(config.dataClients);
+  config.queries = _parseQueries(config.queries);
 
   const weaver = new Weaver(config);
   weaver.run((result) => {
@@ -91,5 +108,7 @@ module.exports = {
   _hasValidDataClient,
   _hasValidDataClientss,
   _isValidConfig,
+  _parseClients,
+  _parseQueries,
   parse,
 };
