@@ -1,9 +1,10 @@
 const Debug = require('debug');
-const shell = require('shelljs');
-const ObjectId = require('bson-objectid');
 const ldLang = require('lodash/lang');
 const ldObject = require('lodash/object');
 const ldColl = require('lodash/collection');
+const ObjectId = require('bson-objectid');
+const uuid = require('uuid');
+const shell = require('shelljs');
 
 const {
   getConfig,
@@ -12,40 +13,43 @@ const Weaver = require('../../../src');
 const WeaverMongoClient = require('../../../src/clients/mongodb');
 
 const logging = Debug('Weaver:bin:commands:run');
+const clientTypes = ['target', 'source'];
+const clientFamilies = ['mongodb', 'postgres'];
 const clientsByFamily = {
   mongodb: WeaverMongoClient,
 };
 
-// TODO: once starting to add new client families,
-// add `family` as required second param, as it will be used to define clients and queries
 const _hasValidQueries = (queries) => {
   let validQueries = ldLang.isArray(queries);
   validQueries = validQueries && !ldLang.isEmpty(queries);
   validQueries = validQueries && !ldLang.isEmpty(queries[0]);
-  validQueries = validQueries && ldColl.every(queries, ObjectId.isValid);
+  validQueries = validQueries && (
+    ldColl.some(queries, ObjectId.isValid)
+    || ldColl.some(queries, uuid.validate)
+  );
   return validQueries;
 };
 
-// TODO: once starting to add new client families,
-// add `family` as required second param, as it will be used to define clients and queries
-const _hasValidDataClient = (dataClient) => {
+const _isValidDataClient = (dataClient) => {
   let validDataClient = ldLang.isObject(dataClient);
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'type');
-  validDataClient = validDataClient && (dataClient.type === 'target' || dataClient.type === 'source');
+  validDataClient = validDataClient && ldObject.hasIn(dataClient, 'family');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.url');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.name');
   validDataClient = validDataClient && ldObject.hasIn(dataClient, 'db.options');
+  validDataClient = validDataClient && clientTypes.indexOf(dataClient.type) > -1;
+  validDataClient = validDataClient && clientFamilies.indexOf(dataClient.family) > -1;
   validDataClient = validDataClient && ldLang.isObject(dataClient.db.options);
   return validDataClient;
 };
 
 // TODO: once starting to add new client families,
 // add `family` as required second param, as it will be used to define clients and queries
-const _hasValidDataClientss = (dataClients) => {
+const _hasValidDataClients = (dataClients) => {
   let validDataClients = ldLang.isArray(dataClients);
   validDataClients = validDataClients && !ldLang.isEmpty(dataClients);
-  validDataClients = validDataClients && ldColl.every(dataClients, _hasValidDataClient);
+  validDataClients = validDataClients && ldColl.every(dataClients, _isValidDataClient);
   return validDataClients;
 };
 
@@ -57,16 +61,14 @@ const _parseClients = (dataClients) => dataClients.map((c) => {
   return c;
 });
 
-// TODO: once starting to add new client families,
-// add `family` as required second param, as it will be used to define clients and queries
-const _parseQueries = (queries) => {
-  const parsedQueries = queries.map((q) => ({ _id: ObjectId(q) }));
-  return parsedQueries;
-};
+const _parseQueries = (queries) => queries.map((q) => ({
+  _id: ObjectId.isValid(q) ? ObjectId(q) : undefined,
+  _uuid: uuid.validate(q) ? uuid.parse(q) : undefined,
+}));
 
 const _isValidConfig = (config) => {
+  const hasDataClients = _hasValidDataClients(config.dataClients);
   const hasQueries = _hasValidQueries(config.queries);
-  const hasDataClients = _hasValidDataClientss(config.dataClients);
   const validConfig = hasDataClients && hasQueries;
   return { hasQueries, hasDataClients, validConfig };
 };
@@ -105,8 +107,8 @@ const parse = (_argv) => {
 
 module.exports = {
   _hasValidQueries,
-  _hasValidDataClient,
-  _hasValidDataClientss,
+  _isValidDataClient,
+  _hasValidDataClients,
   _isValidConfig,
   _parseClients,
   _parseQueries,
