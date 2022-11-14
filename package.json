@@ -55,6 +55,7 @@
     "mongodb": "~4.9.0",
     "rimraf": "^3.0.0",
     "shelljs": "^0.8.5",
+    "uuid": "^9.0.0",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
