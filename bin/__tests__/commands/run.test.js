@@ -1,6 +1,8 @@
 const ObjectId = require('bson-objectid');
+const uuid = require('uuid');
 
 const WeaverMongoClient = require('../../../src/clients/mongodb');
+// const WeaverPostgresClient = require('../../../src/clients/postgres');
 const run = require('../../commands/run');
 const {
   _isValidConfig,
@@ -25,11 +27,12 @@ describe('weaver-cli run command integrity', () => {
 });
 
 describe('weaver-cli MongoDB options and client parsing', () => {
+  const family = 'mongodb';
   const validType = 'source';
   const validDbURL = 'test://';
   const validDbName = 'test';
   const validDataClient = {
-    family: 'mongodb',
+    family,
     type: validType,
     db: {
       url: validDbURL,
@@ -67,6 +70,66 @@ describe('weaver-cli MongoDB options and client parsing', () => {
   });
 
   test('weaver-cli MongoDB options validation', () => {
+    const invalidConfig1 = { queries: [], dataClients: [] };
+    const invalidConfig2 = { queries: {}, dataClients: {} };
+    const invalidConfig3 = { queries: 'any', dataClients: 'any' };
+    const invalidConfig4 = { other: 'value' };
+    const expectedWhenValid = { validConfig: true, hasQueries: true, hasDataClients: true };
+    const expectedWhenInvalid = { validConfig: false, hasQueries: false, hasDataClients: false };
+
+    expect(_isValidConfig).toBeInstanceOf(Function);
+    expect(_isValidConfig(invalidConfig1)).toMatchObject(expectedWhenInvalid);
+    expect(_isValidConfig(invalidConfig2)).toMatchObject(expectedWhenInvalid);
+    expect(_isValidConfig(invalidConfig3)).toMatchObject(expectedWhenInvalid);
+    expect(_isValidConfig(invalidConfig4)).toMatchObject(expectedWhenInvalid);
+    expect(_isValidConfig(validConfig)).toMatchObject(expectedWhenValid);
+  });
+});
+
+describe('weaver-cli Postgres options and client parsing', () => {
+  const family = 'postgres';
+  const validType = 'target';
+  const validDbURL = 'postgres://username:password@host:port/database';
+  const validDbName = 'test';
+  const validDataClient = {
+    family,
+    type: validType,
+    db: {
+      url: validDbURL,
+      name: validDbName,
+      options: {},
+    },
+  };
+  const validDataClients = [validDataClient];
+  const validQuery = 'f343667d-f04f-418e-a12e-9ddc87a31e75';
+  const validQueries = [validQuery];
+  const validConfig = {
+    queries: validQueries,
+    dataClients: validDataClients,
+  };
+
+  test('weaver-cli Postgres query parsing', () => {
+    const parsedQueries = _parseQueries(validQueries);
+
+    expect(_parseQueries).toBeInstanceOf(Function);
+    expect(parsedQueries).toBeInstanceOf(Array);
+    parsedQueries.forEach((query) => {
+      expect(uuid.validate(uuid.stringify(query._uuid))).toBe(true);
+    });
+  });
+
+  test('weaver-cli Postgres client parsing', () => {
+    const parsedClients = _parseClients(validDataClients);
+
+    expect(_parseClients).toBeInstanceOf(Function);
+    expect(parsedClients).toBeInstanceOf(Array);
+
+    // parsedClients.forEach((client) => {
+    //   expect(client).toBeInstanceOf(WeaverPostgresClient);
+    // });
+  });
+
+  test('weaver-cli Postgres options validation', () => {
     const invalidConfig1 = { queries: [], dataClients: [] };
     const invalidConfig2 = { queries: {}, dataClients: {} };
     const invalidConfig3 = { queries: 'any', dataClients: 'any' };
