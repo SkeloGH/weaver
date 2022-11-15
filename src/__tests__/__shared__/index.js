@@ -1,6 +1,5 @@
 const logging = require('debug');
 const ObjectId = require('bson-objectid');
-const ldObject = require('lodash/object');
 
 const CONFIG = require('../config');
 
