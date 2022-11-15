@@ -11,6 +11,7 @@ const {
 } = require('../../lib/config');
 const Weaver = require('../../../src');
 const WeaverMongoClient = require('../../../src/clients/mongodb');
+// const WeaverPostgresClient = require('../../../src/clients/postgres');
 
 const logging = Debug('Weaver:bin:commands:run');
 const clientTypes = ['target', 'source'];
@@ -44,8 +45,6 @@ const _isValidDataClient = (dataClient) => {
   return validDataClient;
 };
 
-// TODO: once starting to add new client families,
-// add `family` as required second param, as it will be used to define clients and queries
 const _hasValidDataClients = (dataClients) => {
   let validDataClients = ldLang.isArray(dataClients);
   validDataClients = validDataClients && !ldLang.isEmpty(dataClients);
@@ -73,7 +72,19 @@ const _isValidConfig = (config) => {
   return { hasQueries, hasDataClients, validConfig };
 };
 
-const parse = (_argv) => {
+const _run = async (config) => {
+  const weaver = new Weaver(config);
+  let result;
+  await weaver.run(async (r) => {
+    result = r;
+    logging('Result', result);
+    await weaver.disconnect(/* cb */);
+  });
+
+  return Promise.resolve(result);
+};
+
+const parse = async (_argv) => {
   logging(`getting config from argv ${_argv}`);
   const config = getConfig(_argv);
   const configStr = JSON.stringify(config, null, 2);
@@ -96,21 +107,18 @@ const parse = (_argv) => {
   config.dataClients = _parseClients(config.dataClients);
   config.queries = _parseQueries(config.queries);
 
-  const weaver = new Weaver(config);
-  weaver.run((result) => {
-    logging('Result', result);
-    shell.echo('Done');
-    weaver.disconnect(process.exit);
-  });
+  await _run(config);
+  shell.echo('Done');
   return _argv;
 };
 
 module.exports = {
-  _hasValidQueries,
-  _isValidDataClient,
   _hasValidDataClients,
+  _hasValidQueries,
   _isValidConfig,
+  _isValidDataClient,
   _parseClients,
   _parseQueries,
+  _run,
   parse,
 };
