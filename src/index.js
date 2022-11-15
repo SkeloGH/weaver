@@ -83,7 +83,7 @@ class Weaver {
       const numClients = this.dataClients.length;
       return (err) => {
         count += 1;
-        if (count === numClients) { onCloseCb(err); }
+        if (count === numClients && typeof onCloseCb === 'function') { onCloseCb(err); }
       };
     };
     const closeCb = onClose(cb);
