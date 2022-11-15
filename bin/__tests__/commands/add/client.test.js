@@ -2,6 +2,7 @@ const importedModule = require('../../../commands/add/client');
 const { getConfig, setConfig } = require('../../../lib/config');
 
 const { addClient, clientExists } = importedModule;
+const { removeClients } = require('../../../commands/remove/client');
 const {
   validFamily,
   validTypeSource,
@@ -39,131 +40,162 @@ describe('weaver add client command tests', () => {
   });
 });
 
-describe('addClient', () => {
-  describe('returns false if config is invalid', () => {
-    test('returns false if config is undefined', () => {
-      const arg1 = undefined;
-      const expected = false;
-      const result = importedModule.addClient(arg1);
-      expect(result).toBe(expected);
-    });
-    test('returns false if config is empty obj', () => {
-      const arg1 = {};
-      const expected = false;
-      const result = importedModule.addClient(arg1);
-      expect(result).toBe(expected);
-    });
-    test('returns false if config is invalid, mix', () => {
-      const case1 = {
-        family: '', origin: '', type: '', name: '', url: '',
-      };
-      const case2 = {
-        family: 0, origin: null, type: false, name: null, url: undefined,
-      };
-      const case3 = {
-        family: validFamily,
-        origin: null,
-        type: validTypeTarget,
-        name: validSourceName,
-        url: validUrl,
-      };
-      const expected = false;
-
-      const result1 = importedModule.addClient(case1);
-      const result2 = importedModule.addClient(case2);
-      const result3 = importedModule.addClient(case3);
-
-      expect(result1).toBe(expected);
-      expect(result2).toBe(expected);
-      expect(result3).toBe(expected);
-    });
+describe('weaver add client returns false if config is invalid', () => {
+  test('returns false if config is undefined', () => {
+    const arg1 = undefined;
+    const expected = false;
+    const result = importedModule.addClient(arg1);
+    expect(result).toBe(expected);
   });
+  test('returns false if config is empty obj', () => {
+    const arg1 = {};
+    const expected = false;
+    const result = importedModule.addClient(arg1);
+    expect(result).toBe(expected);
+  });
+  test('returns false if config is invalid, mix', () => {
+    const case1 = {
+      family: '', origin: '', type: '', name: '', url: '',
+    };
+    const case2 = {
+      family: 0, origin: null, type: false, name: null, url: undefined,
+    };
+    const case3 = {
+      family: validFamily,
+      origin: null,
+      type: validTypeTarget,
+      name: validSourceName,
+      url: validUrl,
+    };
+    const expected = false;
 
-  describe('returns the new config object if clients are valid', () => {
-    let initialConfig = {};
-    const _validSourceClient = { ...validSourceClient };
-    const _validTargetClient = { ...validTargetClient };
-    _validSourceClient.options = { test: true };
-    _validTargetClient.options = { test: true };
+    const result1 = importedModule.addClient(case1);
+    const result2 = importedModule.addClient(case2);
+    const result3 = importedModule.addClient(case3);
 
-    beforeAll(() => {
-      initialConfig = { ...getConfig() };
-    });
-    afterAll(() => { setConfig(initialConfig); });
-
-    test('returns the new config object if source is valid', () => {
-      const result = addClient(_validSourceClient);
-      expect(result.config).not.toBe(undefined);
-      expect(result.dataClients).not.toBe(undefined);
-      expect(result.dataClients[0].db.name).toBe(validSourceName);
-      expect(result.dataClients[0].db.options).not.toBe(undefined);
-      expect(result.dataClients[0].db.options.test).toBe(true);
-      expect(result.dataClients[0].db.url).toBe(validUrl);
-      expect(result.dataClients[0].family).toBe(validFamily);
-      expect(result.dataClients[0].origin).toBe(undefined);
-      expect(result.dataClients[0].type).toBe(validTypeSource);
-      expect(result.jsonConfig).not.toBe(undefined);
-      expect(result.queries).not.toBe(undefined);
-    });
-    test('returns the new config object if target is valid', () => {
-      const result = addClient(_validTargetClient);
-      expect(result.config).not.toBe(undefined);
-      expect(result.dataClients).not.toBe(undefined);
-      expect(result.dataClients[0].db.name).toBe(validTargetName);
-      expect(result.dataClients[0].db.options).not.toBe(undefined);
-      expect(result.dataClients[0].db.options.test).toBe(true);
-      expect(result.dataClients[0].db.url).toBe(validUrl);
-      expect(result.dataClients[0].family).toBe(validFamily);
-      expect(result.dataClients[0].origin).toBe(validOrigin);
-      expect(result.dataClients[0].type).toBe(validTypeTarget);
-      expect(result.jsonConfig).not.toBe(undefined);
-      expect(result.queries).not.toBe(undefined);
-    });
+    expect(result1).toBe(expected);
+    expect(result2).toBe(expected);
+    expect(result3).toBe(expected);
   });
 });
 
-describe('clientExists', () => {
-  describe('returns false if not already saved', () => {
-    test('returns false if not already saved', () => {
-      const expected = false;
-      const result1 = clientExists(validSourceClient);
-      const result2 = clientExists(validTargetClient);
-
-      expect(result1.exists).toBe(expected);
-      expect(result2.exists).toBe(expected);
-    });
+describe('weaver add client returns false if config is invalid', () => {
+  test('returns false if config is undefined', () => {
+    const arg1 = undefined;
+    const expected = false;
+    const result = importedModule.addClient(arg1);
+    expect(result).toBe(expected);
   });
-  describe('returns true if already saved', () => {
-    let initialConfig = {};
-    beforeAll(() => {
-      initialConfig = { ...getConfig() };
-      const sourceClient = addClient(validSourceClient);
-      setConfig(sourceClient);
+  test('returns false if config is empty obj', () => {
+    const arg1 = {};
+    const expected = false;
+    const result = importedModule.addClient(arg1);
+    expect(result).toBe(expected);
+  });
+  test('returns false if config is invalid, mix', () => {
+    const case1 = {
+      family: '', origin: '', type: '', name: '', url: '',
+    };
+    const case2 = {
+      family: 0, origin: null, type: false, name: null, url: undefined,
+    };
+    const case3 = {
+      family: validFamily,
+      origin: null,
+      type: validTypeTarget,
+      name: validSourceName,
+      url: validUrl,
+    };
+    const expected = false;
 
-      const targetClient = addClient(validTargetClient);
-      setConfig(targetClient);
-    });
-    afterAll(() => { setConfig(initialConfig); });
+    const result1 = importedModule.addClient(case1);
+    const result2 = importedModule.addClient(case2);
+    const result3 = importedModule.addClient(case3);
 
-    test('returns true if already saved', () => {
-      const expected = true;
-      const result1 = importedModule.clientExists(validSourceClient);
-      const result2 = importedModule.clientExists(validTargetClient);
-
-      expect(result1.exists).toBe(expected);
-      expect(result2.exists).toBe(expected);
-    });
+    expect(result1).toBe(expected);
+    expect(result2).toBe(expected);
+    expect(result3).toBe(expected);
   });
 });
 
-// describe('commandHandler', () => {
-//   test('commandHandler', () => {
-//     const case1 = null;
-//     const expected = null;
-//     const result1 = importedModule.commandHandler(case1);
-//     expect(result1).toBe(expected);
-//   });
-// });
+describe('weaver add client returns the new config object if clients are valid', () => {
+  let initialConfig = {};
+  const _validSourceClient = { ...validSourceClient };
+  const _validTargetClient = { ...validTargetClient };
+  _validSourceClient.options = { test: true };
+  _validTargetClient.options = { test: true };
+
+  beforeAll(() => {
+    initialConfig = { ...getConfig() };
+  });
+  afterAll(() => { setConfig(initialConfig); });
+
+  test('returns the new config object if source is valid', () => {
+    const result = addClient(_validSourceClient);
+    expect(result.config).not.toBe(undefined);
+    expect(result.dataClients).not.toBe(undefined);
+    expect(result.dataClients[0].db.name).toBe(validSourceName);
+    expect(result.dataClients[0].db.options).not.toBe(undefined);
+    expect(result.dataClients[0].db.options.test).toBe(true);
+    expect(result.dataClients[0].db.url).toBe(validUrl);
+    expect(result.dataClients[0].family).toBe(validFamily);
+    expect(result.dataClients[0].origin).toBe(undefined);
+    expect(result.dataClients[0].type).toBe(validTypeSource);
+    expect(result.dataClients[0].clientId).not.toBe(validSourceName);
+    expect(result.jsonConfig).not.toBe(undefined);
+    expect(result.queries).not.toBe(undefined);
+    removeClients(result.dataClients.map((c) => c.clientId));
+  });
+  test('returns the new config object if target is valid', () => {
+    const result = addClient(_validTargetClient);
+    expect(result.config).not.toBe(undefined);
+    expect(result.dataClients).not.toBe(undefined);
+    expect(result.dataClients[0].db.name).toBe(validTargetName);
+    expect(result.dataClients[0].db.options).not.toBe(undefined);
+    expect(result.dataClients[0].db.options.test).toBe(true);
+    expect(result.dataClients[0].db.url).toBe(validUrl);
+    expect(result.dataClients[0].family).toBe(validFamily);
+    expect(result.dataClients[0].origin).toBe(validOrigin);
+    expect(result.dataClients[0].type).toBe(validTypeTarget);
+    expect(result.dataClients[0].clientId).not.toBe(validSourceName);
+    expect(result.jsonConfig).not.toBe(undefined);
+    expect(result.queries).not.toBe(undefined);
+    removeClients(result.dataClients.map((c) => c.clientId));
+  });
+});
+
+describe('returns false if client not already saved', () => {
+  test('returns false if not already saved', () => {
+    const expected = false;
+    const result1 = clientExists(validSourceClient);
+    const result2 = clientExists(validTargetClient);
+    expect(result1.exists).toBe(expected);
+    expect(result2.exists).toBe(expected);
+  });
+});
+
+describe('returns true if already saved', () => {
+
+  test('returns true if already saved', () => {
+    const initialConfig = { ...getConfig() };
+    const sourceClient = addClient(validSourceClient);
+    setConfig(sourceClient);
+
+    const targetClient = addClient(validTargetClient);
+    setConfig(targetClient);
+
+    const expected = true;
+    const result1 = importedModule.clientExists(validSourceClient);
+    const result2 = importedModule.clientExists(validTargetClient);
+
+    expect(result1.exists).toBe(expected);
+    expect(result2.exists).toBe(expected);
+
+    removeClients(sourceClient.clientId);
+    removeClients(targetClient.clientId);
+    setConfig(initialConfig);
+  });
+});
 
 describe('isSameFamily', () => {
   test('false if different', () => {
