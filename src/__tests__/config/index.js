@@ -1,5 +1,5 @@
 const ObjectId = require('bson-objectid');
-const dataClients = require('./clients');
+const { dataClients } = require('./clients/mongodb');
 
 module.exports = {
   queries: [

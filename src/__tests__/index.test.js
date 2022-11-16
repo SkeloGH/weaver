@@ -2,12 +2,12 @@ const logging = require('debug');
 const ldObject = require('lodash/object');
 
 const {
-  disconnectMongoDB,
-  initializeAndSeedMongoDB,
+  disconnect,
+  initializeAndSeed,
   mockCart,
   mockOrder,
   mockUser,
-} = require('./__shared__');
+} = require('./__setup__/mongodb');
 const CONFIG = require('./config');
 const Weaver = require('..');
 
@@ -17,11 +17,11 @@ let targetClient1;
 beforeAll(async () => {
   log('Initializing dataClients');
   [targetClient1] = CONFIG.dataClients;
-  await initializeAndSeedMongoDB();
+  await initializeAndSeed();
 });
 
 afterAll(async () => {
-  await disconnectMongoDB();
+  await disconnect();
 });
 
 describe('Weaver main test suite', () => {

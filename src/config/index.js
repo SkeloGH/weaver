@@ -1,6 +1,6 @@
 const ObjectId = require('bson-objectid');
 
-const dataClients = require('./clients');
+const { dataClients } = require('./clients');
 
 /**
  * The main app configuration.
