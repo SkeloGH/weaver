@@ -1,4 +1,5 @@
 const logging = require('debug');
+const { Client } = require('pg');
 
 /**
  * @class WeaverPostgresClient A Postgres client interface for Weaver
@@ -31,30 +32,86 @@ class WeaverPostgresClient {
 
     this._configure(config);
   }
+
+  /**
+   *
+   * Splits `config` into `this` class properties.
+   * @param {Object} config - The cass configuration object
+   * @param {Array.<WeaverPostgresClient>} config.dataClients - Instances of the clients to run
+   * the queries on.
+   * @returns {this} - instance of WeaverPostgresClient
+   */
+  _configure = (config) => {
+    this.logging = logging(`WeaverPostgresClient:${config.db.name}`);
+    this.type = config.type;
+    this.config = config;
+    this.ignoreFields = (config.client && config.client.ignoreFields) || [];
+    return this;
+  }
+
+  /**
+   *
+   * Initializes the `client` connection
+   * @returns {Promise.<Array>} The client DB collection names.
+   */
+  connect = async () => {
+    const {
+      url: host,
+      name: database,
+      options,
+    } = this.config.db;
+    this.client = new Client({
+      user: options.user,
+      host,
+      database,
+      password: options.password,
+      port: options.port,
+    });
+
+    this.logging('Connecting Postgres client');
+    await this.client.connect();
+    this._onClientConnect(this.client);
+    return this.client;
+  }
+
+  /**
+   * Postgres client connection success handler.
+   * Saves local a reference to the Postgres DB client and retrieves the collection names.
+   * @param {MongoClient.<DBConstructor>} database - The DB client API.
+   * @returns {Promise.<Array>} The client DB collection names.
+   */
+  _onClientConnect = (database) => {
+    this.database = database;
+    this.db = database;
+    this.logging('Connection success');
+    // return this._fetchCollections();
+  }
+
+  /**
+   * Retrieves the collection names from Postgres DB.
+   * @todo - Rename _fetchCollections to _fetchCollectionNames
+   * @returns {Promise.<Array>} The client DB collection names.
+  */
+  //  _fetchCollections = () => {
+  //    this.logging('Listing collections');
+  //    return this.db.listCollections({}, { nameOnly: true })
+  //      .toArray()
+  //      .then(this._saveCollections);
+  //  }
+
+  /**
+   * Saves a local reference to the `Array` of `collection` `Objects`.
+   * Saves and returns a local reference to the  `Array` of `collection.name` `Strings`.
+   * @param {Array.<String>} collections - The list of collection names.
+   * @returns {Promise.<Array>} The client DB collection names.
+   */
+  // _saveCollections = (collections) => {
+  //   this.collections = collections;
+  //   this.collNames = collections.map((result) => result.name);
+  //   return Promise.resolve(this.collNames);
+  // }
 }
-
-/**
- *
- * Splits `config` into `this` class properties.
- * @param {Object} config - The cass configuration object
- * @param {Array.<WeaverPostgresClient>} config.dataClients - Instances of the clients to run
- * the queries on.
- * @returns {this} - instance of WeaverPostgresClient
- */
-const _configure = (config) => {
-  this.logging = logging(`WeaverPostgresClient:${config.db.name}`);
-  this.type = config.type;
-  this.config = config;
-  this.ignoreFields = (config.client && config.client.ignoreFields) || [];
-
-  // Hide mongo deprecation notice by using the new url parser
-  this.config.db.options.useNewUrlParser = true;
-  return this;
-};
-
-WeaverPostgresClient.prototype._configure = _configure;
 
 module.exports = {
   WeaverPostgresClient,
-  _configure,
 };

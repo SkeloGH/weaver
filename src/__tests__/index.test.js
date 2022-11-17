@@ -8,6 +8,7 @@ const {
   mockOrder,
   mockUser,
 } = require('./__setup__/mongodb');
+// TODO: initialize and seed pg
 const CONFIG = require('./config');
 const Weaver = require('..');
 

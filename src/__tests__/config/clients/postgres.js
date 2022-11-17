@@ -2,16 +2,13 @@ const logging = require('debug');
 const { WeaverPostgresClient } = require('../../../clients/postgres');
 
 const log = logging('Weaver:__tests__:config:clients:postgres');
-// let PGHOST = process.env || '';
-let PGHOST = '';
-PGHOST = PGHOST.replace('?', '');
+const PGHOST = 'localhost';
 
 const source1 = {
   name: 'weaver--pg-test-source-1',
-  url: `${PGHOST}weaver--pg-test-target-1`,
+  url: PGHOST,
 };
 
-log('process.env.MONGO_URL', PGHOST);
 log('source1.url', source1.url);
 
 const mockSourceClientConfig = {
@@ -19,7 +16,11 @@ const mockSourceClientConfig = {
   db: {
     url: source1.url,
     name: source1.name,
-    options: {},
+    options: {
+      user: '',
+      password: null,
+      port: 5432,
+    },
   },
   client: {
     ignoreFields: [],
@@ -30,7 +31,8 @@ const mockTargetClientConfig = {
   type: 'target',
   origin: source1.name, // << note how is using source 1 as ref
   db: {
-    url: `${PGHOST}weaver--pg-test-target-1`,
+    user: 'postgres',
+    url: PGHOST,
     name: 'weaver--pg-test-target-1',
     options: {},
   },
