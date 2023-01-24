@@ -1,5 +1,5 @@
 const ObjectId = require('bson-objectid');
-const uuid = require('uuid');
+const uuid = require('uuid3');
 const WeaverMongoClient = require('../../../src/clients/mongodb');
 // const WeaverPostgresClient = require('../../../src/clients/postgres');
 const run = require('../../commands/run');
