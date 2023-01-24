@@ -67,7 +67,7 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   // moduleDirectories: [
-  //   "node_modules"
+  //   "node_modules/"
   // ],
 
   // An array of file extensions your modules use
@@ -82,11 +82,11 @@ module.exports = {
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "uuid": require.resolve('uuid'),
+    uuid3: require.resolve('uuid3'),
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
-  // modulePathIgnorePatterns: [],
+  // modulePathIgnorePatterns: ['uuid'],
 
   // Activates notifications for test results
   // notify: false,
@@ -125,7 +125,6 @@ module.exports = {
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
-  runner: "jest-light-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
   // setupFiles: [],
