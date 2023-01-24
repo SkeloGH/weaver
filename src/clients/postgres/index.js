@@ -1,5 +1,5 @@
 const logging = require('debug');
-const { Client } = require('pg');
+const { Client } = require('./pgclient');
 
 /**
  * @class WeaverPostgresClient A Postgres client interface for Weaver
@@ -60,6 +60,7 @@ class WeaverPostgresClient {
       name: database,
       options,
     } = this.config.db;
+
     this.client = new Client({
       user: options.user,
       host,

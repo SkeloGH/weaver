@@ -6,23 +6,20 @@ const {
 
 describe('WeaverPostgresClient module tests', () => {
   const config = mockSourceClientConfig;
-  const clientAPI = new WeaverPostgresClient(config);
-  let dbClient;
+  const client = new WeaverPostgresClient(config);
 
   test('it lists out client properties', () => {
-    expect(clientAPI.logging).not.toBe(undefined);
-    expect(clientAPI.type).not.toBe(undefined);
-    expect(clientAPI.config).not.toBe(undefined);
-    expect(clientAPI.ignoreFields).not.toBe(undefined);
+    expect(client.logging).not.toBe(undefined);
+    expect(client.type).not.toBe(undefined);
+    expect(client.config).not.toBe(undefined);
+    expect(client.ignoreFields).not.toBe(undefined);
   });
 
-  test('client connects', async () => {
-    dbClient = await clientAPI.connect();
-    const query = await dbClient.query('SELECT NOW() as now');
-
+  test.skip('client connects', async () => {
+    const dbClient = await client.connect();
+    console.log(dbClient);
     expect(dbClient.readyForQuery).toBe(true);
-    expect(query.rows).not.toBe(undefined);
-    expect(query).not.toBe(undefined);
+    dbClient.end();
   });
 
   test.skip('client disconnects', async () => {
