@@ -3,7 +3,7 @@ const ldLang = require('lodash/lang');
 const ldObject = require('lodash/object');
 const ldColl = require('lodash/collection');
 const ObjectId = require('bson-objectid');
-const uuid = require('uuid');
+const uuid = require('uuid3');
 const shell = require('shelljs');
 
 const {
