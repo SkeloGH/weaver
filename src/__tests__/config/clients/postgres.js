@@ -24,6 +24,7 @@ const mockSourceClientConfig = {
   },
   client: {
     ignoreFields: [],
+    useMock: true,
   },
 };
 

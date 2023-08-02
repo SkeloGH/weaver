@@ -1,5 +1,5 @@
 const logging = require('debug');
-const { Client } = require('./pgclient');
+const { getPGClient } = require('./pgclient');
 
 /**
  * @class WeaverPostgresClient A Postgres client interface for Weaver
@@ -55,6 +55,7 @@ class WeaverPostgresClient {
    * @returns {Promise.<Array>} The client DB collection names.
    */
   connect = async () => {
+    const Client = getPGClient(this.config.client);
     const {
       url: host,
       name: database,
@@ -71,7 +72,7 @@ class WeaverPostgresClient {
 
     this.logging('Connecting Postgres client');
     await this.client.connect();
-    this._onClientConnect(this.client);
+    // this._onClientConnect(this.client);
     return this.client;
   }
 

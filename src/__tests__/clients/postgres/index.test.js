@@ -5,21 +5,23 @@ const {
 } = require('../../config/clients/postgres');
 
 describe('WeaverPostgresClient module tests', () => {
-  const config = mockSourceClientConfig;
-  const client = new WeaverPostgresClient(config);
-
   test('it lists out client properties', () => {
+    const config = mockSourceClientConfig;
+    const client = new WeaverPostgresClient(config);
     expect(client.logging).not.toBe(undefined);
     expect(client.type).not.toBe(undefined);
     expect(client.config).not.toBe(undefined);
     expect(client.ignoreFields).not.toBe(undefined);
   });
 
-  test.skip('client connects', async () => {
+  test('client connects', async () => {
+    const config = mockSourceClientConfig;
+    config.useMock = false; // pg-mem doesn't support connect method, using pg instead
+    const client = new WeaverPostgresClient(config);
     const dbClient = await client.connect();
     console.log(dbClient);
     expect(dbClient.readyForQuery).toBe(true);
-    dbClient.end();
+    // dbClient.end();
   });
 
   test.skip('client disconnects', async () => {
