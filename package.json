@@ -14,9 +14,9 @@
     "dev": "DEBUG=* nodemon --config ./nodemon.json ./src/index.js",
     "debug-install": "MONGOMS_DEBUG=1 npm install --foreground-scripts",
     "test": "jest --runInBand",
-    "test-debug": "jest --clearCache && MONGOMS_DEBUG=1 DEBUG=Weaver* jest --runInBand --detectOpenHandles --debug",
-    "test-dev": "MONGOMS_DEBUG=1 jest --runInBand --detectOpenHandles --onlyChanged",
-    "test-coverage": "jest  --runInBand --detectOpenHandles --coverage --coverageReporters=text-lcov | coveralls"
+    "test-debug": "jest --clearCache && MONGOMS_DEBUG=1 DEBUG=Weaver*,babel:* jest --runInBand --detectOpenHandles --silent=false --debug",
+    "test-dev": "jest --runInBand --detectOpenHandles --onlyChanged --silent=false",
+    "test-coverage": "jest --runInBand --detectOpenHandles --coverage --coverageReporters=text-lcov | coveralls"
   },
   "bin": {
     "weaver": "dist/bin/cli.js"
@@ -53,8 +53,11 @@
     "lodash": "^4.17.21",
     "md5": "^2.2.1",
     "mongodb": "~4.9.0",
+    "pg": "^8.8.0",
+    "pg-mem": "^2.6.4",
     "rimraf": "^3.0.0",
     "shelljs": "^0.8.5",
+    "uuid3": "npm:uuid@^8.3.1",
     "yargs": "^15.4.1"
   },
   "devDependencies": {

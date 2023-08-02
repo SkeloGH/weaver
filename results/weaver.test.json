@@ -1,6 +1,6 @@
 {
   "abcdef78901234abcdef1234": {
-    "database": "weaver--test-source-1",
+    "database": "weaver--mongodb-test-source-1",
     "dataSet": "users",
     "data": {
       "_id": "abcdef78901234abcdef1234",
@@ -13,7 +13,7 @@
     }
   },
   "4321fedcbafedcba67890123": {
-    "database": "weaver--test-source-1",
+    "database": "weaver--mongodb-test-source-1",
     "dataSet": "orders",
     "data": {
       "_id": "4321fedcbafedcba67890123",
@@ -21,7 +21,7 @@
     }
   },
   "fedcba67890123fedcba4321": {
-    "database": "weaver--test-source-1",
+    "database": "weaver--mongodb-test-source-1",
     "dataSet": "carts",
     "data": {
       "_id": "fedcba67890123fedcba4321",
