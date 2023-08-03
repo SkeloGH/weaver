@@ -34,11 +34,7 @@ To use Weaver:
 
 Output will be saved to the configured JSON file.
 
-See [Examples](./EXAMPLES) for more usage details.
-
-- [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
-- [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
-
+See [Examples](./EXAMPLES.md) and [CLI README](./bin/README.md) for more usage details.
 
 
 # Requirements
@@ -54,6 +50,11 @@ See [Examples](./EXAMPLES) for more usage details.
 [See what's been worked on](https://github.com/SkeloGH/weaver/projects).
 
 Questions? [create an issue!](https://github.com/SkeloGH/weaver/issues).
+
+# Related links
+
+- [Entity-relationship model](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model)
+- [Extended reference pattern](https://www.mongodb.com/blog/post/building-with-patterns-the-extended-reference-pattern)
 
 ## License
 
